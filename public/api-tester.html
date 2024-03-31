@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  <script type="text/javascript">
+
+    function callApi() {
+      var path = document.getElementById("path").value;
+      var e = document.getElementById("httpMethod");
+      var httpMethodValue = e.value;
+      var httpMethodText = e.options[e.selectedIndex].text;
+      console.log("callApi: " + httpMethodValue + " " + path);      
+      var inputTextData = document.getElementById("data").value;
+      if (inputTextData.length > 0) {
+        console.log(JSON.parse(inputTextData));
+      }
+
+      axios({
+        method: httpMethodValue,
+        //url: "http://localhost:3000" + path,
+        url: path,
+        headers: {'Content-Type': 'application/json'},
+        data: inputTextData.length > 0 ? JSON.parse(inputTextData) : {}
+      })
+      .then(function(response) { 
+        console.log(response.data)
+        console.log(response.status)
+      })
+      .then(function(error) { 
+        if (error != undefined) {
+          console.log(error)
+        }
+      });
+    }
+  </script>
+
+  <title>API Tester</title>
+</head>
+<body>
+  <!--https://github.com/WebDevSimplified/postman-clone/tree/main-->
+  <div>
+    <form>
+      <div>
+        <select id="httpMethod">
+          <option value="get" selected>GET</option>
+          <option value="post">POST</option>
+          <option value="put">PUT</option>
+          <option value="patch">PATCH</option>
+          <option value="delete">DELETE</option>
+        </select>
+        <input id="path" type="text" placeholder="/game" /><br/>
+        <textarea id="data" rows="10" cols="80"></textarea><br/>        
+        <input type="button" value="Send" onclick="javascript:callApi();"/>
+
+      </div>
+
+    </form>
+  </div>
+</body>
+</html>
