@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  <script src="./rurik-client.js"></script>
+  <script type="text/javascript">
+  </script>
+  <link rel="stylesheet" type="text/css" href="./rurik-styles.css"  />
+  <style>
+  </style>
+
+  <title>Rurik: Dawn of Kiev</title>
+</head>
+<body onload="onLoad()">
+  <div>
+    <div id="map-overlay" style="float:left; width: 50%; position:relative; top: 0; left: 0; z-index: 1 ">
+      <div id="map">
+        <img height="650px" src="/rurik_map.jpg" alt="Rurik map" />
+      </div>
+      <div id="Pskov" style="position:absolute; top: 100px; left: 55px; z-index: 1 "> 
+        <span id="Pskov_red_troops" class="red numberBox" style="display: none">0</span><span id="Pskov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Pskov_white_troops" class="white numberBox" style="display: none">0</span><span id="Pskov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Pskov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Pskov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Pskov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Pskov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Pskov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Novgorod" style="position:absolute; top: 100px; left: 150px; z-index: 1 "> 
+        <span id="Novgorod_red_troops" class="red numberBox" style="display: none">0</span><span id="Novgorod_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Novgorod_white_troops" class="white numberBox" style="display: none">0</span><span id="Novgorod_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Novgorod_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Novgorod_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Novgorod_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Novgorod_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Novgorod_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Rostov" style="position:absolute; top: 50px; left: 305px; z-index: 1 "> 
+        <span id="Rostov_red_troops" class="red numberBox" style="display: none">0</span><span id="Rostov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Rostov_white_troops" class="white numberBox" style="display: none">0</span><span id="Rostov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Rostov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Rostov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Rostov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Rostov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Rostov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Suzdal" style="position:absolute; top: 50px; left: 420px; z-index: 1 "> 
+        <span id="Suzdal_red_troops" class="red numberBox" style="display: none">0</span><span id="Suzdal_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Suzdal_white_troops" class="white numberBox" style="display: none">0</span><span id="Suzdal_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Suzdal_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Suzdal_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Suzdal_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Suzdal_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Suzdal_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Brest" style="position:absolute; top: 340px; left: 4px; z-index: 1 "> 
+        <span id="Brest_red_troops" class="red numberBox" style="display: none">0</span><span id="Brest_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Brest_white_troops" class="white numberBox" style="display: none">0</span><span id="Brest_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Brest_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Brest_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Brest_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Brest_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Brest_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Volyn" style="position:absolute; top: 330px; left: 50px; z-index: 1 "> 
+        <span id="Volyn_red_troops" class="red numberBox" style="display: none">0</span><span id="Volyn_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Volyn_white_troops" class="white numberBox" style="display: none">0</span><span id="Volyn_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Volyn_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Volyn_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Volyn_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Volyn_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Volyn_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Polotsk" style="position:absolute; top: 240px; left: 162px; z-index: 1 "> 
+        <span id="Polotsk_red_troops" class="red numberBox" style="display: none">0</span><span id="Polotsk_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Polotsk_white_troops" class="white numberBox" style="display: none">0</span><span id="Polotsk_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Polotsk_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Polotsk_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Polotsk_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Polotsk_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Polotsk_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Chernigov" style="position:absolute; top: 265px; left: 340px; z-index: 1 "> 
+        <span id="Chernigov_red_troops" class="red numberBox" style="display: none">0</span><span id="Chernigov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Chernigov_white_troops" class="white numberBox" style="display: none">0</span><span id="Chernigov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Chernigov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Chernigov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Chernigov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Chernigov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Chernigov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Smolensk" style="position:absolute; top: 180px; left: 225px; z-index: 1 "> 
+        <span id="Smolensk_red_troops" class="red numberBox" style="display: none">0</span><span id="Smolensk_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Smolensk_white_troops" class="white numberBox" style="display: none">0</span><span id="Smolensk_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Smolensk_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Smolensk_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Smolensk_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Smolensk_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Smolensk_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Murom" style="position:absolute; top: 270px; left: 395px; z-index: 1 "> 
+        <span id="Murom_red_troops" class="red numberBox" style="display: none">0</span><span id="Murom_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Murom_white_troops" class="white numberBox" style="display: none">0</span><span id="Murom_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Murom_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Murom_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Murom_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Murom_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Murom_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Kiev" style="position:absolute; top: 400px; left: 190px; z-index: 1 "> 
+        <span id="Kiev_red_troops" class="red numberBox" style="display: none">0</span><span id="Kiev_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Kiev_white_troops" class="white numberBox" style="display: none">0</span><span id="Kiev_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Kiev_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Kiev_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Kiev_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Kiev_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Kiev_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Pereyaslavl" style="position:absolute; top: 375px; left: 370px; z-index: 1 "> 
+        <span id="Pereyaslavl_red_troops" class="red numberBox" style="display: none">0</span><span id="Pereyaslavl_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Pereyaslavl_white_troops" class="white numberBox" style="display: none">0</span><span id="Pereyaslavl_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Pereyaslavl_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Pereyaslavl_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Pereyaslavl_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Pereyaslavl_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Pereyaslavl_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Galich" style="position:absolute; top: 475px; left: 140px; z-index: 1 "> 
+        <span id="Galich_red_troops" class="red numberBox" style="display: none">0</span><span id="Galich_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Galich_white_troops" class="white numberBox" style="display: none">0</span><span id="Galich_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Galich_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Galich_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Galich_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Galich_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Galich_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Peresech" style="position:absolute; top: 555px; left: 215px; z-index: 1 "> 
+        <span id="Peresech_red_troops"  class="red numberBox" style="display: none">0</span><span class="red numberCircle" id="Peresech_red_leader" style="display: none">0</span><br/>
+        <span id="Peresech_white_troops" class="white numberBox" style="display: none">0</span><span class="white numberCircle" id="Peresech_white_leader" style="display: none">0</span><br/>
+        <span id="Peresech_yellow_troops" class="yellow numberBox" style="display: none">0</span><span class="yellow numberCircle" id="Peresech_yellow_leader" style="display: none">0</span><br/>
+        <span id="Peresech_blue_troops" class="blue numberBox" style="display: none">0</span><span class="blue numberCircle" id="Peresech_blue_leader" style="display: none">0</span><br/>
+        <span id="Peresech_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+      <div id="Azov" style="position:absolute; top: 490px; left: 310px; z-index: 1 "> 
+        <span id="Azov_red_troops" class="red numberBox" style="display: none">0</span><span id="Azov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
+        <span id="Azov_white_troops" class="white numberBox" style="display: none">0</span><span id="Azov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
+        <span id="Azov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Azov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
+        <span id="Azov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Azov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
+        <span id="Azov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      </div>
+    </div>
+    
+    <div style="float:right; width:50%">
+      <form>
+        <div id="statusDiv" style="display:none;">
+          <!--
+            [color] <Player> as <Leader> 
+            Game: <GameName> (gameId)  1 of 4 (Players)
+            Status: <status> Round: <round> CurrentPlayer: <color> FirstPlayer <color> NextPlayer: <color>
+          -->
+          [<span id="myColor"></span>] <span id="myName"></span> as <span id="leader">. . .</span>  (<span id="myPosition" ></span>)<br/>
+          Game: <span id="gameStatusName"></span> (<span id="gameId"></span>)  <span id="gameDate"></span> Round: <span id="gameRound"></span><br/> 
+          Status: <span id="gameStatus"></span><br/> 
+          <br/>
+        </div>
+        <div id="gameListDiv">
+          <input type="button" value="List Games" onclick="javascript:listGames();"/><br/>
+          <div id="gameListData"></div>
+          <br/>
+        </div>
+        <div id="createGameDiv">
+          Game Name: <input id="gameName" type="text" />
+          <input type="button" value="Create Game" onclick="javascript:createGame();"/><br/>
+          <br/>
+        </div>
+        <div id="joinGameDiv" style="display:none;">
+          Player Name: <input id="playerName" type="text">          
+          <select id="selectGameId"></select>
+          <select id="selectColor">
+            <option>blue</option>
+            <option>red</option>
+            <option>white</option>
+            <option>yellow</option>
+          </select>
+          <select id="selectPosition">
+            <option value="N">North</option>
+            <option value="E">East</option>
+            <option value="S">South</option>
+            <option value="W">West</option>
+          </select>
+          <input type="button" value="Join Game" onclick="javascript:joinGame();"/><br/>
+          <br/>
+        </div>
+        <div id="rejoinGameDiv" style="display:none;">
+          <select id="selectGameId2"></select>
+          <select id="selectColor2">
+            <option>blue</option>
+            <option>red</option>
+            <option>white</option>
+            <option>yellow</option>
+          </select>
+          <input type="button" value="ReJoin Game" onclick="javascript:rejoinGame();"/><br/>
+          <br/>
+        </div>
+        <div id="startGameDiv" style="display:none;">
+          <input type="button" value="Start Game" onclick="javascript:startGame();"/><br/>
+        </div>
+        <div id="pickFirstPlayerDiv" style="display:none;">
+          <select id="selectFirstPlayerColor">
+            <option>blue</option>
+            <option>red</option>
+            <option>white</option>
+            <option>yellow</option>
+          </select>
+          <input type="button" value="Pick First Player" onclick="javascript:pickFirstPlayer();"/>
+          <input type="button" value="Pick Random First Player" onclick="javascript:pickRandomFirstPlayer();"/><br/>
+        </div>
+        <div id="leaderSelectionDiv" style="display:none;">
+          <select id="selectLeader"></select>
+          <input type="button" value="Select Leader" onclick="javascript:chooseLeader();"/><br/>
+          <br/>
+        </div>
+        <div id="chooseSecretAgendaDiv" style="display:none;">
+          <input type="radio" id="secretAgenda1" name="secretAgenda" value="">
+          <label id="secretAgenda1Label" for="secretAgenda1"></label><br>
+          <input type="radio" id="secretAgenda2" name="secretAgenda" value="">
+          <label id="secretAgenda2Label" for="secretAgenda2"></label><br>
+          <input type="button" value="Select Secret Agenda" onclick="javascript:chooseSecretAgenda();"/><br/>
+          <br/>
+        </div>
+
+        <div id="placeInitialTroopsDiv" style="display:none;">
+          <select id="selectLocation"></select>
+          <input id="placeTroopButton" type="button" value="Place Troop" onclick="javascript:placeTroop();"/><br/>
+          <br/>
+        </div>
+      </form>
+    </div>    
+  </div>
+</body>
+</html>

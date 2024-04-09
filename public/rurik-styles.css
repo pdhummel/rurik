@@ -1,0 +1,51 @@
+
+    div#map {
+      float: left;
+      width:50%;
+      /*background-image: url("/rurik_map.jpg");
+      background-repeat: no-repeat;
+      height: 650px;
+      opacity: 1;
+      position:absolute; top: 0; left: 0; 
+      z-index: 0;*/
+    }
+
+    .numberBox {
+      width: 8px;
+      height: 8px;
+      padding: 4px;
+      border: 1px solid #666;
+      /*color: #060000;*/
+      text-align: center;
+      font: 10px Arial, sans-serif;
+    }
+    .numberCircle {
+      border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      padding: 4px;
+      border: 1px solid #666;
+      text-align: center;
+      font: 10px Arial, sans-serif;
+    }
+
+    .red {
+      background: red;
+      color: black;
+    }
+    .yellow {
+      background: yellow;
+      color: black;
+    }
+    .blue {
+      background: blue;
+      color: white;
+    }
+    .white {
+      background: white;
+      color: black;
+    }
+    .black {
+      background: black;
+      color: white;
+    }

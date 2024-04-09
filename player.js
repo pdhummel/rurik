@@ -16,11 +16,13 @@ class GamePlayers {
             throw new Error("Target player count has already been reached.", "addPlayer()");
         }
         var player = new Player(name, color, position, isPlayerAi);
+        console.log("addPlayer(): player created")
         this.players.push(player);
         this.playersByColor[color] = player;
         this.playersByName[name] = player;
         this.playersByPosition[position] = player;
         // Note the player much choose between these 2 cards 
+        console.log("addPlayer(): before addSecretAgenda")
         player.addSecretAgenda(cards.dealRandomSecretAgendaCard());
         player.addSecretAgenda(cards.dealRandomSecretAgendaCard());
         return player;
@@ -84,6 +86,9 @@ class GamePlayers {
     }
 
     getNextPlayer(player) {
+        if (player === undefined || player == null) {
+            return null;
+        }
         for (var i=0; i < this.sortedPlayers.length; i++) {
             if (this.sortedPlayers[i].color == player.color) {
                 var nextIndex = i + 1;

@@ -171,16 +171,16 @@ class GameMap {
 
 
     getLocations(numberOfPlayers) {
-        locations = []
+        var locations = []
         // green
-        if (numberOfPlayers < 2) {
-            locations = this.locations.slice(0, 7);
+        if (numberOfPlayers <= 2) {
+            locations = this.locations.slice(0, 8);
         // yellow
         } else if (numberOfPlayers == 3) {
-            locations = this.locations.slice(0, 10);
+            locations = this.locations.slice(0, 11);
         // brown
         } else {
-            locations = this.locations.slice(0, 14);
+            locations = this.locations.slice(0, 15);
         }
         return locations;
     }
