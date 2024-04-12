@@ -11,123 +11,170 @@
   <link rel="stylesheet" type="text/css" href="./rurik-styles.css"  />
   <style>
   </style>
-
+  <!-- Used assets from https://brdgm.me/rurik -->
+  <!-- https://brdgm.me/rurik/assets/index-OJyTpDrt.js -->
   <title>Rurik: Dawn of Kiev</title>
 </head>
 <body onload="onLoad()">
   <div>
-    <div id="map-overlay" style="float:left; width: 50%; position:relative; top: 0; left: 0; z-index: 1 ">
-      <div id="map">
-        <img height="650px" src="/rurik_map.jpg" alt="Rurik map" />
+    <div id="map-overlay" style="float:left; width: 55%; position:relative; top: 0; left: 0; z-index: 1 ">
+      <!--<div id="map">-->
+      <img height="700px" src="/rurik_map.jpg" alt="Rurik map" />
+      <!--</div>-->
+      <div id="Pskov" style="position:absolute; top: 100px; left: 55px; z-index: 1 ">
+        <div style="display:flex;"><span id="Pskov_red_troops" class="red numberBox" style="display: none">0</span><span id="Pskov_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Pskov_white_troops" class="white numberBox" style="display: none">0</span><span id="Pskov_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Pskov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Pskov_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Pskov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Pskov_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Pskov_rebels" class="black numberBox" style="display: none">0</span>
       </div>
-      <div id="Pskov" style="position:absolute; top: 100px; left: 55px; z-index: 1 "> 
-        <span id="Pskov_red_troops" class="red numberBox" style="display: none">0</span><span id="Pskov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Pskov_white_troops" class="white numberBox" style="display: none">0</span><span id="Pskov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Pskov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Pskov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Pskov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Pskov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Pskov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="resourcePskov" style="position:absolute; top: 140px; left: 95px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/fish.jpg" alt="fish" height="35px" width="30px" />
       </div>
-      <div id="Novgorod" style="position:absolute; top: 100px; left: 150px; z-index: 1 "> 
-        <span id="Novgorod_red_troops" class="red numberBox" style="display: none">0</span><span id="Novgorod_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Novgorod_white_troops" class="white numberBox" style="display: none">0</span><span id="Novgorod_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Novgorod_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Novgorod_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Novgorod_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Novgorod_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Novgorod_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="Novgorod" style="position:absolute; top: 100px; left: 155px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Novgorod_red_troops" class="red numberBox" style="display: none">0</span><span id="Novgorod_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Novgorod_white_troops" class="white numberBox" style="display: none">0</span><span id="Novgorod_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Novgorod_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Novgorod_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Novgorod_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Novgorod_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Novgorod_rebels" class="black numberBox" style="display: none">0</span>
       </div>
-      <div id="Rostov" style="position:absolute; top: 50px; left: 305px; z-index: 1 "> 
-        <span id="Rostov_red_troops" class="red numberBox" style="display: none">0</span><span id="Rostov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Rostov_white_troops" class="white numberBox" style="display: none">0</span><span id="Rostov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Rostov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Rostov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Rostov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Rostov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Rostov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="resourceNovgorod" style="position:absolute; top: 170px; left: 195px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/wood.png" alt="wood" height="35px" width="30px" />
+      </div>
+      <div id="Rostov" style="position:absolute; top: 50px; left: 310px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Rostov_red_troops" class="red numberBox" style="display: none">0</span><span id="Rostov_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Rostov_white_troops" class="white numberBox" style="display: none">0</span><span id="Rostov_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Rostov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Rostov_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Rostov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Rostov_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Rostov_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourceRostov" style="position:absolute; top: 170px; left: 365px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/stone.jpg" alt="stone" height="35px" width="30px" />
       </div>
       <div id="Suzdal" style="position:absolute; top: 50px; left: 420px; z-index: 1 "> 
-        <span id="Suzdal_red_troops" class="red numberBox" style="display: none">0</span><span id="Suzdal_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Suzdal_white_troops" class="white numberBox" style="display: none">0</span><span id="Suzdal_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Suzdal_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Suzdal_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Suzdal_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Suzdal_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Suzdal_rebels" class="black numberBox" style="display: none">0</span><br/>
+        <div style="display:flex;"><span id="Suzdal_red_troops" class="red numberBox" style="display: none">0</span><span id="Suzdal_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Suzdal_white_troops" class="white numberBox" style="display: none">0</span><span id="Suzdal_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Suzdal_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Suzdal_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Suzdal_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Suzdal_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Suzdal_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourceSuzdal" style="position:absolute; top: 200px; left: 465px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/wood.png" alt="wood" height="35px" width="30px" />
       </div>
       <div id="Brest" style="position:absolute; top: 340px; left: 4px; z-index: 1 "> 
-        <span id="Brest_red_troops" class="red numberBox" style="display: none">0</span><span id="Brest_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Brest_white_troops" class="white numberBox" style="display: none">0</span><span id="Brest_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Brest_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Brest_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Brest_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Brest_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Brest_rebels" class="black numberBox" style="display: none">0</span><br/>
+        <div style="display:flex;"><span id="Brest_red_troops" class="red numberBox" style="display: none">0</span><span id="Brest_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Brest_white_troops" class="white numberBox" style="display: none">0</span><span id="Brest_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Brest_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Brest_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Brest_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Brest_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Brest_rebels" class="black numberBox" style="display: none">0</span>
       </div>
-      <div id="Volyn" style="position:absolute; top: 330px; left: 50px; z-index: 1 "> 
-        <span id="Volyn_red_troops" class="red numberBox" style="display: none">0</span><span id="Volyn_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Volyn_white_troops" class="white numberBox" style="display: none">0</span><span id="Volyn_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Volyn_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Volyn_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Volyn_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Volyn_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Volyn_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="resourceBrest" style="position:absolute; top: 333px; left: 22px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/wood.png" alt="wood" height="35px" width="30px" />
       </div>
-      <div id="Polotsk" style="position:absolute; top: 240px; left: 162px; z-index: 1 "> 
-        <span id="Polotsk_red_troops" class="red numberBox" style="display: none">0</span><span id="Polotsk_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Polotsk_white_troops" class="white numberBox" style="display: none">0</span><span id="Polotsk_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Polotsk_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Polotsk_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Polotsk_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Polotsk_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Polotsk_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="Volyn" style="position:absolute; top: 350px; left: 60px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Volyn_red_troops" class="red numberBox" style="display: none">0</span><span id="Volyn_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Volyn_white_troops" class="white numberBox" style="display: none">0</span><span id="Volyn_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Volyn_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Volyn_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Volyn_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Volyn_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Volyn_rebels" class="black numberBox" style="display: none">0</span>
       </div>
-      <div id="Chernigov" style="position:absolute; top: 265px; left: 340px; z-index: 1 "> 
-        <span id="Chernigov_red_troops" class="red numberBox" style="display: none">0</span><span id="Chernigov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Chernigov_white_troops" class="white numberBox" style="display: none">0</span><span id="Chernigov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Chernigov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Chernigov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Chernigov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Chernigov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Chernigov_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="resourceVolyn" style="position:absolute; top: 455px; left: 85px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/fish.jpg" alt="fish" height="35px" width="30px" />
       </div>
-      <div id="Smolensk" style="position:absolute; top: 180px; left: 225px; z-index: 1 "> 
-        <span id="Smolensk_red_troops" class="red numberBox" style="display: none">0</span><span id="Smolensk_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Smolensk_white_troops" class="white numberBox" style="display: none">0</span><span id="Smolensk_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Smolensk_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Smolensk_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Smolensk_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Smolensk_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Smolensk_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="Polotsk" style="position:absolute; top: 280px; left: 170px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Polotsk_red_troops" class="red numberBox" style="display: none">0</span><span id="Polotsk_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Polotsk_white_troops" class="white numberBox" style="display: none">0</span><span id="Polotsk_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Polotsk_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Polotsk_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Polotsk_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Polotsk_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Polotsk_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourcePolotsk" style="position:absolute; top: 280px; left: 140px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/stone.jpg" alt="stone" height="35px" width="30px" />
+      </div>
+      <div id="Chernigov" style="position:absolute; top: 290px; left: 350px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Chernigov_red_troops" class="red numberBox" style="display: none">0</span><span id="Chernigov_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Chernigov_white_troops" class="white numberBox" style="display: none">0</span><span id="Chernigov_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Chernigov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Chernigov_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Chernigov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Chernigov_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Chernigov_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourceChernigov" style="position:absolute; top: 390px; left: 290px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/fish.jpg" alt="fish" height="35px" width="30px" />
+      </div>
+      <div id="Smolensk" style="position:absolute; top: 200px; left: 245px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Smolensk_red_troops" class="red numberBox" style="display: none">0</span><span id="Smolensk_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Smolensk_white_troops" class="white numberBox" style="display: none">0</span><span id="Smolensk_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Smolensk_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Smolensk_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Smolensk_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Smolensk_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Smolensk_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourceSmolensk" style="position:absolute; top: 290px; left: 285px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/honey.png" alt="honey" height="35px" width="30px" />
       </div>
       <div id="Murom" style="position:absolute; top: 270px; left: 395px; z-index: 1 "> 
-        <span id="Murom_red_troops" class="red numberBox" style="display: none">0</span><span id="Murom_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Murom_white_troops" class="white numberBox" style="display: none">0</span><span id="Murom_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Murom_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Murom_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Murom_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Murom_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Murom_rebels" class="black numberBox" style="display: none">0</span><br/>
+        <div style="display:flex;"><span id="Murom_red_troops" class="red numberBox" style="display: none">0</span><span id="Murom_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Murom_white_troops" class="white numberBox" style="display: none">0</span><span id="Murom_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Murom_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Murom_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Murom_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Murom_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Murom_rebels" class="black numberBox" style="display: none">0</span>
       </div>
-      <div id="Kiev" style="position:absolute; top: 400px; left: 190px; z-index: 1 "> 
-        <span id="Kiev_red_troops" class="red numberBox" style="display: none">0</span><span id="Kiev_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Kiev_white_troops" class="white numberBox" style="display: none">0</span><span id="Kiev_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Kiev_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Kiev_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Kiev_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Kiev_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Kiev_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="resourceMurom" style="position:absolute; top: 295px; left: 450px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/stone.jpg" alt="stone" height="35px" width="30px" />
       </div>
-      <div id="Pereyaslavl" style="position:absolute; top: 375px; left: 370px; z-index: 1 "> 
-        <span id="Pereyaslavl_red_troops" class="red numberBox" style="display: none">0</span><span id="Pereyaslavl_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Pereyaslavl_white_troops" class="white numberBox" style="display: none">0</span><span id="Pereyaslavl_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Pereyaslavl_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Pereyaslavl_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Pereyaslavl_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Pereyaslavl_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Pereyaslavl_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="Kiev" style="position:absolute; top: 420px; left: 210px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Kiev_red_troops" class="red numberBox" style="display: none">0</span><span id="Kiev_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Kiev_white_troops" class="white numberBox" style="display: none">0</span><span id="Kiev_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Kiev_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Kiev_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Kiev_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Kiev_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Kiev_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourceKiev" style="position:absolute; top: 420px; left: 180px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/wood.png" alt="wood" height="35px" width="30px" />
+      </div>
+      <div id="Pereyaslavl" style="position:absolute; top: 410px; left: 390px; z-index: 1 "> 
+        <div style="display:flex;"><span id="Pereyaslavl_red_troops" class="red numberBox" style="display: none">0</span><span id="Pereyaslavl_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Pereyaslavl_white_troops" class="white numberBox" style="display: none">0</span><span id="Pereyaslavl_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Pereyaslavl_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Pereyaslavl_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Pereyaslavl_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Pereyaslavl_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Pereyaslavl_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourcePereyaslavl" style="position:absolute; top: 460px; left: 340px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/beaver.jpg" alt="fur" height="35px" width="30px" />
       </div>
       <div id="Galich" style="position:absolute; top: 475px; left: 140px; z-index: 1 "> 
-        <span id="Galich_red_troops" class="red numberBox" style="display: none">0</span><span id="Galich_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Galich_white_troops" class="white numberBox" style="display: none">0</span><span id="Galich_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Galich_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Galich_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Galich_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Galich_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Galich_rebels" class="black numberBox" style="display: none">0</span><br/>
+        <div style="display:flex;"><span id="Galich_red_troops" class="red numberBox" style="display: none">0</span><span id="Galich_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Galich_white_troops" class="white numberBox" style="display: none">0</span><span id="Galich_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Galich_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Galich_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Galich_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Galich_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Galich_rebels" class="black numberBox" style="display: none">0</span>
       </div>
-      <div id="Peresech" style="position:absolute; top: 555px; left: 215px; z-index: 1 "> 
-        <span id="Peresech_red_troops"  class="red numberBox" style="display: none">0</span><span class="red numberCircle" id="Peresech_red_leader" style="display: none">0</span><br/>
-        <span id="Peresech_white_troops" class="white numberBox" style="display: none">0</span><span class="white numberCircle" id="Peresech_white_leader" style="display: none">0</span><br/>
-        <span id="Peresech_yellow_troops" class="yellow numberBox" style="display: none">0</span><span class="yellow numberCircle" id="Peresech_yellow_leader" style="display: none">0</span><br/>
-        <span id="Peresech_blue_troops" class="blue numberBox" style="display: none">0</span><span class="blue numberCircle" id="Peresech_blue_leader" style="display: none">0</span><br/>
-        <span id="Peresech_rebels" class="black numberBox" style="display: none">0</span><br/>
+      <div id="resourceGalich" style="position:absolute; top: 580px; left: 120px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/honey.png" alt="honey" height="35px" width="30px" />
+      </div>
+      <div id="Peresech" style="position:absolute; top: 555px; left: 215px; z-index: 1;"> 
+        <div style="display:flex;"><span id="Peresech_red_troops"  class="red numberBox" style="display: none">0</span><span class="red numberCircle" id="Peresech_red_leader" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Peresech_white_troops" class="white numberBox" style="display: none">0</span><span class="white numberCircle" id="Peresech_white_leader" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Peresech_yellow_troops" class="yellow numberBox" style="display: none">0</span><span class="yellow numberCircle" id="Peresech_yellow_leader" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Peresech_blue_troops" class="blue numberBox" style="display: none">0</span><span class="blue numberCircle" id="Peresech_blue_leader" style="display: none">0</span></div>
+        <span id="Peresech_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourcePeresech" style="position:absolute; top: 655px; left: 200px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/beaver.jpg" alt="fur" height="35px" width="30px" />
       </div>
       <div id="Azov" style="position:absolute; top: 490px; left: 310px; z-index: 1 "> 
-        <span id="Azov_red_troops" class="red numberBox" style="display: none">0</span><span id="Azov_red_leader" class="red numberCircle" style="display: none">0</span><br/>
-        <span id="Azov_white_troops" class="white numberBox" style="display: none">0</span><span id="Azov_white_leader" class="white numberCircle" style="display: none">0</span><br/>
-        <span id="Azov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Azov_yellow_leader" class="yellow numberCircle" style="display: none">0</span><br/>
-        <span id="Azov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Azov_blue_leader" class="blue numberCircle" style="display: none">0</span><br/>
-        <span id="Azov_rebels" class="black numberBox" style="display: none">0</span><br/>
+        <div style="display:flex;"><span id="Azov_red_troops" class="red numberBox" style="display: none">0</span><span id="Azov_red_leader" class="red numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Azov_white_troops" class="white numberBox" style="display: none">0</span><span id="Azov_white_leader" class="white numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Azov_yellow_troops" class="yellow numberBox" style="display: none">0</span><span id="Azov_yellow_leader" class="yellow numberCircle" style="display: none">0</span></div>
+        <div style="display:flex;"><span id="Azov_blue_troops" class="blue numberBox" style="display: none">0</span><span id="Azov_blue_leader" class="blue numberCircle" style="display: none">0</span></div>
+        <span id="Azov_rebels" class="black numberBox" style="display: none">0</span>
+      </div>
+      <div id="resourceAzov" style="position:absolute; top: 565px; left: 385px; z-index: 1; display: none; ">
+        <img style="border-radius: 50%;" src="/fish.jpg" alt="fish" height="35px" width="30px" />
       </div>
     </div>
     
-    <div style="float:right; width:50%">
+    <!--<div style="float:right; width:45%; background-color: #58ad53;">-->
+    <div style="float:right; width:45%;">
       <form>
         <div id="statusDiv" style="display:none;">
           <!--
@@ -210,8 +257,112 @@
           <select id="selectLocation"></select>
           <input id="placeTroopButton" type="button" value="Place Troop" onclick="javascript:placeTroop();"/><br/>
           <br/>
+        </div>        
+
+        <div id="placeAdvisorDiv" style="display:none;">
+          Action: <select id="selectAction">
+            <option>muster</option>
+            <option>move</option>
+            <option>attack</option>
+            <option>tax</option>
+            <option>build</option>
+            <option>scheme</option>
+          </select>
+          Advisor: <select id="selectAdvisor"></select>
+          Coins: <input id="bidCoins" type="text" size="2" maxlength="3">
+          <input type="button" value="Place Advisor" onclick="javascript:placeAdvisor();"/><br/>
         </div>
       </form>
+
+
+      <div id="advisors" style="display: none">
+        <div id="advisorRow" style="display:flex;">
+          <!--<span id="advisor1" style="display: block;"><img height="40px" src="/one-blue.png" alt="advisor 1" /></span>-->
+        </div>        
+      </div>
+      <div id="strategyBoard" style="display: none">
+        <!--<img height="400px" src="/strategy-board-2-player.png" alt="Strategy board" />-->
+        <!--<img height="400px" src="/rurik-strategy-board-1-2p.jpg" alt="Strategy board" />-->
+        <img width="400px" src="/rurik-strategy-board-3-4.jpg" alt="Strategy board" />
+
+      </div>
+
+      <table>
+      <tr><td>
+      <!--<div id="boatDiv" style="display: block; background-image: url('wood-background.jpg')">-->
+      <div id="boatDiv" style="display: none; ">
+        <!--<img height="200px" src="/rurik-boat.jpg" alt="Boat" />-->
+        <div style="display:flex; height: 35px;"><span style="width: 40px"><b>Dock:</b></span> 
+          <span class="container"><img style="border-radius: 50%;" src="/stone.jpg" alt="stone" height="35px" width="30px" /><span id="dockStone" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/wood.png" alt="wood" height="35px" width="30px" /><span id="dockWood" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/fish.jpg" alt="fish" height="35px" width="30px" /><span id="dockFish" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/honey.png" alt="honey" height="35px" width="30px" /><span id="dockHoney" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="dockFur" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="tradeboon" height="35px" width="30px" /><span id="tradeBoon" class="centered">0</span></span>
+          <!--<span style="width: 20px"></span><span class="container-b"><img style="border-radius: 50%;" src="/troop-blue.png" alt="troops" width="30px" /><span id="playerCoins" class="centered">0</span></span>-->
+        </div><br/>
+        <div style="display:flex; height: 35px;"><span style="width: 40px"><b>Boat:</b></span>
+          <span class="container"><img style="border-radius: 50%;" src="/stone.jpg" alt="stone" height="35px" width="30px" /><span id="boatStone" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/wood.png" alt="wood" height="35px" width="30px" /><span id="boatWood" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/fish.jpg" alt="fish" height="35px" width="30px" /><span id="boatFish" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/honey.png" alt="honey" height="35px" width="30px" /><span id="boatHoney" class="centered">0</span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="boatFur" class="centered">0</span></span>
+        </div>
+        <div style="display:flex; height: 35px;"><span style="width: 40px"></span>
+          <img style="border-radius: 50%;" src="/stone.jpg" alt="stone" width="30px" />
+          <img style="border-radius: 50%;" src="/wood.png" alt="wood" width="30px" />
+          <img style="border-radius: 50%;" src="/fish.jpg" alt="fish" width="30px" />
+          <img style="border-radius: 50%;" src="/honey.png" alt="honey" width="30px" />
+          <span style="width: 30px"></span>
+        </div>
+        <div style="display:flex; height: 35px;"><span style="width: 40px"></span>
+          <span style="width: 30px"></span>
+          <img style="border-radius: 50%;" src="/wood.png" alt="wood" width="30px" />
+          <img style="border-radius: 50%;" src="/fish.jpg" alt="fish" width="30px" />
+          <span style="width: 30px"></span>
+          <span style="width: 30px"></span>
+        </div>
+        <div style="display:flex; height: 35px;"><span style="width: 40px"></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="coin" height="35px" width="30px" /><span id="boatStoneCoin" class="centered"></span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="coin" height="35px" width="30px" /><span id="boatWoodCoin" class="centered"></span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFishCoin" class="centered"></span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="coin" height="35px" width="30px" /><span id="boatHoneyCoin" class="centered"></span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFurCoin" class="centered"></span></span>          
+        </div>
+        <div style="display:flex; height: 35px;"><span style="width: 40px"></span>
+          <span style="width: 30px"></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="tradeboon" height="35px" width="30px" /><span id="boatWoodTradeboon" class="centered"></span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="tradeboon" height="35px" width="30px" /><span id="boatFishTradeboon" class="centered"></span></span>
+          <span class="container"><img style="border-radius: 50%;" src="/coin.png" alt="tradeboon" height="35px" width="30px" /><span id="boatHoneyTradeboon" class="centered"></span></span>
+          <span style="width: 30px"></span>
+        </div>
+      </div>
+      </td>
+      <td style="width: 20px"></td>
+      <td>
+      <div id="supplyDiv" style="display: none">
+        <b>Supply</b><br/>
+        <div style="display:flex; height: 50px;">
+          <span class="container">
+            <img src="/coin.png" alt="coin" width="40px" height="45px" />
+            <span id="playerCoins" class="centered">0</span>
+          </span><br/>
+        </div>
+        <div style="display:flex; height: 50px;">
+          <span class="container"><img id="tavernImage" src="/tavern-blue.png" alt="tavern" height="45px" width="40px" /><span id="tavernCount" class="centered">0</span></span>
+          <span class="container"><img id="marketImage" src="/market-blue.png" alt="market" height="45px" width="40px" /><span id="marketCount" class="centered">0</span></span>
+          <span class="container"><img id="strongholdImage" src="/stronghold-blue.png" alt="stronghold" height="45px" width="40px" /><span id="strongholdCount" class="centered">0</span></span>
+          <span class="container"><img id="churchImage" src="/church-blue.png" alt="church" height="45px" width="40px" /><span id="churchCount" class="centered">0</span></span>
+          <span class="container"><img id="stableImage" src="/stable-blue.png" alt="stable" height="45px" width="40px" /><span id="stableCount" class="centered">0</span></span>
+        </div><br/>
+        <div style="display:flex; height: 50px;">
+          <span class="container"><img id="troopImage" src="/troop-blue.png" alt="troops" height="45px" width="40px" /><span id="troopCount" class="centered">0</span></span>
+        </div><br/>        
+      </div>
+      </td>
+      </tr>
+      </table>
+
     </div>    
   </div>
 </body>

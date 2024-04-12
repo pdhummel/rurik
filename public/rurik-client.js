@@ -167,19 +167,25 @@ function refreshGameStatus() {
     }
     callApi("/gameStatus/" + gameId + clientColorParam, "get", "", refreshGameStatusResponseHandler);
     refreshMap();
+    refreshPlayer();
   }
 }
 function refreshGameStatusResponseHandler(response) {
     console.log("refreshGameStatusResponseHandler(): " + JSON.stringify(response.data));
+
     var myColor = getInnerHtmlValue("myColor");
     var gameId = getInnerHtmlValue("gameId");
     var gameStatus = response.data;
     var gameName = gameStatus.gameName;
     var currentState = gameStatus.currentState;
     var currentPlayer = gameStatus.currentPlayer;
+    var gameRound = gameStatus.round;
     var status = currentState;
     var clientLeader = gameStatus.clientLeader;
     var clientPosition = gameStatus.clientPosition;
+    if (gameRound != undefined) {
+      setInnerHtml("gameRound", gameRound);
+    }
     if (clientLeader != undefined && clientLeader != null && 
         clientLeader.name != undefined && clientLeader.name != null && clientLeader.name.length > 0) {
       setInnerHtml("leader", clientLeader.name);
@@ -195,8 +201,12 @@ function refreshGameStatusResponseHandler(response) {
 
     if (currentState == "waitingForPlayers") {
       show("startGameDiv");
+      hide("boatDiv");
+      hide("supplyDiv");
     } else {
       hide("startGameDiv");
+      show("boatDiv");
+      show("supplyDiv");
     }
     if (currentState == "waitingForFirstPlayerSelection") {
       show("pickFirstPlayerDiv");
@@ -220,6 +230,19 @@ function refreshGameStatusResponseHandler(response) {
       show("placeInitialTroopsDiv");
     } else {
       hide("placeInitialTroopsDiv");
+    }
+    if (currentState == "strategyPhase") {
+      show("strategyBoard");
+      show("advisors");
+      if (currentPlayer == myColor) {
+        show("placeAdvisorDiv");
+      } else {
+        hide("placeAdvisorDiv");
+      }
+    } else {
+      hide("strategyBoard");
+      hide("advisors");
+      hide("placeAdvisorDiv");
     }
 }
 function leaderResponseHandler(response) {
@@ -262,6 +285,16 @@ function refreshMapResponseHandler(response) {
     option.innerText = locationName;
     option.value = locationName;
     selectLocation.append(option);
+
+    var resourceCount = locationData.resourceCount;
+    var defaultResource = locationData.defaultResource;
+    var resourceElementName = "resource" + locationName;
+    if (defaultResource != undefined && defaultResource != null && 
+        resourceCount != undefined && resourceCount != null && resourceCount > 0) {
+      show(resourceElementName);
+    } else {
+      hide(resourceElementName);
+    }
 
     var colors = ["red", "blue", "white", "yellow"];
     for (var j=0; j<colors.length; j++) {
@@ -420,3 +453,61 @@ function placeTroopResponseHandler(response) {
   hide("placeInitialTroopsDiv");
   refreshGameStatus();  
 }
+
+function refreshPlayer() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  if (gameId != undefined && gameId != null && color != undefined && color != null) {
+    callApi('/game/' + gameId + '/player/' + color, "get", "", refreshPlayerResponseHandler);
+  } 
+}
+function refreshPlayerResponseHandler(response) {
+  console.log("refreshPlayerResponseHandler(): " + JSON.stringify(response.data));
+  var color = response.data.color;
+  var advisors = response.data.advisors;
+  var advisorRow = document.getElementById("advisorRow");
+  var innerHtml = "";
+  advisorRow.innerHTML = innerHtml;
+  var advisorNumToText ={};
+  advisorNumToText[1] = "one";
+  advisorNumToText[2] = "two";
+  advisorNumToText[3] = "three";
+  advisorNumToText[4] = "four";
+  advisorNumToText[5] = "five";
+  console.log("refreshPlayerResponseHandler(): advisors=" + advisors);
+  var selectAdvisor = document.getElementById("selectAdvisor");
+  clearOptions(selectAdvisor);
+  for (var i=0; i<advisors.length; i++) {
+    var option = document.createElement("option");
+    option.innerText = advisors[i];
+    option.value = advisors[i];
+    selectAdvisor.append(option);
+    var imageFile = "/" + advisorNumToText[advisors[i]] + "-" + color + ".png";
+    innerHtml = innerHtml + '<img height="40px" src="' + imageFile + '" />';
+    // <span id="advisor1" style="display: block;"><img height="40px" src="/one-blue.png" alt="advisor 1" /></span>
+  }
+  advisorRow.innerHTML = innerHtml;
+  var goodsOnDock = response.data["boat"]["goodsOnDock"];
+  setInnerHtml("dockStone", goodsOnDock["stone"]);
+  setInnerHtml("dockWood", goodsOnDock["wood"]);
+  setInnerHtml("dockFish", goodsOnDock["fish"]);
+  setInnerHtml("dockHoney", goodsOnDock["honey"]);
+  setInnerHtml("dockFur", goodsOnDock["fur"]);
+  var goodsOnBoat = response.data["boat"]["goodsOnBoat"];
+  setInnerHtml("boatStone", goodsOnBoat["stone"]);
+  setInnerHtml("boatWood", goodsOnBoat["wood"]);
+  setInnerHtml("boatFish", goodsOnBoat["fish"]);
+  setInnerHtml("boatHoney", goodsOnBoat["honey"]);
+  setInnerHtml("boatFur", goodsOnBoat["fur"]);
+  var money = response.data["boat"]["money"];
+  setInnerHtml("playerCoins", money);
+  var supplyTroops = response.data["supplyTroops"];
+  setInnerHtml("troopCount", supplyTroops);
+  var buildings = response.data["buildings"];
+  setInnerHtml("tavernCount", buildings["tavern"]);
+  setInnerHtml("stableCount", buildings["stable"]);
+  setInnerHtml("marketCount", buildings["market"]);
+  setInnerHtml("strongholdCount", buildings["stronghold"]);
+  setInnerHtml("churchCount", buildings["church"]);
+}
+
