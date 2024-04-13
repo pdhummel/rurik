@@ -267,8 +267,26 @@ app.put('/game/:id/location/:location/leader', (req, res) => {
   res.send(location);
 });
 
+app.get('/game/:id/auction', (req, res) => {
+  console.log(req.path, req.params);
+  var game = games.getGameById(req.params.id);
+  res.send(game.auctionBoard);
+});
 
-
+app.put('/game/:id/auction/:action', (req, res) => {
+  console.log(req.path, req.params);
+  var game = games.getGameById(req.params.id);
+  var action = req.params.action;
+  var color = req.body.color;
+  var advisor = req.body.advisor;
+  var bidCoins = req.body.bidCoins;
+  var coins = 0;
+  if (bidCoins != undefined && bidCoins != null && bidCoins > 0){
+    coins = bidCoins;
+  }
+  game.playAdvisor(color, action, advisor, coins);
+  res.send(game.auctionBoard);
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

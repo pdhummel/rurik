@@ -168,6 +168,7 @@ function refreshGameStatus() {
     callApi("/gameStatus/" + gameId + clientColorParam, "get", "", refreshGameStatusResponseHandler);
     refreshMap();
     refreshPlayer();
+    refreshStrategyBoard();
   }
 }
 function refreshGameStatusResponseHandler(response) {
@@ -204,6 +205,12 @@ function refreshGameStatusResponseHandler(response) {
       hide("boatDiv");
       hide("supplyDiv");
     } else {
+      document.getElementById("tavernImage").src = "/tavern-" + myColor + ".png";
+      document.getElementById("marketImage").src = "/market-" + myColor + ".png";
+      document.getElementById("churchImage").src = "/church-" + myColor + ".png";
+      document.getElementById("strongholdImage").src = "/stronghold-" + myColor + ".png";
+      document.getElementById("stableImage").src = "/stable-" + myColor + ".png";
+      document.getElementById("troopImage").src = "/troop-" + myColor + ".png";
       hide("startGameDiv");
       show("boatDiv");
       show("supplyDiv");
@@ -232,15 +239,32 @@ function refreshGameStatusResponseHandler(response) {
       hide("placeInitialTroopsDiv");
     }
     if (currentState == "strategyPhase") {
-      show("strategyBoard");
+      if (gameStatus.numberOfPlayers <= 2) {
+        show("strategyBoard-1-2");
+        hide("strategyBoard-3-4");
+      } else {
+        show("strategyBoard-3-4");
+        hide("strategyBoard-1-2");
+      }
       show("advisors");
       if (currentPlayer == myColor) {
         show("placeAdvisorDiv");
+        hide("strategyBoard-3-4");
       } else {
         hide("placeAdvisorDiv");
       }
+    } else if (currentState == "actionPhase") {
+      if (gameStatus.numberOfPlayers <= 2) {
+        show("strategyBoard-1-2");
+      } else {
+        show("strategyBoard-3-4");
+        hide("strategyBoard-1-2");
+      }
+      hide("advisors");
+      hide("placeAdvisorDiv");
     } else {
-      hide("strategyBoard");
+      hide("strategyBoard-1-2");
+      hide("strategyBoard-3-4");
       hide("advisors");
       hide("placeAdvisorDiv");
     }
@@ -511,3 +535,58 @@ function refreshPlayerResponseHandler(response) {
   setInnerHtml("churchCount", buildings["church"]);
 }
 
+function placeAdvisor() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var selectedAction = getSelectedValue("selectAction");
+  var advisor = getSelectedValue("selectAdvisor");
+  var bidCoins = getValue("bidCoins");
+  var coins = 0;
+  if (bidCoins > 0) {
+    coins = bidCoins;
+  }
+  var data = '{ "color":"'+ color +'", "bidCoins":"' + coins + '", "advisor":"'+ advisor + '" }';
+  callApi("/game/" + gameId + "/auction/" + selectedAction, "put", data, placeAdvisorResponseHandler);
+}
+function placeAdvisorResponseHandler(response) {
+  console.log("placeAdvisorResponseHandler(): " + JSON.stringify(response.data));
+  var numberOfPlayers = response.data["numberOfPlayers"];
+  var board = response.data["board"];
+  var advisorNumToText ={};
+  advisorNumToText[1] = "one";
+  advisorNumToText[2] = "two";
+  advisorNumToText[3] = "three";
+  advisorNumToText[4] = "four";
+  advisorNumToText[5] = "five";  
+  var sb = "sb-3-4-";
+  if (numberOfPlayers <= 2) {
+    sb = "sb-1-2-";
+  }
+  console.log("board", board);
+  for (var k=0; k < Object.keys(board).length; k ++) {
+    var key = Object.keys(board)[k];
+    console.log("columnKey", key);    
+    var column = board[key];
+    for (var i=0; i < column.length; i++) {
+      var advisor = column[i]["advisor"];
+      // sb-1-2-muster-r3-advisor
+      var elementId = sb + key + "-r" + (i + 1) + "-advisor";
+      console.log(elementId, advisor);
+      if (advisor > 0) {
+        var color = column[i]["color"];
+        var image = document.getElementById(elementId);
+        // "/one-blue.png"
+        var imageSrc = "/" + advisorNumToText[advisor] + "-" + color + ".png";
+        image.src = imageSrc;
+        show(elementId);
+      } else {
+        hide(elementId);
+      }
+    }
+  }
+  refreshGameStatus();
+}
+
+function refreshStrategyBoard() {
+
+}

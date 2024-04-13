@@ -101,7 +101,6 @@ class Game {
         this.players = new GamePlayers(targetNumberOfPlayers);
         this.availableLeaders = new AvailableLeaders();
         this.gameStates = new GameStates();
-        this.auctionBoard = new AuctionBoard();
         // TODO: generate id with uuid
         this.id = Date.now();
         // TODO: creation date
@@ -251,6 +250,7 @@ class Game {
     }
 
     playAdvisor(color, columnName, advisor, bidCoins=0) {
+        console.log("playAdvisor():", color, columnName, advisor, bidCoins);
         if (this.gameStates.currentState.name == "strategyPhase") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
