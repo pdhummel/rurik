@@ -139,15 +139,13 @@ function listGamesResponseHandler(response) {
     row.push(games[key].gameId);
     row.push(games[key].gameName);
     row.push(games[key].currentState);
-    // var playerSummary = games[key].numberOfPlayers + " of " + games[key].targetNumberOfPlayers;
     var playerSummary = "";
     if (games[key].numberOfPlayers > 0) {
-      //playerSummary = playerSummary + " ( " + games[key].playerNames + ")";
       var playersByPosition = games[key].playersByPosition;
       for (var p=0; p < Object.keys(playersByPosition).length; p++) {
         var position = Object.keys(playersByPosition)[p];
         var player = playersByPosition[position];
-        playerSummary = playerSummary + '<input type="button" style="background-color: 	#696969; color:' + player.color + '" value="' + player.name + '" onclick=\'javascript:rejoinGame("' + games[key].gameId + '", "' + player.color + '");\' />';
+        playerSummary = playerSummary + '<input type="button" style="background-color: 	#696969; color:' + player.color + '" value="' + player.name + '-' + position + '" onclick=\'javascript:rejoinGame("' + games[key].gameId + '", "' + player.color + '");\' />';
       }
       
     }
@@ -158,7 +156,6 @@ function listGamesResponseHandler(response) {
   if (Object.keys(games).length > 0) {
     populateTable(rows, ["Game Id", "Game Name", "Status", "Players"]);
     show("joinGameDiv");
-    //show("rejoinGameDiv");
   }
   gameId = getInnerHtmlValue("gameId");
   if (gameId == undefined || gameId == null || gameId.length <= 0) {
@@ -552,7 +549,6 @@ function refreshPlayerResponseHandler(response) {
     selectAdvisor.append(option);
     var imageFile = "/" + advisorNumToText[advisors[i]] + "-" + color + ".png";
     innerHtml = innerHtml + '<img height="40px" src="' + imageFile + '" />';
-    // <span id="advisor1" style="display: block;"><img height="40px" src="/one-blue.png" alt="advisor 1" /></span>
   }
   advisorRow.innerHTML = innerHtml;
   var goodsOnDock = response.data["boat"]["goodsOnDock"];
@@ -621,13 +617,12 @@ function refreshStrategyBoardResponseHandler(response) {
   console.log("board", board);
   for (var k=0; k < Object.keys(board).length; k ++) {
     var key = Object.keys(board)[k];
-    //console.log("columnKey", key);    
     var column = board[key];
     for (var i=0; i < column.length; i++) {
       var advisor = column[i]["advisor"];
+      var bidCoins = column[i]["bidCoins"];
       // sb-1-2-muster-r3-advisor
       var elementId = sb + key + "-r" + (i + 1) + "-advisor";
-      //console.log(elementId, advisor);
       if (advisor > 0) {
         var color = column[i]["color"];
         var image = document.getElementById(elementId);
@@ -637,6 +632,12 @@ function refreshStrategyBoardResponseHandler(response) {
         show(elementId);
       } else {
         hide(elementId);
+      }
+      var coinElementId = sb + key + "-r" + (i + 1) + "-coin";
+      if (bidCoins > 0) {        
+        setInnerHtml(coinElementId, bidCoins);
+      } else {
+        setInnerHtml(coinElementId, "");
       }
     }
   }

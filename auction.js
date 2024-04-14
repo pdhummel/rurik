@@ -35,12 +35,45 @@ class AuctionBoard {
         this.numberOfRows = this.board["muster"].length;
     }
 
+    isPlayerAlreadyInColumn(actionName, color) {
+        for (var i=0; i<this.numberOfRows; i++) {
+            if (this.board[actionName][i].color == color) {
+                return true;
+            }
+        }
+        return false;        
+    }
+
+    isPlayerIn3Columns(color) {
+        var count = 0;
+        var columns = Object.keys(this.board);
+        for (var k=0; k<columns.length; k++) {
+            var actionName = columns[k];
+            for (var i=0; i<this.numberOfRows; i++) {
+                if (this.board[actionName][i].color == color) {
+                    count = count + 1;
+                    break;
+                }
+            }
+        }
+        if (count >= 3) {
+            return true;
+        }
+        return false;
+    }
+
     // row=0-3
     auctionBid(actionName, color, advisor, bidCoins) {
         if (this.isColumnFull(actionName)) {
-            throw "Cannot place advisor in " + actionName + " column, because it is full."
+            throw new Error("Cannot place advisor in " + actionName + " column, because it is full.");
         }
-        // TODO: check for 2 advisors from the same player
+        // check for 2 advisors from the same player
+        if (this.isPlayerAlreadyInColumn(actionName, color)) {
+            if (! this.isPlayerIn3Columns(color)) {
+                throw new Error("Cannot place advisor in " + actionName + " column, because you can only place a second advisor in the same column, if you are in three or more different columns.");
+            }
+        }
+
         var totalBid = advisor + bidCoins;
         for (var i=0; i < this.numberOfRows; i++) {
             var currentBid = this.board[actionName][i].advisor + this.board[actionName][i].bidCoins;

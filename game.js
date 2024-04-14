@@ -78,6 +78,9 @@ class Games {
 
     getGameStatus(gameId, clientColor=null) {
         var game = this.games[gameId];
+        if (game === undefined || game == null) {
+            return null;
+        }
         var gameStatus = new GameStatus(game, clientColor);
         return gameStatus;
     }
@@ -259,7 +262,13 @@ class Game {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 if (currentPlayer.isAdvisorAvailable(advisor)) {
+                    if (currentPlayer.boat.money < bidCoins) {
+                        // TODO: validation error
+                        return;
+                    }
+                    // TODO: check for 2 advisors from the same player
                     this.auctionBoard.auctionBid(columnName, color, advisor, bidCoins);
+                    currentPlayer.boat.money = currentPlayer.boat.money - bidCoins;
                     currentPlayer.useAdvisor(advisor);
                     var nextPlayer = this.players.getNextPlayer(currentPlayer);
                     if (nextPlayer.advisors.length > 0) {
