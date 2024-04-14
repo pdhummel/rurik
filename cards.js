@@ -15,6 +15,15 @@ class Cards {
         this.availableSecretAgendaCards = {};
         this.addSecretAgendaCard("Esteemed", "Occupy the most regions with your troops.", 2);
         this.addSecretAgendaCard("Conquering", "Finish in first place on the warfare track.", 2);
+        this.addSecretAgendaCard("Prosperous", "Finish in first place on the trade track.", 2);
+        this.addSecretAgendaCard("Capable", "Have the most goods.", 2);
+        this.addSecretAgendaCard("Successful", "Finish in first place on the rule track.", 2);
+        this.addSecretAgendaCard("Regal", "Have the most combined fur and honey.", 2);
+        this.addSecretAgendaCard("Protective", "Rule the most structures.", 2);
+        this.addSecretAgendaCard("Committed", "Finish in first place on the build track.", 2);
+        this.addSecretAgendaCard("Dignified", "Accomplish the most deeds.", 2);
+        this.addSecretAgendaCard("Courageous", "Defeat the most rebels.", 2);
+        this.addSecretAgendaCard("Wealthy", "Have the most coins.", 2);
     }
 
 

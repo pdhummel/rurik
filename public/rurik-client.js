@@ -100,8 +100,9 @@ function populateTable(rows, headings) {
       var td = document.createElement('td');
       td.style.align = "left";
       td.style.border = "1px solid black";
-      var textNode = document.createTextNode(row[cell]);
-      td.appendChild(textNode);
+      td.innerHTML = row[cell];
+      //var textNode = document.createTextNode(row[cell]);
+      //td.appendChild(textNode);
       tr.appendChild(td);
     }
     table.appendChild(tr);
@@ -114,6 +115,10 @@ function listGames() {
 }
 function listGamesResponseHandler(response) {
   console.log("listGamesResponseHandler(): " + JSON.stringify(response.data));
+  var gameId = getInnerHtmlValue("gameId");
+  if (gameId != undefined && gameId != null && gameId.length > 0) {
+    return;
+  }  
   selectGameId = document.getElementById("selectGameId");
   selectGameId2 = document.getElementById("selectGameId2");
   clearOptions(selectGameId);
@@ -134,17 +139,30 @@ function listGamesResponseHandler(response) {
     row.push(games[key].gameId);
     row.push(games[key].gameName);
     row.push(games[key].currentState);
-    var playerSummary = games[key].numberOfPlayers + " of " + games[key].targetNumberOfPlayers;
+    // var playerSummary = games[key].numberOfPlayers + " of " + games[key].targetNumberOfPlayers;
+    var playerSummary = "";
     if (games[key].numberOfPlayers > 0) {
-      playerSummary = playerSummary + " ( " + games[key].playerNames + ")";
+      //playerSummary = playerSummary + " ( " + games[key].playerNames + ")";
+      var playersByPosition = games[key].playersByPosition;
+      for (var p=0; p < Object.keys(playersByPosition).length; p++) {
+        var position = Object.keys(playersByPosition)[p];
+        var player = playersByPosition[position];
+        playerSummary = playerSummary + '<input type="button" style="background-color: 	#696969; color:' + player.color + '" value="' + player.name + '" onclick=\'javascript:rejoinGame("' + games[key].gameId + '", "' + player.color + '");\' />';
+      }
+      
     }
     row.push(playerSummary);
     rows.push(row);
   }
+
   if (Object.keys(games).length > 0) {
     populateTable(rows, ["Game Id", "Game Name", "Status", "Players"]);
     show("joinGameDiv");
-    show("rejoinGameDiv");
+    //show("rejoinGameDiv");
+  }
+  gameId = getInnerHtmlValue("gameId");
+  if (gameId == undefined || gameId == null || gameId.length <= 0) {
+    setTimeout(listGames, 15000);
   }
 }
 
@@ -153,7 +171,7 @@ function createGame() {
   callApi("/game", "post", data, createGameResponseHandler);
 }
 function createGameResponseHandler(response) {
-  console.log("listGamesResponseHandler(): " + response.data);
+  console.log("createGameResponseHandler(): " + response.data);
   listGames();
 }
 
@@ -173,17 +191,33 @@ function refreshGameStatus() {
 }
 function refreshGameStatusResponseHandler(response) {
     console.log("refreshGameStatusResponseHandler(): " + JSON.stringify(response.data));
-
-    var myColor = getInnerHtmlValue("myColor");
-    var gameId = getInnerHtmlValue("gameId");
     var gameStatus = response.data;
-    var gameName = gameStatus.gameName;
-    var currentState = gameStatus.currentState;
     var currentPlayer = gameStatus.currentPlayer;
-    var gameRound = gameStatus.round;
+    var myColor = getInnerHtmlValue("myColor");
+    if (currentPlayer != myColor) {
+      setTimeout(refreshGameStatus, 10000);
+    }
+
+    var currentState = gameStatus.currentState;
     var status = currentState;
+    var gameId = getInnerHtmlValue("gameId");
+    var gameName = gameStatus.gameName;
+    var gameRound = gameStatus.round;
     var clientLeader = gameStatus.clientLeader;
     var clientPosition = gameStatus.clientPosition;
+    var playersByPosition = gameStatus.playersByPosition;
+    for (var p=0; p < Object.keys(playersByPosition).length; p++) {
+      var position = Object.keys(playersByPosition)[p];
+      var positionElement = document.getElementById(position + "_position");
+      var player = playersByPosition[position];
+      positionElement.className = player.color + " numberBox";
+      show(position + "_position");
+    }
+
+    if (currentPlayer != undefined) {
+      status = status + " Current Player:" + currentPlayer;
+    }
+
     if (gameRound != undefined) {
       setInnerHtml("gameRound", gameRound);
     }
@@ -193,9 +227,7 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       setInnerHtml("leader", ". . . ?");
     }
-    if (currentPlayer != undefined) {
-      status = status + " Current Player:" + currentPlayer;
-    }
+
     setInnerHtml("gameStatusName", gameName);
     setInnerHtml("gameStatus", status);
     console.log("refreshGameStatusResponseHandler: currentState=" + currentState + ", currentPlayer=" + currentPlayer + ", myColor=" + myColor);
@@ -272,6 +304,7 @@ function refreshGameStatusResponseHandler(response) {
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
   selectLeader = document.getElementById("selectLeader");
+  clearOptions(selectLeader);
   var leaders = response.data;
   for (var i=0; i < Object.keys(leaders).length; i++) {
     var key = Object.keys(leaders)[i];
@@ -356,17 +389,21 @@ function joinGame() {
   var color = getSelectedValue("selectColor");
   var position = getSelectedValue("selectPosition");
   var name = getValue("playerName");
-  if (gameId != undefined) {
+  if (gameId != undefined && gameId != null && gameId.length > 0) {
     var data = '{ "color": "' + color + '", "position": "' + position + '", "name":"' + name + '" }'
     callApi("/game/" + gameId + "/player", "post", data, joinGameResponseHandler);
     setInnerHtml("gameId", gameId);
     setInnerHtml("myName", name);
-    setInnerHtml("myPosition", position);
     setInnerHtml("myColor", color);
   }
 }
 function joinGameResponseHandler(response) {
     console.log("joinGameResponseHandler(): " + JSON.stringify(response.data));
+    var leftSideDiv = document.getElementById("leftSideDiv");
+    var rightSideDiv = document.getElementById("rightSideDiv");
+    rightSideDiv.style.width = "45%";
+    leftSideDiv.style.width = "55%";
+    leftSideDiv.style.display = "block";
     refreshGameStatus();
     show("statusDiv");
     hide("gameListDiv");
@@ -375,9 +412,13 @@ function joinGameResponseHandler(response) {
     hide("rejoinGameDiv");
 }
 
-function rejoinGame() {
-  var gameId = getSelectedValue("selectGameId2");
-  var color = getSelectedValue("selectColor2");
+function rejoinGame(gameId, color) {
+  if (gameId == undefined || gameId == null || gameId.length <= 0) {
+    gameId = getSelectedValue("selectGameId2");
+  }
+  if (color == undefined || color == null || color.length <= 0) {
+    color = getSelectedValue("selectColor2");
+  }
   if (gameId != undefined) {
     setInnerHtml("gameId", gameId);
     setInnerHtml("myColor", color);
@@ -390,6 +431,9 @@ function rejoinGameResponseHandler(response) {
   var name = response.data.name;
   var position = response.data.tablePosition;
   if (name != undefined && position != undefined) {
+    rightSideDiv.style.width = "45%";
+    leftSideDiv.style.width = "55%";
+    leftSideDiv.style.display = "block";
     refreshGameStatus();
     setInnerHtml("myName", name);
     setInnerHtml("myPosition", position);
@@ -550,6 +594,18 @@ function placeAdvisor() {
 }
 function placeAdvisorResponseHandler(response) {
   console.log("placeAdvisorResponseHandler(): " + JSON.stringify(response.data));
+  refreshGameStatus();
+}
+
+function refreshStrategyBoard() {
+  var gameId = getInnerHtmlValue("gameId");  
+  callApi("/game/" + gameId + "/auction", "get", "", refreshStrategyBoardResponseHandler);
+}
+function refreshStrategyBoardResponseHandler(response) {
+  console.log("refreshStrategyBoardResponseHandler(): " + JSON.stringify(response.data));
+  if (response.data == null || response.data.board == null) {
+    return;
+  }
   var numberOfPlayers = response.data["numberOfPlayers"];
   var board = response.data["board"];
   var advisorNumToText ={};
@@ -565,13 +621,13 @@ function placeAdvisorResponseHandler(response) {
   console.log("board", board);
   for (var k=0; k < Object.keys(board).length; k ++) {
     var key = Object.keys(board)[k];
-    console.log("columnKey", key);    
+    //console.log("columnKey", key);    
     var column = board[key];
     for (var i=0; i < column.length; i++) {
       var advisor = column[i]["advisor"];
       // sb-1-2-muster-r3-advisor
       var elementId = sb + key + "-r" + (i + 1) + "-advisor";
-      console.log(elementId, advisor);
+      //console.log(elementId, advisor);
       if (advisor > 0) {
         var color = column[i]["color"];
         var image = document.getElementById(elementId);
@@ -584,9 +640,4 @@ function placeAdvisorResponseHandler(response) {
       }
     }
   }
-  refreshGameStatus();
-}
-
-function refreshStrategyBoard() {
-
 }

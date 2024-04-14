@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 app.get('/game', (req, res) => {
   console.log("get " + req.path);
   var gameList = games.listGames();
-  console.log(gameList);
+  //console.log(gameList);
   res.send(gameList);
 });
 
@@ -81,7 +81,7 @@ app.get('/game/:id', (req, res) => {
 app.get('/gameStatus/:id', (req, res) => {
   console.log("get " + req.path + ", id=" + req.params.id + ", " +  req.query.clientColor);
   var gameStatus = games.getGameStatus(req.params.id, req.query.clientColor);
-  console.log(gameStatus);
+  //console.log(gameStatus);
   if (gameStatus === undefined) {
     res.status(404).send('Not found');
   }    
@@ -178,7 +178,7 @@ app.get('/game/:id/player/:color', (req, res) => {
   if (player === undefined) {
     res.status(404).send('Not found');
   }
-  console.log(player);
+  //console.log(player);
   // TODO: if requesting player != player, then protect hidden info.
   res.send(player);
 });
@@ -187,16 +187,10 @@ app.get('/game/:id/map', (req, res) => {
   console.log(req.path, req.params);
   var game = games.getGameById(req.params.id);
   var locations = game.gameMap.getLocations(game.players.players.length);  
-  console.log(game.gameMap);
+  //console.log(game.gameMap);
   res.send(locations);
 });
 
-app.get('/game/:id/auctionBoard', (req, res) => {
-  console.log(req.path, req.params);
-  var game = games.getGameById(req.params.id);
-  console.log(game.auctionBoard);
-  res.send(game.auctionBoard);
-});
 
 app.put('/game/:id/firstplayer/:color', (req, res) => {
   console.log(req.path, req.params);
@@ -267,9 +261,17 @@ app.put('/game/:id/location/:location/leader', (req, res) => {
   res.send(location);
 });
 
+app.get('/game/:id/auctionBoard', (req, res) => {
+  console.log(req.path, req.params);
+  var game = games.getGameById(req.params.id);
+  console.log(game.auctionBoard);
+  res.send(game.auctionBoard);
+});
+
 app.get('/game/:id/auction', (req, res) => {
   console.log(req.path, req.params);
   var game = games.getGameById(req.params.id);
+  console.log(game.auctionBoard);
   res.send(game.auctionBoard);
 });
 

@@ -17,7 +17,8 @@
 </head>
 <body onload="onLoad()">
   <div>
-    <div id="map-overlay" style="float:left; width: 55%; position:relative; top: 0; left: 0; z-index: 1 ">
+    <!-- 55 -->
+    <div id="leftSideDiv" style="float:left; display: none; width: 5%; position:relative; top: 0; left: 0; z-index: 1 ">
       <!--<div id="map">-->
       <img height="700px" src="/rurik_map.jpg" alt="Rurik map" />
       <!--</div>-->
@@ -173,7 +174,8 @@
       </div>
     </div>
     
-    <div style="float:right; width:45%;">
+    <!-- 45 -->
+    <div id="rightSideDiv" style="float:right; width:95%">
       <form>
         <div id="statusDiv" style="display:none;">
           <!--
@@ -181,13 +183,28 @@
             Game: <GameName> (gameId)  1 of 4 (Players)
             Status: <status> Round: <round> CurrentPlayer: <color> FirstPlayer <color> NextPlayer: <color>
           -->
-          [<span id="myColor"></span>] <span id="myName"></span> as <span id="leader">. . .</span>  (<span id="myPosition" ></span>)<br/>
-          Game: <span id="gameStatusName"></span> (<span id="gameId"></span>)  <span id="gameDate"></span> Round: <span id="gameRound"></span><br/> 
-          Status: <span id="gameStatus"></span><br/> 
-          <br/>
+          <table>
+            <tr>
+              <td><div style="position: relative; top:0px; left: 0px">
+                <img src="/compass.jpg" height="100px" />
+                    <span id="N_position" class="white numberBox" style="position:absolute; top: 0px; left: 42px; z-index: 1; opacity: .5; display: none"></span>
+                    <span id="E_position" class="white numberBox" style="position:absolute; top: 40px; left: 85px; z-index: 1; opacity: .5; display: none"></span>
+                    <span id="S_position" class="white numberBox" style="position:absolute; top: 85px; left: 42px; z-index: 1; opacity: .5; display: none"></span>
+                    <span id="W_position" class="white numberBox" style="position:absolute; top: 40px; left: 0px; z-index: 1; opacity: .5; display: none"></span>
+              </div></td>
+              <td>&nbsp;</td>
+              <td>
+                [<span id="myColor"></span>] <span id="myName"></span> as <span id="leader">. . .</span><br/>
+                Game: <span id="gameStatusName"></span> (<span id="gameId"></span>)  <span id="gameDate"></span> Round: <span id="gameRound"></span><br/> 
+                Status: <span id="gameStatus"></span><br/> 
+                <br/>      
+              </td>
+            </tr>
+          </table>
+          
         </div>
         <div id="gameListDiv">
-          <input type="button" value="List Games" onclick="javascript:listGames();"/><br/>
+          <!--<input type="button" value="List Games" onclick="javascript:listGames();"/><br/>-->
           <div id="gameListData"></div>
           <br/>
         </div>

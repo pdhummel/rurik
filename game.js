@@ -14,10 +14,12 @@ class GameStatus {
         this.gameName = game.name;
         this.name = game.name;
         this.playerNames = "";
+        this.currentPlayer = null;
         this.numberOfPlayers = game.players.players.length;
         this.targetNumberOfPlayers = game.targetNumberOfPlayers;
         this.currentState = game.gameStates.getCurrentState().name;
         var firstPlayer = game.players.getFirstPlayer();
+        this.playersByPosition = game.players.playersByPosition;
         for (var i=0; i<this.numberOfPlayers; i++) {
             this.playerNames = this.playerNames + " " + game.players.players[i].name;
         }
@@ -32,6 +34,7 @@ class GameStatus {
         }
         if (this.currentState != "waitingForPlayers") {
             this.round = game.currentRound;
+            //this.auctionBoard = game.auctionBoard;
             var currentPlayer = game.players.getCurrentPlayer();
             if (currentPlayer != undefined && currentPlayer != null) {
                 this.currentPlayer = currentPlayer.color;
@@ -95,6 +98,7 @@ class Game {
     // validate targetNumberOfPlayers
     constructor(gameName, targetNumberOfPlayers=4, password="") {
         this.currentRound = 1;
+        this.auctionBoard = null;
         this.gameMap = new GameMap();
         this.cards = new Cards();
         this.targetNumberOfPlayers = targetNumberOfPlayers;
