@@ -201,19 +201,46 @@ function refreshGameStatusResponseHandler(response) {
     var gameName = gameStatus.gameName;
     var gameRound = gameStatus.round;
     var clientLeader = gameStatus.clientLeader;
-    var clientPosition = gameStatus.clientPosition;
+    var clientPosition = null;
+    var currentPlayerPosition = null;
     var playersByPosition = gameStatus.playersByPosition;
     for (var p=0; p < Object.keys(playersByPosition).length; p++) {
       var position = Object.keys(playersByPosition)[p];
       var positionElement = document.getElementById(position + "_position");
       var player = playersByPosition[position];
-      positionElement.className = player.color + " numberBox";
+      if (myColor == player.color) {
+        clientPosition = position;
+      }
+      if (currentPlayer == player.color) {
+        currentPlayerPosition = position;
+      }
+      if (currentPlayer != undefined && currentPlayer != null && currentPlayer == player.color) {
+        positionElement.className = player.color + " numberCircle";
+        positionElement.style.opacity = 1;
+        positionElement.innerHTML = position;
+      } else {
+        positionElement.className = player.color + " numberBox";
+        positionElement.style.opacity = .5;
+        positionElement.innerHTML = "";
+      }
       show(position + "_position");
     }
-
-    if (currentPlayer != undefined) {
-      status = status + " Current Player:" + currentPlayer;
+    var myColorIconElement = document.getElementById("myColorIcon");
+    if (currentPlayer != undefined && currentPlayer != null && currentPlayer == myColor) {
+      myColorIconElement.innerHTML = clientPosition;
+      myColorIconElement.className = myColor + " numberBox";
+    } else {
+      myColorIconElement.innerHTML = clientPosition;
+      myColorIconElement.className = myColor + " numberBox";
     }
+    var currentPlayerColorElement = document.getElementById("currentPlayerColor");
+    if (currentPlayer != undefined && currentPlayer != null) {
+      currentPlayerColorElement.innerHTML = currentPlayerPosition;
+      currentPlayerColorElement.className = currentPlayer + " numberCircle";
+    } else {
+      currentPlayerColorElement.innerHTML = "";
+      //currentPlayerColorElement.style.display = "none";
+    }    
 
     if (gameRound != undefined) {
       setInnerHtml("gameRound", gameRound);
@@ -361,6 +388,7 @@ function refreshMapResponseHandler(response) {
       } else {
         hide(span);
       }
+
       var leader = locationData["leaderByColor"][color];
       var span = locationName + "_" + color + "_leader";
       setInnerHtml(span, leader);
@@ -370,6 +398,7 @@ function refreshMapResponseHandler(response) {
         hide(span);
       }
     }
+    
     var rebels = locationData["rebels"].length;
     span = locationName + "_rebels";
     setInnerHtml(span, rebels);

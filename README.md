@@ -1,14 +1,14 @@
 # rurik
-nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
+WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 ## TODO
 
 
-* add more leaders
-* fix troop coordinates on map
+
 * show buildings on map
-    
+* add more leaders
+
 
 * action phase
   * define scheme cards
@@ -68,6 +68,7 @@ nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show coins on advisor bid
 * validation - coins for auction bid
 * validation -- multiple advisors same color, same column
+* fix troop coordinates on map
 
 
 ## Notes
