@@ -120,9 +120,7 @@ function listGamesResponseHandler(response) {
     return;
   }  
   selectGameId = document.getElementById("selectGameId");
-  selectGameId2 = document.getElementById("selectGameId2");
   clearOptions(selectGameId);
-  clearOptions(selectGameId2);
   var games = response.data;
   var rows = [];
   for (var i=0; i < Object.keys(games).length; i++) {
@@ -134,7 +132,6 @@ function listGamesResponseHandler(response) {
     element = document.createElement("option");
     element.innerText = games[key].gameId + " " + games[key].gameName;
     element.value = games[key].gameId;        
-    selectGameId2.append(element);
     var row = [];
     row.push(games[key].gameId);
     row.push(games[key].gameName);
@@ -309,7 +306,7 @@ function refreshGameStatusResponseHandler(response) {
       } else {
         hide("placeAdvisorDiv");
       }
-    } else if (currentState == "actionPhase") {
+    } else if (currentState == "actionPhase" || currentState == "retrieveAdvisor") {
       if (gameStatus.numberOfPlayers <= 2) {
         show("strategyBoard-1-2");
       } else {
@@ -324,6 +321,12 @@ function refreshGameStatusResponseHandler(response) {
       hide("advisors");
       hide("placeAdvisorDiv");
     }
+    if (currentState == "retrieveAdvisor" && currentPlayer == myColor) {
+      getNextAdvisor();
+    } else {
+      hide("retrieveAdvisorDiv");
+    }
+
 }
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
@@ -362,6 +365,21 @@ function refreshMapResponseHandler(response) {
     var locationName = locations[i].name;
     var locationData = locations[i];
     
+    for (var b=0; b<3; b++) {
+      // Ex: AzovBuilding1
+      var buildingElementId = locationName + "Building" + (b+1);
+      var buildingElement = document.getElementById(buildingElementId);
+      if (b < locationData.buildings) {
+        var buildingName = locationData.buildings[b].name;
+        var buildingColor = locationData.buildings[b].color;
+        var buildingImage = "/" + buildingName + "-" + buildingColor + ".png";
+        buildingElement.src = buildingImage;
+        show(buildingElementId);
+      } else {
+        hide(buildingElementId);
+      }
+    }
+
     var option = document.createElement("option");
     option.innerText = locationName;
     option.value = locationName;
@@ -398,7 +416,7 @@ function refreshMapResponseHandler(response) {
         hide(span);
       }
     }
-    
+
     var rebels = locationData["rebels"].length;
     span = locationName + "_rebels";
     setInnerHtml(span, rebels);
@@ -425,6 +443,7 @@ function joinGame() {
 }
 function joinGameResponseHandler(response) {
     console.log("joinGameResponseHandler(): " + JSON.stringify(response.data));
+
     var leftSideDiv = document.getElementById("leftSideDiv");
     var rightSideDiv = document.getElementById("rightSideDiv");
     rightSideDiv.style.width = "45%";
@@ -439,12 +458,6 @@ function joinGameResponseHandler(response) {
 }
 
 function rejoinGame(gameId, color) {
-  if (gameId == undefined || gameId == null || gameId.length <= 0) {
-    gameId = getSelectedValue("selectGameId2");
-  }
-  if (color == undefined || color == null || color.length <= 0) {
-    color = getSelectedValue("selectColor2");
-  }
   if (gameId != undefined) {
     setInnerHtml("gameId", gameId);
     setInnerHtml("myColor", color);
@@ -615,7 +628,7 @@ function placeAdvisor() {
     coins = bidCoins;
   }
   var data = '{ "color":"'+ color +'", "bidCoins":"' + coins + '", "advisor":"'+ advisor + '" }';
-  callApi("/game/" + gameId + "/auction/" + selectedAction, "put", data, placeAdvisorResponseHandler);
+  callApi("/game/" + gameId + "/advisorBid/" + selectedAction, "put", data, placeAdvisorResponseHandler);
 }
 function placeAdvisorResponseHandler(response) {
   console.log("placeAdvisorResponseHandler(): " + JSON.stringify(response.data));
@@ -670,4 +683,62 @@ function refreshStrategyBoardResponseHandler(response) {
       }
     }
   }
+}
+
+function getNextAdvisor() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  callApi('/game/' + gameId + '/player/' + color + '/nextAdvisor', "get", "", getNextAdvisorResponseHandler);
+}
+function getNextAdvisorResponseHandler(response) {
+  console.log("getNextAdvisorResponseHandler(): " + JSON.stringify(response.data));
+  // populate radio buttons
+  // [{"actionName":"muster","quantity":3,"extraCoin":0,"color":"blue","advisor":"1","bidCoins":0}]
+  var advisors = response.data;
+  var advisor1Label = document.getElementById("advisor1Label");
+  advisor1Label.innerHTML = "Advisor " + advisors[0].advisor + ", row " + (advisors[0].row+1) + ": " + 
+      advisors[0].actionName + " " + advisors[0].quantity;
+  var advisor1 = document.getElementById("advisor1");
+  advisor1.value = advisors[0].actionName + "-" + advisors[0].advisor + "-" + advisors[0].row
+  if (advisors.length > 1) {
+    show("showAdvisor2");
+    var advisor2Label = document.getElementById("advisor2Label");
+    advisor2Label.innerHTML = advisors[1].advisor + ": " + advisors[1].actionName + " " + advisors[1].quantity;
+    var advisor2 = document.getElementById("advisor2");
+    advisor2.value = advisors[1].actionName + "-" + advisors[1].advisor + "-" + advisors[1].row  
+  } else {
+    hide("showAdvisor2");
+  }
+  show("retrieveAdvisorDiv");
+}
+
+function retrieveAdvisor() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var advisors = document.getElementsByName('advisor');
+  var advisorValue = null;
+  for (var i = 0; i < advisors.length; i++) {
+      if (advisors[i].checked) {
+        advisorValue = advisors[i].value;
+      }
+  }
+
+  // action-advisorNumber-row - Example: muster-1-1 
+  var advisorValues = advisorValue.split("-");
+  var action = advisorValues[0];
+  var advisor = advisorValues[1];
+  var row = advisorValues[2];
+  var forfeitAction = "N";
+  var forfeitActionYN = document.getElementById("forfeitActionYN");
+  if (forfeitActionYN != undefined && forfeitActionYN != null && forfeitActionYN.checked) {
+    forfeitAction = forfeitActionYN.value;
+  }
+  var data = '{ "color": "' + color + '", "advisor": "' + advisor + '", "row": "' + row + 
+    '", "forfeitAction": "' + forfeitAction + '"}';
+    console.log("retrieveAdvisor: data=" + data);
+  callApi('/game/' + gameId + '/advisorRetrieve/' + action, "put", data, retrieveAdvisorHandler);
+}
+function retrieveAdvisorHandler(response) {
+  console.log("retrieveAdvisorHandler(): " + JSON.stringify(response.data));
+  refreshGameStatus();
 }

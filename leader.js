@@ -5,7 +5,14 @@ class AvailableLeaders {
         this.addLeader("Gleb");
         this.addLeader("Sviatoslav");
         this.addLeader("Theofana");
-
+        this.addLeader("Agatha");
+        this.addLeader("Sudislav");
+        this.addLeader("Boris");
+        this.addLeader("Sviatopolk");
+        this.addLeader("Maria");
+        this.addLeader("Yaroslav");
+        this.addLeader("Mstislav");
+        this.addLeader("Predslava");
     }
 
     addLeader(name) {

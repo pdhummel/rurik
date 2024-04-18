@@ -17,7 +17,11 @@ class GameStatus {
         this.currentPlayer = null;
         this.numberOfPlayers = game.players.players.length;
         this.targetNumberOfPlayers = game.targetNumberOfPlayers;
-        this.currentState = game.gameStates.getCurrentState().name;
+        var currentGameState = game.gameStates.getCurrentState();
+        this.currentState = null;
+        if (currentGameState != undefined && currentGameState != null) {
+            this.currentState = currentGameState.name;
+        }
         var firstPlayer = game.players.getFirstPlayer();
         this.playersByPosition = game.players.playersByPosition;
         for (var i=0; i<this.numberOfPlayers; i++) {
@@ -40,10 +44,10 @@ class GameStatus {
                 this.currentPlayer = currentPlayer.color;
                 if (currentPlayer.color == clientColor) {
                     this.statusMessage = "Waiting on you";
-                    this.availableActions = this.currentState.allowedActions;
+                    this.availableActions = currentGameState.allowedActions;
                 } else if (clientColor == undefined || clientColor == null || clientColor.length < 1) {
                     this.statusMessage = "Waiting on " + currentPlayer.color;
-                    this.availableActions = this.currentState.allowedActions;
+                    this.availableActions = currentGameState.allowedActions;
                 } else {
                     this.statusMessage = "Waiting on " + currentPlayer.color;
                     this.availableActions = [];                
@@ -278,15 +282,17 @@ class Game {
                         var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
                         this.players.setAdvisors(advisors);
                         this.players.mapAdvisorsToAuctionSpaces(this.auctionBoard);
-                        this.gameStates.setCurrentState("actionPhase");
+                        //this.gameStates.setCurrentState("actionPhase");
+                        this.gameStates.setCurrentState("retrieveAdvisor");
                     }
                 }
             }
         }
     }
 
-    takeMainAction(color, advisor, actionColumnName, forfeitAction=false) {
-        if (this.gameStates.currentState.name == "actionPhase") {
+    takeMainAction(color, advisor, actionColumnName, row, forfeitAction=false) {
+        console.log("takeMainAction(): ", color, advisor, actionColumnName, row, forfeitAction);
+        if (this.gameStates.currentState.name == "retrieveAdvisor") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color && currentPlayer.tookMainActionForTurn == false) {
                 // TODO: figure out how to differentiate if there are 2 with the same advisor number 
@@ -301,12 +307,20 @@ class Game {
                         auctionSpace = auctionSpaces.pop();
                     } else {
                         // TODO: throw exception
+                        console.log("takeMainAction(): TODO: exception");
                     }
+
+                    // remove advisor from auctionSpace
+                    auctionSpace.color = null;
+                    auctionSpace.advisor = 0;
+                    auctionSpace.bidCoins = 0;
+
                     if (forfeitAction == true) {
                         currentPlayer.boat.money++;
                     } else {
                         if (auctionSpace.extraCoin > currentPlayer.boat.money) {
                             // TODO: throw exception
+                            console.log("takeMainAction(): TODO: exception, not enough money");
                         } else {
                             currentPlayer.boat.money = currentPlayer.boat.money - auctionSpace.extraCoin;
                         }
@@ -339,7 +353,11 @@ class Game {
                         }
     
                     }
+                    console.log("takeMainAction(): tookMainActionForTurn");
                     currentPlayer.tookMainActionForTurn = true;
+                    if (currentPlayer.tookMainActionForTurn && this.gameStates.getCurrentState().name == "retrieveAdvisor") {
+                        this.gameStates.setCurrentState("actionPhase");
+                    }
                 }
 
             }

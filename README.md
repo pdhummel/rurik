@@ -4,15 +4,11 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 ## TODO
 
-
-
-* show buildings on map
-* add more leaders
-
-
 * action phase
   * define scheme cards
+  * scheme
   * use conversion token
+  * take action - muster, move, tax, build, attack
   * leader abilities
 
 
@@ -69,11 +65,11 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * validation - coins for auction bid
 * validation -- multiple advisors same color, same column
 * fix troop coordinates on map
+* add more leaders
+* retrieve advisor from auction board
+* show buildings on map
 
 
 ## Notes
 
-[blue] Paul as . . . ? (N)
-Game: pg (1713035303372) Round:
-Status: waitingForPlayers
 

@@ -62,6 +62,29 @@ class AuctionBoard {
         return false;
     }
 
+    getNextAuctionSpaceAdvisor(color) {
+        var currentValue = 6;
+        var advisors = [];
+        var columns = Object.keys(this.board);
+        for (var k=0; k<columns.length; k++) {
+            var actionName = columns[k];
+            for (var i=0; i<this.numberOfRows; i++) {
+                if (this.board[actionName][i].color == color) {
+                    if (this.board[actionName][i].advisor == currentValue) {
+                        this.board[actionName][i].row = i;
+                        advisors.push(this.board[actionName][i]);
+                    } else if (this.board[actionName][i].advisor < currentValue) {
+                        advisors.length = 0;
+                        this.board[actionName][i].row = i;
+                        advisors.push(this.board[actionName][i]);
+                        currentValue = this.board[actionName][i].advisor;
+                    }    
+                }
+            }
+        }
+        return advisors;
+    }
+
     // row=0-3
     auctionBid(actionName, color, advisor, bidCoins) {
         if (this.isColumnFull(actionName)) {

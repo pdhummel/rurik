@@ -273,17 +273,7 @@
           <input type="button" value="Join Game" onclick="javascript:joinGame();"/><br/>
           <br/>
         </div>
-        <div id="rejoinGameDiv" style="display:none;">
-          <select id="selectGameId2"></select>
-          <select id="selectColor2">
-            <option>blue</option>
-            <option>red</option>
-            <option>white</option>
-            <option>yellow</option>
-          </select>
-          <input type="button" value="ReJoin Game" onclick="javascript:rejoinGame();"/><br/>
-          <br/>
-        </div>
+
         <div id="startGameDiv" style="display:none;">
           <input type="button" value="Start Game" onclick="javascript:startGame();"/><br/>
         </div>
@@ -337,6 +327,19 @@
         <div id="advisorRow" style="display:flex;">
           <!--<span id="advisor1" style="display: block;"><img height="40px" src="/one-blue.png" alt="advisor 1" /></span>-->
         </div>        
+      </div>
+
+      <div id="retrieveAdvisorDiv" style="display:none">
+        <input type="radio" id="advisor1" name="advisor" value="" checked>
+        <label id="advisor1Label" for="advisor1"></label><br/>
+        <span id="showAdvisor2" style="display:none">
+          <input type="radio" id="advisor2" name="advisor" value="" >
+          <label id="advisor2Label" for="advisor2" ></label><br/>
+        </span>
+        <input type="checkbox" id="forfeitActionYN" value="Y"/>
+        <label for="forfeitActionYN">Forfeit action for 1 coin.</label><br/>
+        <input type="button" value="Retrieve Advisor" onclick="javascript:retrieveAdvisor();"/><br/>
+        <br/>
       </div>
 
       <table id="strategyBoard-1-2" style="display: none">
@@ -407,6 +410,14 @@
         </tr>
       </table>
 
+      <table style="display:none">
+        <tr><th>Points</th><th>Rule</th><th>Build</th><th>Trade</th></tr>
+        <tr><td>8</td><td>5 Regions (including Kiev & Novgorod)</td><td>7 Adjacent Regions</td><td>11 Goods on Boat</td></tr>
+        <tr><td>5</td><td>5 Regions</td><td>5 Adjacent Regions</td><td>9 Goods on Boat</td></tr>
+        <tr><td>3</td><td>4 Regions</td><td>4 Adjacent Regions</td><td>7 Goods on Boat</td></tr>
+        <tr><td>2</td><td>3 Regions</td><td>3 Adjacent Regions</td><td>5 Goods on Boat</td></tr>
+        <tr><td>1</td><td>2 Regions</td><td>2 Adjacent Regions</td><td>3 Goods on Boat</td></tr>
+      </table>
 
       <table>
       <tr><td>

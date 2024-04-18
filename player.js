@@ -15,6 +15,12 @@ class GamePlayers {
         if (this.players.length >= this.targetNumberOfPlayers) {
             throw new Error("Target player count has already been reached.", "addPlayer()");
         }
+        if (this.playersByColor[color] != undefined && this.playersByColor[color] != null) {
+            throw new Error("Color " + color + " has already been selected.", "addPlayer()");
+        }
+        if (this.playersByPosition[position] != undefined && this.playersByPosition[position] != null) {
+            throw new Error("Position " + position + " has already been selected.", "addPlayer()");
+        }
         var player = new Player(name, color, position, isPlayerAi);
         console.log("addPlayer(): player created")
         this.players.push(player);

@@ -8,6 +8,7 @@ class GameStates {
         this.gameStates["waitingForTroopPlacement"] = new GameState("waitingForTroopPlacement", ["placeTroop"]);
         this.gameStates["waitingForLeaderPlacement"] = new GameState("waitingForLeaderPlacement", ["placeLeader"]);
         this.gameStates["strategyPhase"] = new GameState("strategyPhase", ["playAdvisor"]);
+        this.gameStates["retrieveAdvisor"] = new GameState("retrieveAdvisor", ["retrieveAdvisor"]);
         this.gameStates["actionPhase"] = new GameState("actionPhase", ["takeMainAction", "playSchemeCard", "accomplishDeed", "convertGoods", "endTurn"]);
         this.gameStates["scheme"] = new GameState("scheme", ["drawSchemeCards", "selectSchemeCard", "assignFirstPlayer"]);
         this.gameStates["claimPhase"] = new GameState("claimPhase", ["chooseDeedCard"]);

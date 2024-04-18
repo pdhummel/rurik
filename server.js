@@ -177,7 +177,7 @@ app.put('/game/:id', (req, res) => {
 
 // getPlayer
 app.get('/game/:id/player/:color', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("get " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -195,7 +195,7 @@ app.get('/game/:id/player/:color', (req, res) => {
 });
 
 app.get('/game/:id/map', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("get " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -207,7 +207,7 @@ app.get('/game/:id/map', (req, res) => {
 
 
 app.put('/game/:id/firstplayer/:color', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("put " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -220,7 +220,7 @@ app.put('/game/:id/firstplayer/:color', (req, res) => {
 });
 
 app.post('/game/:id/firstplayer', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("post " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -232,7 +232,7 @@ app.post('/game/:id/firstplayer', (req, res) => {
 });
 
 app.get('/game/:id/leaders', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("get " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -242,7 +242,7 @@ app.get('/game/:id/leaders', (req, res) => {
 });
 
 app.post('/game/:id/player/:color/leaders', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("post " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -261,7 +261,7 @@ app.post('/game/:id/player/:color/leaders', (req, res) => {
 
 
 app.get('/game/:id/player/:color/secretAgenda', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("get " +  req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -277,7 +277,7 @@ app.get('/game/:id/player/:color/secretAgenda', (req, res) => {
 });
 
 app.post('/game/:id/player/:color/secretAgenda', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("post " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -295,7 +295,7 @@ app.post('/game/:id/player/:color/secretAgenda', (req, res) => {
 });
 
 app.put('/game/:id/location/:location/troops', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("put " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -306,8 +306,9 @@ app.put('/game/:id/location/:location/troops', (req, res) => {
   var location = game.gameMap.getLocation(req.params.location);
   res.send(location);
 });
+
 app.put('/game/:id/location/:location/leader', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("put " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -320,8 +321,32 @@ app.put('/game/:id/location/:location/leader', (req, res) => {
 });
 
 
+app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  var color = req.params.color;
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var player = game.getPlayer(color);
+  if (player === undefined) {
+    res.status(404).send('Player not found for color ' + color);
+    return;
+  }
+  try {
+    var auctionSpaces = game.auctionBoard.getNextAuctionSpaceAdvisor(color);
+    res.send(auctionSpaces);
+    return;
+  } catch(error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
+    return;
+  }     
+});
+
 app.get('/game/:id/auction', (req, res) => {
-  console.log(req.path, req.params);
+  console.log("get " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -330,8 +355,8 @@ app.get('/game/:id/auction', (req, res) => {
   res.send(game.auctionBoard);
 });
 
-app.put('/game/:id/auction/:action', (req, res) => {
-  console.log(req.path, req.params);
+app.put('/game/:id/advisorBid/:action', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
   if (game === undefined) {
     res.status(404).send('Game not found');
@@ -354,6 +379,36 @@ app.put('/game/:id/auction/:action', (req, res) => {
   }   
   res.send(game.auctionBoard);
 });
+
+app.put('/game/:id/advisorRetrieve/:action', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var action = req.params.action;
+  var color = req.body.color;
+  var advisor = req.body.advisor;
+  var row = req.body.row;
+  var forfeitActionYN = req.body.forfeitAction;
+  var forfeitAction = false;
+  if (forfeitActionYN == 'Y') {
+    forfeitAction = true;
+  }
+  try {
+    console.log("/game/:id/advisorRetrieve/:action: " + color + " " + advisor + " " + action + " " + " " + row + " " + 
+        forfeitActionYN + " " + forfeitAction);
+    game.takeMainAction(color, advisor, action, row, forfeitAction)
+  } catch(error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
+    return;
+  }   
+  res.send(game.auctionBoard);
+});
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
