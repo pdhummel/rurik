@@ -72,4 +72,14 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 ## Notes
 
+docker build -f ./docker/Dockerfile -t ubuntu-focus-nodejs-11 .
+docker run --name nodejs -d ubuntu-focus-nodejs-11 tail -f /dev/null
+docker exec -it  nodejs bash
+docker kill nodejs
+docker rm nodejs
 
+docker build -f ./docker/Dockerfile -t nodejs-rurik .
+docker run -d --name rurik -p 3000:3000 -d nodejs-rurik
+docker exec -it  rurik bash
+docker kill rurik
+docker rm rurik

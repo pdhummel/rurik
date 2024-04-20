@@ -258,12 +258,12 @@ function refreshGameStatusResponseHandler(response) {
       hide("boatDiv");
       hide("supplyDiv");
     } else {
-      document.getElementById("tavernImage").src = "/tavern-" + myColor + ".png";
-      document.getElementById("marketImage").src = "/market-" + myColor + ".png";
-      document.getElementById("churchImage").src = "/church-" + myColor + ".png";
-      document.getElementById("strongholdImage").src = "/stronghold-" + myColor + ".png";
-      document.getElementById("stableImage").src = "/stable-" + myColor + ".png";
-      document.getElementById("troopImage").src = "/troop-" + myColor + ".png";
+      document.getElementById("tavernImage").src = "/assets/tavern-" + myColor + ".png";
+      document.getElementById("marketImage").src = "/assets/market-" + myColor + ".png";
+      document.getElementById("churchImage").src = "/assets/church-" + myColor + ".png";
+      document.getElementById("strongholdImage").src = "/assets/stronghold-" + myColor + ".png";
+      document.getElementById("stableImage").src = "/assets/stable-" + myColor + ".png";
+      document.getElementById("troopImage").src = "/assets/troop-" + myColor + ".png";
       hide("startGameDiv");
       show("boatDiv");
       show("supplyDiv");
@@ -326,7 +326,11 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       hide("retrieveAdvisorDiv");
     }
-
+    if (currentState == "actionPhase" && currentPlayer == myColor) {
+      showStrategyPhaseDiv();
+    } else {
+      hide("strategyPhaseDiv");
+    }
 }
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
@@ -372,7 +376,7 @@ function refreshMapResponseHandler(response) {
       if (b < locationData.buildings) {
         var buildingName = locationData.buildings[b].name;
         var buildingColor = locationData.buildings[b].color;
-        var buildingImage = "/" + buildingName + "-" + buildingColor + ".png";
+        var buildingImage = "/assets/" + buildingName + "-" + buildingColor + ".png";
         buildingElement.src = buildingImage;
         show(buildingElementId);
       } else {
@@ -589,7 +593,7 @@ function refreshPlayerResponseHandler(response) {
     option.innerText = advisors[i];
     option.value = advisors[i];
     selectAdvisor.append(option);
-    var imageFile = "/" + advisorNumToText[advisors[i]] + "-" + color + ".png";
+    var imageFile = "/assets/" + advisorNumToText[advisors[i]] + "-" + color + ".png";
     innerHtml = innerHtml + '<img height="40px" src="' + imageFile + '" />';
   }
   advisorRow.innerHTML = innerHtml;
@@ -668,8 +672,8 @@ function refreshStrategyBoardResponseHandler(response) {
       if (advisor > 0) {
         var color = column[i]["color"];
         var image = document.getElementById(elementId);
-        // "/one-blue.png"
-        var imageSrc = "/" + advisorNumToText[advisor] + "-" + color + ".png";
+        // "/assets/one-blue.png"
+        var imageSrc = "/assets/" + advisorNumToText[advisor] + "-" + color + ".png";
         image.src = imageSrc;
         show(elementId);
       } else {
@@ -741,4 +745,25 @@ function retrieveAdvisor() {
 function retrieveAdvisorHandler(response) {
   console.log("retrieveAdvisorHandler(): " + JSON.stringify(response.data));
   refreshGameStatus();
+}
+
+function showStrategyPhaseDiv() {
+  // TODO: get player details
+  show("strategyPhaseDiv");
+}
+function showStrategyPhaseHandler(response) {
+  console.log("showStrategyPhaseHandler(): " + JSON.stringify(response.data));
+  /*
+        this.tookMainActionForTurn = false;
+        this.schemeCardsCanPlay = 1;
+        this.oneTimeSchemeCard = null;
+        this.accomplishedDeedForTurn = false;
+        this.convertedGoodsForTurn = false;
+        this.taxActions = 0;
+        this.buildActions = 0;
+        this.moveActions = 0;
+        this.attackActions = 0;
+        this.moveActionsFromLocation = {};
+  */
+  show("strategyPhaseDiv");
 }
