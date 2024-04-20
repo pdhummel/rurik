@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
-  <script src="./rurik-client.js"></script>
+  <script src="./rurik-client.jsx"></script>
   <script type="text/javascript">
   </script>
   <link rel="stylesheet" type="text/css" href="./rurik-styles.css"  />
@@ -343,48 +343,36 @@
       </div>
 
       <div id="strategyPhaseDiv" style="display:none">
-        Action Phase<br/>
-        <!--
-          [rb] Muster: 0 troop(s) available.
-          [rb] Move: 0 action(s) available. 
-          [rb] Attack: 0 action(s) available.
-          [rb] Tax: 0 action(s) available.
-          [rb] Build: 0 action(s) available.
-          [rb] Play scheme card.
-          [rb] Convert goods.
-          [rb] Accomplish deed.
-          [rb] End turn.
-          [Perform Action]
-        -->
-        <span id="showMuster" style="display:block">
+        <b>Action Phase</b><br/>
+        <span id="musterOption" style="display:block">
           <input type="radio" id="musterAction" name="strategyPhaseAction" value="musterAction">
           <label id="musterActionLabel" for="musterAction">Muster: <span id="musterActions">0</span> troop(s) available.</label><br/>
         </span>
-        <span id="showMove" style="display:block">
+        <span id="moveOption" style="display:block">
           <input type="radio" id="moveAction" name="strategyPhaseAction" value="moveAction">
           <label id="moveActionLabel" for="moveAction">Move: <span id="moveActions">0</span> action(s) available.</label><br/>
         </span>
-        <span id="showAttack" style="display:block">
+        <span id="attackOption" style="display:block">
           <input type="radio" id="attackAction" name="strategyPhaseAction" value="attackAction">
           <label id="attackActionLabel" for="attackAction">Attack: <span id="attackActions">0</span> action(s) available.</label><br/>
         </span>
-        <span id="showTax" style="display:block">
+        <span id="taxOption" style="display:block">
           <input type="radio" id="buildAction" name="strategyPhaseAction" value="buildAction">
           <label id="taxActionLabel" for="taxAction">Tax: <span id="taxActions">0</span> action(s) available.</label><br/>
         </span>
-        <span id="showBuild" style="display:block">
+        <span id="buildOption" style="display:block">
           <input type="radio" id="buildAction" name="strategyPhaseAction" value="buildAction">
           <label id="buildActionLabel" for="buildAction">Build: <span id="buildActions">0</span> action(s) available.</label><br/>
         </span>
-        <span id="showScheme" style="display:block">
+        <span id="schemeOption" style="display:block">
           <input type="radio" id="schemeAction" name="strategyPhaseAction" value="schemeAction">
           <label id="schemeActionLabel" for="schemeAction">Play a scheme card.</label><br/>
         </span>
-        <span id="showConvertGoods" style="display:block">
+        <span id="convertGoodsOption" style="display:block">
           <input type="radio" id="convertGoodsAction" name="strategyPhaseAction" value="convertGoodsAction">
           <label id="convertGoodsActionLabel" for="convertGoodsAction">Convert Goods.</label><br/>
         </span>
-        <span id="showAccomplishDeed" style="display:block">
+        <span id="accomplishDeedOption" style="display:block">
           <input type="radio" id="accomplishDeedAction" name="strategyPhaseAction" value="accomplishDeedAction">
           <label id="accomplishDeedActionLabel" for="accomplishDeedAction">Accomplish Deed.</label><br/>
         </span>

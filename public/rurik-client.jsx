@@ -142,7 +142,7 @@ function listGamesResponseHandler(response) {
       for (var p=0; p < Object.keys(playersByPosition).length; p++) {
         var position = Object.keys(playersByPosition)[p];
         var player = playersByPosition[position];
-        playerSummary = playerSummary + '<input type="button" style="background-color: 	#696969; color:' + player.color + '" value="' + player.name + '-' + position + '" onclick=\'javascript:rejoinGame("' + games[key].gameId + '", "' + player.color + '");\' />';
+        playerSummary = playerSummary + '<input type="button" style="background-color: 	#696969; color:' + player.color + '" value="' + player.name + ' (' + position + ')" onclick=\'javascript:rejoinGame("' + games[key].gameId + '", "' + player.color + '");\' />';
       }
       
     }
@@ -150,8 +150,8 @@ function listGamesResponseHandler(response) {
     rows.push(row);
   }
 
+  populateTable(rows, ["Game Id", "Game Name", "Status", "Players"]);
   if (Object.keys(games).length > 0) {
-    populateTable(rows, ["Game Id", "Game Name", "Status", "Players"]);
     show("joinGameDiv");
   }
   gameId = getInnerHtmlValue("gameId");
@@ -749,21 +749,99 @@ function retrieveAdvisorHandler(response) {
 
 function showStrategyPhaseDiv() {
   // TODO: get player details
-  show("strategyPhaseDiv");
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  if (gameId != undefined && gameId != null && color != undefined && color != null) {
+    callApi('/game/' + gameId + '/player/' + color, "get", "", showStrategyPhaseHandler);
+  } 
 }
 function showStrategyPhaseHandler(response) {
   console.log("showStrategyPhaseHandler(): " + JSON.stringify(response.data));
   /*
-        this.tookMainActionForTurn = false;
-        this.schemeCardsCanPlay = 1;
-        this.oneTimeSchemeCard = null;
         this.accomplishedDeedForTurn = false;
-        this.convertedGoodsForTurn = false;
-        this.taxActions = 0;
-        this.buildActions = 0;
-        this.moveActions = 0;
-        this.attackActions = 0;
-        this.moveActionsFromLocation = {};
+  
   */
+  var playerData = response.data;
+  if (playerData.convertedGoodsForTurn == false && 
+    (playerData.boat.canPlayAttackConversionTile || playerData.boat.canPlayBuildConversionTile || playerData.boat.canPlayMusterConversionTile)) {
+      show("convertGoodsOption");
+  } else {
+    hide("convertGoodsOption");
+  }
+  var moveActions = playerData.moveActions;
+  if (moveActions > 0) {
+    setInnerHtml("moveActions", moveActions);
+    show("moveOption");
+  } else {
+    for (var i=0; i<Object.keys(playerData.moveActionsFromLocation).length; i++) {
+      var key = Object.keys(playerData.moveActionsFromLocation)[i];
+      var moves = playerData.moveActionsFromLocation[key];
+      moveActions = moveActions + moves;
+    }
+    if (moveActions > 0) {
+      setInnerHtml("moveActions", moveActions);
+      show("moveOption");
+    } else {
+      hide("moveOption");
+    }
+  }
+  if (playerData.attackActions > 0) {
+    setInnerHtml("attackActions", playerData.attackActions);
+    show("attackOption");
+  } else {
+    hide("attackOption");
+  }
+  if (playerData.taxActions > 0) {
+    setInnerHtml("taxActions", playerData.taxActions);
+    show("taxOption");
+  } else {
+    hide("taxOption");
+  }
+  if (playerData.buildActions > 0) {
+    setInnerHtml("buildActions", playerData.buildActions);
+    show("buildOption");
+  } else {
+    hide("buildOption");
+  }
+  // TODO: check if leader can be deployed
+  if (playerData.troopsToDeploy > 0) {
+    setInnerHtml("musterActions", playerData.troopsToDeploy);
+    show("musterOption");
+  } else {
+    hide("musterOption");
+  }
+  if (playerData.schemeCards.length > 0 && playerData.schemeCardsCanPlay > 0) {
+    show("schemeOption");
+  } else {
+    hide("schemeOption");
+  }
+  // TODO: check that the player has unfulfilled deed cards
+  if (playerData.accomplishedDeedForTurn == false) {
+    show("accomplishDeedOption");
+  } else {
+    hide("accomplishDeedOption");
+  }
   show("strategyPhaseDiv");
+}
+
+function performStrategyPhaseAction() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var strategyPhaseActions = document.getElementsByName('strategyPhaseAction');
+  var strategyPhaseActionValue = null;
+  for (var i = 0; i < strategyPhaseActions.length; i++){
+      if (strategyPhaseActions[i].checked){
+        strategyPhaseActionValue = strategyPhaseActions[i].value;
+      }
+  }
+  if (strategyPhaseActionValue == "endTurnAction") {
+    endTurn(gameId, color);
+  }
+}
+function endTurn(gameId, color) {
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "delete", "", endTurnResponseHandler);
+}
+function endTurnResponseHandler(response) {
+  console.log("endTurnResponseHandler(): " + JSON.stringify(response.data));
+  refreshGameStatus();
 }

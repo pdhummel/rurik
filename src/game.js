@@ -282,7 +282,6 @@ class Game {
                         var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
                         this.players.setAdvisors(advisors);
                         this.players.mapAdvisorsToAuctionSpaces(this.auctionBoard);
-                        //this.gameStates.setCurrentState("actionPhase");
                         this.gameStates.setCurrentState("retrieveAdvisor");
                     }
                 }
@@ -290,6 +289,7 @@ class Game {
         }
     }
 
+    // retrieve advisor
     takeMainAction(color, advisor, actionColumnName, row, forfeitAction=false) {
         console.log("takeMainAction(): ", color, advisor, actionColumnName, row, forfeitAction);
         if (this.gameStates.currentState.name == "retrieveAdvisor") {
@@ -297,14 +297,17 @@ class Game {
             if (currentPlayer.color == color && currentPlayer.tookMainActionForTurn == false) {
                 // TODO: figure out how to differentiate if there are 2 with the same advisor number 
                 // in the same column - for now, process top to bottom.
-                if (advisor == currentPlayer.advisors[0]) {
+                
+                if (currentPlayer.advisors.length > 0 && advisor == currentPlayer.advisors[0]) {
                     currentPlayer.advisors.shift();
                     var auctionSpaces = currentPlayer.advisorsToAuctionSpace[advisor];
                     var auctionSpace = null;
                     if (auctionSpaces.length > 0 && auctionSpaces[0].actionName == actionColumnName) {
                         auctionSpace = auctionSpaces.shift();
+                        console.log("takeMainAction(): shift " + auctionSpace.actionName);
                     } else if (auctionSpaces.length > 1 && auctionSpaces[1].actionName == actionColumnName) {
                         auctionSpace = auctionSpaces.pop();
+                        console.log("takeMainAction(): pop " + auctionSpace.actionName);
                     } else {
                         // TODO: throw exception
                         console.log("takeMainAction(): TODO: exception");
@@ -314,6 +317,7 @@ class Game {
                     auctionSpace.color = null;
                     auctionSpace.advisor = 0;
                     auctionSpace.bidCoins = 0;
+                    console.log("takeMainAction(): advisor removed");
 
                     if (forfeitAction == true) {
                         currentPlayer.boat.money++;
@@ -326,16 +330,12 @@ class Game {
                         }
                         if (actionColumnName == "build") {
                             currentPlayer.buildActions = currentPlayer.buildActions + auctionSpace.quantity;
-                            //this.gameStates.setCurrentState("build");
                         } else if (actionColumnName == "tax") {
                             currentPlayer.taxActions = currentPlayer.taxActions + auctionSpace.quantity;
-                            //this.gameStates.setCurrentState("tax");
                         } else if (actionColumnName == "move") {
                             currentPlayer.moveActions = currentPlayer.moveActions + auctionSpace.quantity;
-                            //this.gameStates.setCurrentState("move");
                         } else if (actionColumnName == "attack") {
                             currentPlayer.attackActions = currentPlayer.attackActions + auctionSpace.quantity;
-                            //this.gameStates.setCurrentState("attack");
                         } else if (actionColumnName == "muster") {
                             var quantity = auctionSpace.quantity;
                             if (quantity > currentPlayer.supplyTroops) {
@@ -358,6 +358,8 @@ class Game {
                     if (currentPlayer.tookMainActionForTurn && this.gameStates.getCurrentState().name == "retrieveAdvisor") {
                         this.gameStates.setCurrentState("actionPhase");
                     }
+                } else {
+                    console.log("takeMainAction(): advisor does not match: " + advisor + " " + currentPlayer.color + " " + currentPlayer.advisors);
                 }
 
             }
@@ -684,8 +686,8 @@ class Game {
         if (this.gameStates.currentState.name == "actionPhase") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
-                if (currentPlayer.advisorCountByTurn > currentPlayer.advisors.length) {
-                    currentPlayer.advisorCountByTurn = currentPlayer.advisors.length;
+                if (currentPlayer.advisorCountForTurn > currentPlayer.advisors.length) {
+                    currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
                     currentPlayer.troopsToDeploy = 0;
                     currentPlayer.taxActions = 0;
                     currentPlayer.buildActions = 0;
@@ -699,6 +701,7 @@ class Game {
                     var nextPlayer = this.players.getNextPlayer(currentPlayer);            
                     if (nextPlayer.advisors.length > 0) {
                         this.players.setCurrentPlayer(nextPlayer);
+                        this.gameStates.setCurrentState("retrieveAdvisor");
                     } else {
                         this.players.setCurrentPlayer(this.players.firstPlayer);
                         this.gameStates.setCurrentState("claimPhase");

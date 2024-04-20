@@ -408,6 +408,23 @@ app.put('/game/:id/advisorRetrieve/:action', (req, res) => {
   res.send(game.auctionBoard);
 });
 
+app.delete('/game/:id/player/:color/turn', (req, res) => {
+  console.log("delete " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  game.endTurn(color);
+  var gameStatus = games.getGameStatus(req.params.id, color);
+  if (gameStatus === undefined || gameStatus == null) {
+    res.status(404).send('Game not found');
+    return;
+  }    
+  res.send(gameStatus);
+});
+
 
 
 app.listen(port, () => {

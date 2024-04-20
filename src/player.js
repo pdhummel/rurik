@@ -42,7 +42,11 @@ class GamePlayers {
 
     setAdvisors(advisors) {
         for (var i=0; i < this.players.length; i++) {
-            this.players[i].setAdvisors(advisors);
+            var newAdvisors = [];
+            for (var j=0; j<advisors.length; j++) {
+                newAdvisors.push(advisors[j]);
+            }
+            this.players[i].setAdvisors(newAdvisors);
             this.players[i].advisorCountForTurn = advisors.length;
             this.players[i].advisorsToAuctionSpace = {};
             this.players[i].advisorsToAuctionSpace[1] = [];

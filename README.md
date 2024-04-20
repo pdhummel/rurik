@@ -4,8 +4,9 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 ## TODO
 
+* define scheme cards
+
 * action phase
-  * define scheme cards
   * scheme
   * use conversion token
   * take action - muster, move, tax, build, attack
@@ -40,8 +41,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * Add AI to game creation/setup views
 
 
-
-
 * game status -- show players joined before 
 * game creator - 
   * create and join game in one action
@@ -52,7 +51,10 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * join game -- only show available positions in dropdown
 * join game -- only show available colors in dropdown  
 
-* dockerize
+
+* unit tests - mocha+chai
+* integration tests
+
 
 ## Complete
 * refresh every 10 seconds
@@ -68,10 +70,11 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * add more leaders
 * retrieve advisor from auction board
 * show buildings on map
+* dockerize
 
 
 ## Notes
-
+```
 docker build -f ./docker/Dockerfile -t ubuntu-focus-nodejs-11 .
 docker run --name nodejs -d ubuntu-focus-nodejs-11 tail -f /dev/null
 docker exec -it  nodejs bash
@@ -86,4 +89,8 @@ docker rm rurik
 
 node_modules/nodemon/bin/nodemon.js ./src/server.js
 nodejs ./src/server.js
+```
 
+https://cloud.oracle.com
+pdhummel
+ssh opc@155.248.209.86
