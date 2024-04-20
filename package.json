@@ -2,7 +2,7 @@
   "name": "rurik",
   "version": "1.0.0",
   "description": "",
-  "main": "rurik.js",
+  "main": "src/server.js",
   "dependencies": {
     "express": "^4.19.2"
   },

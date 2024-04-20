@@ -13,14 +13,14 @@ const port = 3000;
 
 
 // set static directories
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
 
 app.get('/api-tester', function (req, res) {
-    res.sendFile(path.join(__dirname+ '/public/api-tester.html'));
+    res.sendFile(path.join(__dirname + '../public/api-tester.html'));
 });
 app.get('/view/rurik', function (req, res) {
-  res.sendFile(path.join(__dirname+ '/public/rurik.html'));
+  res.sendFile(path.join(__dirname + '../public/rurik.html'));
 });
 
 

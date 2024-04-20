@@ -83,3 +83,7 @@ docker run -d --name rurik -p 3000:3000 -d nodejs-rurik
 docker exec -it  rurik bash
 docker kill rurik
 docker rm rurik
+
+node_modules/nodemon/bin/nodemon.js ./src/server.js
+nodejs ./src/server.js
+
