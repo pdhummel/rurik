@@ -69,6 +69,7 @@ class Cards {
         this.schemeDeck2 = [];
         this.schemeCardList = [];
         var schemeCards = this.schemeCardList;
+        // Rewards, coin cost, deaths
         this.addSchemeCard(["deedCard", "coin"], 0, 1);
         this.addSchemeCard(["muster"], 1, 0);
         this.addSchemeCard(["move", "move"], 0, 0);

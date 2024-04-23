@@ -81,6 +81,16 @@ class Location {
         return hasMarket;
     }
 
+    doesPlayerHaveBuilding(color) {
+        var hasBuilding = false;
+        for (var i=0; i<this.buildings.length; i++) {
+            if (buildings[i].color == color) {
+                hasBuilding = true;
+            }
+        }
+        return hasBuilding;
+    }
+
     doesOccupy(color) {
         if (this.troopsByColor[color] > 0 || this.leaderByColor[color] > 0) {
             return true;
@@ -97,12 +107,12 @@ class Location {
 
 
     whoRules() {
-        yellow = this.countStrongholds("yellow") + this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
-        red = this.countStrongholds("red") + this.troopsByColor["red"] + this.leaderByColor["red"];
-        white = this.countStrongholds("white") + this.troopsByColor["white"] + this.leaderByColor["white"];
-        blue = this.countStrongholds("blue") + this.troopsByColor["blue"] + this.leaderByColor["blue"];
+        var yellow = this.countStrongholds("yellow") + this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
+        var red = this.countStrongholds("red") + this.troopsByColor["red"] + this.leaderByColor["red"];
+        var white = this.countStrongholds("white") + this.troopsByColor["white"] + this.leaderByColor["white"];
+        var blue = this.countStrongholds("blue") + this.troopsByColor["blue"] + this.leaderByColor["blue"];
         var highValue = yellow;
-        ruler = "yellow";
+        var ruler = "yellow";
         if (red > highValue) {
             ruler = "red"
             highValue = red;
@@ -169,7 +179,6 @@ class GameMap {
         return this.locationByName[name];
     }
 
-
     getLocations(numberOfPlayers) {
         var locations = []
         // green
@@ -185,9 +194,33 @@ class GameMap {
         return locations;
     }
 
+    getLocationsForPlayer(color) {
+        var locationMap = {};
+        locationMap["rules"] = [];
+        locationMap["occupies"] = [];
+        locationMap["hasBuildings"] = [];
+        for (var i=0; i < this.locations.length; i++) {
+            var location = this.locations[i];
+            locationMap[location.name] = {};
+            locationMap[location.name]["rules"] = location.doesRule(color);
+            if (locationMap[location.name]["rules"]) {
+                locationMap["rules"].push(location.name);
+            }
+            locationMap[location.name]["occupies"] = location.doesOccupy(color);
+            if (locationMap[location.name]["occupies"]) {
+                locationMap["occupies"].push(location.name);
+            }
+            locationMap[location.name]["hasStronghold"] = location.countStrongholds(color) > 0 ? true : false; 
+            locationMap[location.name]["hasMarket"] = location.doesPlayerHaveMarket(color);
+            if (location.doesPlayerHaveBuilding(color)) {
+                locationMap["hasBuildings"].push(location.name);
+            }
+        }
+        return locationMap;
+    }
+
 }
 
 module.exports = GameMap, Location
 
-//map = new GameMap();
-//console.log(map);
+

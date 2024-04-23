@@ -301,9 +301,19 @@ app.put('/game/:id/location/:location/troops', (req, res) => {
     res.status(404).send('Game not found');
     return;
   }
+  var locationName = req.params.location;
   var color = req.body.color;
-  game.placeInitialTroop(color, req.params.location);
-  var location = game.gameMap.getLocation(req.params.location);
+  var gameState = game.gameStates.getCurrentState().name;
+  if (gameState == "waitingForTroopPlacement") {
+    game.placeInitialTroop(color, req.params.location);
+  } else if (gameState == "actionPhase" || gameState == "actionPhaseMuster") {
+    var numberOfTroops = 0;
+    if (req.body.numberOfTroops != undefined && req.body.numberOfTroops != null) {
+      numberOfTroops = req.body.numberOfTroops;
+    }  
+    game.muster(color, locationName, numberOfTroops);
+  }
+  var location = game.gameMap.getLocation(locationName);
   res.send(location);
 });
 
@@ -425,6 +435,35 @@ app.delete('/game/:id/player/:color/turn', (req, res) => {
   res.send(gameStatus);
 });
 
+
+// http://localhost:3000/game/1713819462226/player/blue/turn
+app.put('/game/:id/player/:color/turn', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var action = req.body.action;
+  game.beginActionPhaseAction(color, action);
+  var gameStatus = games.getGameStatus(req.params.id, color);
+  res.send(gameStatus);
+});
+
+
+app.get('/game/:id/player/:color/location', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var locationMap = game.gameMap.getLocationsForPlayer(color);
+  console.log("/game/:id/player/:color/location: " + locationMap);
+  res.send(locationMap);
+});
 
 
 app.listen(port, () => {

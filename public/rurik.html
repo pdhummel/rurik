@@ -305,7 +305,17 @@
           <select id="selectLocation"></select>
           <input id="placeTroopButton" type="button" value="Place Troop" onclick="javascript:placeTroop();"/><br/>
           <br/>
-        </div>        
+        </div>
+
+
+        <div id="musterTroopsDiv" style="display:none;">
+          Muster:</br>
+          <select id="selectMusterTroopsLocation"></select>
+          <select id="selectMusterTroopCount"></select>
+          <input id="musterTroopButton" type="button" value="Muster Troops" onclick="javascript:musterTroops();"/>
+          <input id="cancelMusterButton" type="button" value="Cancel" onclick="javascript:cancelMusterTroops();"/><br/>
+          <br/>
+        </div>   
 
         <div id="placeAdvisorDiv" style="display:none;">
           Action: <select id="selectAction">
@@ -342,43 +352,43 @@
         <br/>
       </div>
 
-      <div id="strategyPhaseDiv" style="display:none">
+      <div id="actionPhaseDiv" style="display:none">
         <b>Action Phase</b><br/>
         <span id="musterOption" style="display:block">
-          <input type="radio" id="musterAction" name="strategyPhaseAction" value="musterAction">
+          <input type="radio" id="musterAction" name="actionPhaseAction" value="musterAction">
           <label id="musterActionLabel" for="musterAction">Muster: <span id="musterActions">0</span> troop(s) available.</label><br/>
         </span>
         <span id="moveOption" style="display:block">
-          <input type="radio" id="moveAction" name="strategyPhaseAction" value="moveAction">
+          <input type="radio" id="moveAction" name="actionPhaseAction" value="moveAction">
           <label id="moveActionLabel" for="moveAction">Move: <span id="moveActions">0</span> action(s) available.</label><br/>
         </span>
         <span id="attackOption" style="display:block">
-          <input type="radio" id="attackAction" name="strategyPhaseAction" value="attackAction">
+          <input type="radio" id="attackAction" name="actionPhaseAction" value="attackAction">
           <label id="attackActionLabel" for="attackAction">Attack: <span id="attackActions">0</span> action(s) available.</label><br/>
         </span>
         <span id="taxOption" style="display:block">
-          <input type="radio" id="buildAction" name="strategyPhaseAction" value="buildAction">
+          <input type="radio" id="buildAction" name="actionPhaseAction" value="buildAction">
           <label id="taxActionLabel" for="taxAction">Tax: <span id="taxActions">0</span> action(s) available.</label><br/>
         </span>
         <span id="buildOption" style="display:block">
-          <input type="radio" id="buildAction" name="strategyPhaseAction" value="buildAction">
+          <input type="radio" id="buildAction" name="actionPhaseAction" value="buildAction">
           <label id="buildActionLabel" for="buildAction">Build: <span id="buildActions">0</span> action(s) available.</label><br/>
         </span>
         <span id="schemeOption" style="display:block">
-          <input type="radio" id="schemeAction" name="strategyPhaseAction" value="schemeAction">
+          <input type="radio" id="schemeAction" name="actionPhaseAction" value="schemeAction">
           <label id="schemeActionLabel" for="schemeAction">Play a scheme card.</label><br/>
         </span>
         <span id="convertGoodsOption" style="display:block">
-          <input type="radio" id="convertGoodsAction" name="strategyPhaseAction" value="convertGoodsAction">
+          <input type="radio" id="convertGoodsAction" name="actionPhaseAction" value="convertGoodsAction">
           <label id="convertGoodsActionLabel" for="convertGoodsAction">Convert Goods.</label><br/>
         </span>
         <span id="accomplishDeedOption" style="display:block">
-          <input type="radio" id="accomplishDeedAction" name="strategyPhaseAction" value="accomplishDeedAction">
+          <input type="radio" id="accomplishDeedAction" name="actionPhaseAction" value="accomplishDeedAction">
           <label id="accomplishDeedActionLabel" for="accomplishDeedAction">Accomplish Deed.</label><br/>
         </span>
-        <input type="radio" id="endTurnAction" name="strategyPhaseAction" value="endTurnAction" checked>
+        <input type="radio" id="endTurnAction" name="actionPhaseAction" value="endTurnAction" checked>
         <label id="endTurnActionLabel" for="endTurnAction">End Turn.</label><br/>
-        <input type="button" value="Perform Action" onclick="javascript:performStrategyPhaseAction();"/><br/>
+        <input type="button" value="Perform Action" onclick="javascript:performActionPhaseAction();"/><br/>
         <br/>
       </div>
 

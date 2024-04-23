@@ -449,18 +449,29 @@ class Game {
     }
 
     muster(color, locationName, numberOfTroops) {
-        if (this.gameStates.currentState.name == "actionPhase") {
+        console.log("muster(): " + color + " " + locationName + " " + numberOfTroops);
+        if (this.gameStates.currentState.name == "actionPhaseMuster") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 var location = this.gameMap.getLocation(locationName);
-                if (location.troopsByColor["color"] > 0 && numberOfTroops <= currentPlayer.troopsToDeploy) {
-                    location.troopsByColor["color"] = location.troopsByColor["color"] + numberOfTroops;
+                if (location.troopsByColor[color] > 0 && numberOfTroops <= currentPlayer.troopsToDeploy &&
+                    numberOfTroops <= currentPlayer.supplyTroops) {
+                    location.troopsByColor[color] = location.troopsByColor[color] + numberOfTroops;
                     currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy - numberOfTroops;
+                    currentPlayer.supplyTroops = currentPlayer.supplyTroops - numberOfTroops;
+                    this.gameStates.setCurrentState("actionPhase");
                     //if (currentPlayer.troopsToDeploy < 1) {
                     //    this.gameStates.setCurrentState("actionPhase");
                     //}
+                } else {
+                    // TODO: split error messages
+                    throw new Error("Not enough troops available or you do not occupy the location.", "muster()");        
                 }
+            } else {
+                throw new Error("It is not your turn right now.", "muster()");    
             }
+        } else {
+            throw new Error("Cannot muster troops right now.", "muster()");
         }
     }
 
@@ -709,6 +720,18 @@ class Game {
                 } else {
                     throw "Cannot end turn before playing your advisor."
                 }
+            }
+        }
+    }
+
+    beginActionPhaseAction(color, action) {
+        var actionToStateMap = {};
+        actionToStateMap["musterAction"] = "actionPhaseMuster";
+        actionToStateMap["cancel"] = "actionPhase";
+        if (this.gameStates.currentState.name.startsWith("actionPhase")) {
+            var currentPlayer = this.players.getCurrentPlayer();
+            if (currentPlayer.color == color) {
+                this.gameStates.setCurrentState(actionToStateMap[action]);
             }
         }
     }

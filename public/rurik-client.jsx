@@ -327,9 +327,14 @@ function refreshGameStatusResponseHandler(response) {
       hide("retrieveAdvisorDiv");
     }
     if (currentState == "actionPhase" && currentPlayer == myColor) {
-      showStrategyPhaseDiv();
+      showActionPhaseDiv();
     } else {
-      hide("strategyPhaseDiv");
+      hide("actionPhaseDiv");
+    }
+    if (currentState == "actionPhaseMuster" && currentPlayer == myColor) {
+      showMusterTroopsDiv();
+    } else {
+      hide("musterTroopsDiv");
     }
 }
 function leaderResponseHandler(response) {
@@ -747,16 +752,16 @@ function retrieveAdvisorHandler(response) {
   refreshGameStatus();
 }
 
-function showStrategyPhaseDiv() {
+function showActionPhaseDiv() {
   // TODO: get player details
   var gameId = getInnerHtmlValue("gameId");
   var color = getInnerHtmlValue("myColor");
   if (gameId != undefined && gameId != null && color != undefined && color != null) {
-    callApi('/game/' + gameId + '/player/' + color, "get", "", showStrategyPhaseHandler);
+    callApi('/game/' + gameId + '/player/' + color, "get", "", showActionPhaseHandler);
   } 
 }
-function showStrategyPhaseHandler(response) {
-  console.log("showStrategyPhaseHandler(): " + JSON.stringify(response.data));
+function showActionPhaseHandler(response) {
+  console.log("showActionPhaseHandler(): " + JSON.stringify(response.data));
   /*
         this.accomplishedDeedForTurn = false;
   
@@ -805,7 +810,7 @@ function showStrategyPhaseHandler(response) {
   }
   // TODO: check if leader can be deployed
   if (playerData.troopsToDeploy > 0) {
-    setInnerHtml("musterActions", playerData.troopsToDeploy);
+    setInnerHtml("musterActions", playerData.troopsToDeploy);    
     show("musterOption");
   } else {
     hide("musterOption");
@@ -821,20 +826,23 @@ function showStrategyPhaseHandler(response) {
   } else {
     hide("accomplishDeedOption");
   }
-  show("strategyPhaseDiv");
+  show("actionPhaseDiv");
 }
 
-function performStrategyPhaseAction() {
+function performActionPhaseAction() {
   var gameId = getInnerHtmlValue("gameId");
   var color = getInnerHtmlValue("myColor");
-  var strategyPhaseActions = document.getElementsByName('strategyPhaseAction');
-  var strategyPhaseActionValue = null;
-  for (var i = 0; i < strategyPhaseActions.length; i++){
-      if (strategyPhaseActions[i].checked){
-        strategyPhaseActionValue = strategyPhaseActions[i].value;
+  var actionPhaseActions = document.getElementsByName('actionPhaseAction');
+  var actionPhaseActionValue = null;
+  for (var i = 0; i < actionPhaseActions.length; i++){
+      if (actionPhaseActions[i].checked){
+        actionPhaseActionValue = actionPhaseActions[i].value;
       }
   }
-  if (strategyPhaseActionValue == "endTurnAction") {
+  if (actionPhaseActionValue == "musterAction") {
+    beginAction(gameId, color, actionPhaseActionValue);
+  }
+  if (actionPhaseActionValue == "endTurnAction") {
     endTurn(gameId, color);
   }
 }
@@ -844,4 +852,65 @@ function endTurn(gameId, color) {
 function endTurnResponseHandler(response) {
   console.log("endTurnResponseHandler(): " + JSON.stringify(response.data));
   refreshGameStatus();
+}
+
+function beginAction(gameId, color, action) {
+  var data = '{ "action": "' + action + '" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+function beginActionResponseHandler(response) {
+  console.log("beginActionResponseHandler(): " + JSON.stringify(response.data));
+  refreshGameStatus();
+}
+
+function showMusterTroopsDiv() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  callApi('/game/' + gameId + '/player/' + color, "get", "", showMusterTroopsHandler1);
+  
+}
+function showMusterTroopsHandler1(response) {
+  console.log("showMusterTroopsHandler1(): " + JSON.stringify(response.data));
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var playerData = response.data;
+  var selectMusterTroopCount = document.getElementById("selectMusterTroopCount");
+  clearOptions(selectMusterTroopCount);
+  for (var i=0; i<= playerData.troopsToDeploy; i++) {
+    var option = document.createElement("option");
+    option.innerText = i;
+    option.value = i;
+    selectMusterTroopCount.append(option);
+  }
+  callApi('/game/' + gameId + '/player/' + color + '/location', "get", "", showMusterTroopsHandler2);
+}
+function showMusterTroopsHandler2(response) {
+  console.log("showMusterTroopsHandler2(): " + JSON.stringify(response.data));
+  var selectLocation = document.getElementById("selectMusterTroopsLocation");
+  clearOptions(selectLocation);
+  var locations = response.data["occupies"];
+  for (var i=0; i<locations.length; i++) {
+    var locationName = locations[i];
+    var option = document.createElement("option");
+    option.innerText = locationName;
+    option.value = locationName;
+    selectLocation.append(option);
+  }
+  show("musterTroopsDiv");
+}
+
+function musterTroops() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var location = getSelectedValue("selectMusterTroopsLocation");
+  var numberOfTroops = getSelectedValue("selectMusterTroopCount");
+  var data = '{ "color": "' + color + '", "numberOfTroops": ' + numberOfTroops + '}';
+  callApi("/game/" + gameId + "/location/" + location + "/troops", "put", data, placeTroopResponseHandler);
+}
+
+function cancelMusterTroops() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "action": "cancel" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
 }
