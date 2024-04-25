@@ -331,6 +331,82 @@ app.put('/game/:id/location/:location/leader', (req, res) => {
 });
 
 
+app.post('/game/:id/player/:color/move', (req, res) => {
+  console.log("post " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  var color = req.params.color;
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var player = game.getPlayer(color);
+  if (player === undefined) {
+    res.status(404).send('Player not found for color ' + color);
+    return;
+  }
+  var fromLocationName = req.body.fromLocationName;
+  var toLocationName = req.body.toLocationName;
+  var fromLocation = game.gameMap.getLocation(fromLocationName);
+  if (fromLocation === undefined) {
+    res.status(404).send('Location not found, ' + fromLocation);
+  }
+  var toLocation = game.gameMap.getLocation(toLocationName);
+  if (toLocation === undefined) {
+    res.status(404).send('Location not found, ' + toLocation);
+  }
+  var moveLeader = false;
+  var moveLeaderYN = req.body.moveLeaderYN;
+  if (moveLeaderYN == 'Y') {
+    moveLeader = true;
+  }
+
+  try {
+    game.move(color, fromLocationName, toLocationName, 1, moveLeader);
+    res.send(game.gameMap.locations);
+    return;
+  } catch(error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
+    return;
+  }     
+});
+
+app.post('/game/:id/player/:color/attack', (req, res) => {
+  console.log("post " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  var color = req.params.color;
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var player = game.getPlayer(color);
+  if (player === undefined) {
+    res.status(404).send('Player not found for color ' + color);
+    return;
+  }
+  var attackLocationName = req.body.attackLocationName;
+  var attackLocation = game.gameMap.getLocation(attackLocationName);
+  if (attackLocation === undefined) {
+    res.status(404).send('Location not found, ' + attackLocation);
+  }
+  var schemeDeckNumber = req.body.schemeDeckNumber;
+  var target = req.body.target;
+  try {
+    if (schemeDeckNumber == 1 || schemeDeckNumber == 2) {
+      game.attack(color, attackLocationName, target, schemeDeckNumber);
+    } else {
+      game.attack(color, attackLocationName, target);
+    }
+    res.send(game.gameMap.locations);
+    return;
+  } catch(error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
+    return;
+  }     
+});
+
+
 app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
   console.log("get " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);

@@ -105,6 +105,13 @@ class Location {
         return false;
     }
 
+    isLeaderInLocation(color) {
+        if (this.leaderByColor[color] > 0) {
+            return true;
+        }
+        return false;
+    }
+
 
     whoRules() {
         var yellow = this.countStrongholds("yellow") + this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
@@ -135,8 +142,10 @@ class Location {
     }
 
     isNeighbor(locationName) {
+        console.log("isNeighbor(): self=" + this.name + ", neighbor? " + locationName);
         for (var i=0; i<this.neighbors.length; i++) {
-            if (this.neighbors[i].name == locationName) {
+            //console.log("isNeighbor(): equal? " + this.neighbors[i] + " " + locationName);
+            if (this.neighbors[i] == locationName) {
                 return true;
             }
         }
@@ -150,6 +159,7 @@ class GameMap {
     constructor() {
         this.locationByName = {};
         this.locations = [];
+        this.locationsForGame = [];
         this.rebels = new Rebels();
         this.addLocation(1, "Novgorod", "green", "wood", ["Pskov", "Polotsk", "Smolensk", "Rostov"]);
         this.addLocation(2, "Rostov", "green", "stone", ["Novgorod", "Smolensk", "Chernigov", "Suzdal"]);
@@ -168,8 +178,8 @@ class GameMap {
         this.addLocation(15, "Azov", "brown", "fish", ["Kiev", "Pereyaslavl", "Galich", "Murom", "Peresech"]);
     }
 
-    addLocation(id, name, color, resource) {
-        var location = new Location(id, name, color, resource);
+    addLocation(id, name, color, resource, neighbors) {
+        var location = new Location(id, name, color, resource, neighbors);
         this.locations.push(location);
         this.locationByName[name] = location;
         location.rebels.push(this.rebels.placeRandomRebel());
@@ -179,7 +189,7 @@ class GameMap {
         return this.locationByName[name];
     }
 
-    getLocations(numberOfPlayers) {
+    setLocationsForGame(numberOfPlayers) {
         var locations = []
         // green
         if (numberOfPlayers <= 2) {
@@ -191,7 +201,14 @@ class GameMap {
         } else {
             locations = this.locations.slice(0, 15);
         }
-        return locations;
+        this.locationsForGame = locations;
+    }
+
+    getLocations(numberOfPlayers) {
+        if (this.locationsForGame.length <= 0) {
+            this.setLocationsForGame(numberOfPlayers);
+        }
+        return this.locationsForGame;
     }
 
     getLocationsForPlayer(color) {
@@ -199,6 +216,14 @@ class GameMap {
         locationMap["rules"] = [];
         locationMap["occupies"] = [];
         locationMap["hasBuildings"] = [];
+        locationMap["neighbors"] = [];
+        locationMap["enemies"] = [];
+        var neighbors = [];
+        var locationsForGame = new Set();
+        for (var i=0; i < this.locationsForGame.length; i++) {
+            locationsForGame.add(this.locationsForGame[i].name);
+        }
+        console.log("getLocationsForPlayer(): locationsForGame=" + [...locationsForGame].join(' '));
         for (var i=0; i < this.locations.length; i++) {
             var location = this.locations[i];
             locationMap[location.name] = {};
@@ -209,6 +234,12 @@ class GameMap {
             locationMap[location.name]["occupies"] = location.doesOccupy(color);
             if (locationMap[location.name]["occupies"]) {
                 locationMap["occupies"].push(location.name);
+                for (var j=0; j<location.neighbors.length; j++) {
+                    var locationName = location.neighbors[j];
+                    if (locationsForGame.has(locationName)) {
+                        neighbors.push(locationName);
+                    }    
+                }
             }
             locationMap[location.name]["hasStronghold"] = location.countStrongholds(color) > 0 ? true : false; 
             locationMap[location.name]["hasMarket"] = location.doesPlayerHaveMarket(color);
@@ -216,6 +247,7 @@ class GameMap {
                 locationMap["hasBuildings"].push(location.name);
             }
         }
+        locationMap["neighbors"] = Array.from(new Set(neighbors));
         return locationMap;
     }
 

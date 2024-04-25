@@ -38,6 +38,14 @@ class BoatMat {
 
     }
 
+    addGoodToBoatOrDock(resource) {
+        if (this.doesBoatHaveRoom(resource)) {
+            this.addGoodToBoat(resource);
+        } else {
+            this.addGoodToDock(resource);
+        }
+    }
+
     addGoodToDock(resource) {
         this.goodsOnDock[resource]++;
     }
@@ -54,7 +62,7 @@ class BoatMat {
     }
 
     doesBoatHaveRoom(resource) {
-        hasRoom = false;
+        var hasRoom = false;
         var openSlots = this.goodsOnBoatSlots[resource] - this.goodsOnBoat[resource];
         if (openSlots > 0) {
             hasRoom = true;

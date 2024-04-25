@@ -78,6 +78,18 @@ function getInnerHtmlValue(elementId) {
   }      
   return e.innerHTML;
 }
+
+function getSelectedRadioButton(elementName) {
+  var choices = document.getElementsByName(elementName);
+  var value = null;
+  for (var i = 0; i < choices.length; i++){
+      if (choices[i].checked) {
+        value = choices[i].value;
+      }
+  }
+  return value;
+}
+
 function populateTable(rows, headings) {
   document.getElementById("gameListData").innerHTML = "";
   var table = document.createElement('table');
@@ -336,6 +348,16 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       hide("musterTroopsDiv");
     }
+    if (currentState == "actionPhaseMove" && currentPlayer == myColor) {
+      showMoveTroopsDiv();
+    } else {
+      hide("moveTroopsDiv");
+    }
+    if (currentState == "actionPhaseAttack" && currentPlayer == myColor) {
+      showAttackDiv();
+    } else {
+      hide("attackDiv");
+    }
 }
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
@@ -539,7 +561,7 @@ function chooseSecretAgenda() {
   var secretAgendas = document.getElementsByName('secretAgenda');
   var secretAgendaValue = null;
   for (var i = 0; i < secretAgendas.length; i++){
-      if (secretAgendas[i].checked){
+      if (secretAgendas[i].checked) {
         secretAgendaValue = secretAgendas[i].value;
       }
   }
@@ -722,6 +744,7 @@ function getNextAdvisorResponseHandler(response) {
 }
 
 function retrieveAdvisor() {
+  console.log("retrieveAdvisor");
   var gameId = getInnerHtmlValue("gameId");
   var color = getInnerHtmlValue("myColor");
   var advisors = document.getElementsByName('advisor');
@@ -839,7 +862,8 @@ function performActionPhaseAction() {
         actionPhaseActionValue = actionPhaseActions[i].value;
       }
   }
-  if (actionPhaseActionValue == "musterAction") {
+  if (actionPhaseActionValue == "musterAction" || actionPhaseActionValue == "moveAction" || 
+      actionPhaseActionValue == "attackAction") {
     beginAction(gameId, color, actionPhaseActionValue);
   }
   if (actionPhaseActionValue == "endTurnAction") {
@@ -855,6 +879,7 @@ function endTurnResponseHandler(response) {
 }
 
 function beginAction(gameId, color, action) {
+  console.log("beginAction(): " + gameId + " " + color + " " + action);
   var data = '{ "action": "' + action + '" }';
   callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
 }
@@ -909,6 +934,101 @@ function musterTroops() {
 }
 
 function cancelMusterTroops() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "action": "cancel" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+
+function showMoveTroopsDiv() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  callApi('/game/' + gameId + '/player/' + color + '/location', "get", "", showMoveTroopsHandler);
+}
+function showMoveTroopsHandler(response) {
+  console.log("showMoveTroopsHandler(): " + JSON.stringify(response.data));
+  var selectFromLocation = document.getElementById("selectMoveFromLocation");
+  clearOptions(selectFromLocation);
+  var locations = response.data["occupies"];
+  for (var i=0; i<locations.length; i++) {
+    var locationName = locations[i];
+    var option = document.createElement("option");
+    option.innerText = locationName;
+    option.value = locationName;
+    selectFromLocation.append(option);
+  }
+
+  // TODO: update selectMoveToLocation based on selectMoveFromLocation
+  var selectToLocation = document.getElementById("selectMoveToLocation");
+  clearOptions(selectToLocation);
+  var locations = response.data["neighbors"];
+  for (var i=0; i<locations.length; i++) {
+    var locationName = locations[i];
+    var option = document.createElement("option");
+    option.innerText = locationName;
+    option.value = locationName;
+    selectToLocation.append(option);
+  }
+  show("moveTroopsDiv");
+}
+
+function moveTroops() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  
+  var fromLocation = getSelectedValue("selectMoveFromLocation");
+  var toLocation = getSelectedValue("selectMoveToLocation");
+  var moveLeader = 'N';
+  var moveLeaderYN = document.getElementById("moveLeaderYN");
+  if (moveLeaderYN.checked) {
+    moveLeaderYN = getValue("moveLeaderYN");
+  }
+  var data = '{ "fromLocationName": "' + fromLocation + '", "toLocationName": "' + toLocation + '", "moveLeaderYN": "' + moveLeader + '" }';
+  callApi("/game/" + gameId + "/player/" + color + "/move", "post", data, placeTroopResponseHandler);
+}
+
+function cancelMoveTroops() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "action": "cancel" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+
+
+function showAttackDiv() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  callApi('/game/' + gameId + '/player/' + color + '/location', "get", "", showAttackHandler);
+}
+function showAttackHandler(response) {
+  console.log("showAttackHandler(): " + JSON.stringify(response.data));
+  var selectAttackLocation = document.getElementById("selectAttackLocation");
+  clearOptions(selectAttackLocation);
+  var locations = response.data["occupies"];
+  for (var i=0; i<locations.length; i++) {
+    var locationName = locations[i];
+    var option = document.createElement("option");
+    option.innerText = locationName;
+    option.value = locationName;
+    selectAttackLocation.append(option);
+  }
+
+  // TODO: update selectTargetToAttack based on location selection.
+  show("attackDiv");
+}
+
+function attack() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  
+  var attackLocation = getSelectedValue("selectAttackLocation");
+  var target = getSelectedValue("selectTargetToAttack");
+  var schemeDeckNumber = getSelectedRadioButton("attackSchemeDeck");
+  var data = '{ "attackLocationName": "' + attackLocation + '", "target": "' + target + '", "schemeDeckNumber": "' + schemeDeckNumber + '" }';
+  callApi("/game/" + gameId + "/player/" + color + "/attack", "post", data, placeTroopResponseHandler);
+}
+
+function cancelAttack() {
   var gameId = getInnerHtmlValue("gameId");
   var color = getInnerHtmlValue("myColor");
   var data = '{ "action": "cancel" }';

@@ -315,7 +315,38 @@
           <input id="musterTroopButton" type="button" value="Muster Troops" onclick="javascript:musterTroops();"/>
           <input id="cancelMusterButton" type="button" value="Cancel" onclick="javascript:cancelMusterTroops();"/><br/>
           <br/>
-        </div>   
+        </div>
+
+        <div id="moveTroopsDiv" style="display:none;">
+          Move 1 troop to a neighboring location.</br>
+          From: <select id="selectMoveFromLocation"></select>
+          To: <select id="selectMoveToLocation"></select></br>
+          <input type="checkbox" id="moveLeaderYN" value="Y"/>
+          <label for="moveLeaderYN">Move leader instead of troops - "from" location.</label><br/>
+          <input id="moveTroopButton" type="button" value="Move Troops" onclick="javascript:moveTroops();"/>
+          <input id="cancelMoveButton" type="button" value="Cancel" onclick="javascript:cancelMoveTroops();"/><br/>
+          <br/>
+        </div>
+
+        <div id="attackDiv" style="display:none;">
+          Attack:</br>
+          Location: <select id="selectAttackLocation"></select>
+          Target: <select id="selectTargetToAttack">
+            <option>rebel</option>
+            <option>blue</option>
+            <option>red</option>
+            <option>yellow</option>
+            <option>white</option>
+          </select></br>
+          <input type="radio" id="attackSchemeDeck1" name="attackSchemeDeck" value="1" checked>
+          <label id="attackSchemeDeckLabel1" for="attackSchemeDeck1">Casualty Scheme Deck 1</label><br>
+          <input type="radio" id="attackSchemeDeck2" name="attackSchemeDeck" value="2">
+          <label id="attackSchemeDeckLabel2" for="attackSchemeDeck2">Casualty Scheme Deck 2</label><br>
+
+          <input id="AttackButton" type="button" value="Attack" onclick="javascript:attack();"/>
+          <input id="cancelAttackButton" type="button" value="Cancel" onclick="javascript:cancelAttack();"/><br/>
+          <br/>
+        </div>
 
         <div id="placeAdvisorDiv" style="display:none;">
           Action: <select id="selectAction">

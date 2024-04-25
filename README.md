@@ -12,9 +12,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * use conversion token
   * play scheme card
   * tax action
-  * move action
   * build action
-  * attack action
   * leader abilities
 
 
@@ -77,6 +75,9 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show buildings on map
 * dockerize
 * muster action
+* move action
+* attack action
+
 
 
 ## Notes

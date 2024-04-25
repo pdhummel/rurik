@@ -145,6 +145,7 @@ class Game {
             if (this.players.getNumberOfPlayers() > 0) {
                 this.players.sortPlayers();
                 this.auctionBoard = new AuctionBoard(this.players.getNumberOfPlayers());
+                this.gameMap.setLocationsForGame(this.players.getNumberOfPlayers());
                 this.gameStates.setCurrentState("waitingForFirstPlayerSelection");
                 console.log("startGame(): exit");
             } else {
@@ -323,8 +324,7 @@ class Game {
                         currentPlayer.boat.money++;
                     } else {
                         if (auctionSpace.extraCoin > currentPlayer.boat.money) {
-                            // TODO: throw exception
-                            console.log("takeMainAction(): TODO: exception, not enough money");
+                            throw new Error("Not enough money to take action.", "takeMainAction()");        
                         } else {
                             currentPlayer.boat.money = currentPlayer.boat.money - auctionSpace.extraCoin;
                         }
@@ -342,7 +342,6 @@ class Game {
                                 quantity = currentPlayer.supplyTroops;
                             }
                             currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy + quantity;
-                            currentPlayer.supplyTroops = currentPlayer.supplyTroops - quantity;
                             //this.gameStates.setCurrentState("muster");
                         } else if (actionColumnName == "scheme") {
                             currentPlayer.schemeCardsToDraw = auctionSpace.quantity;
@@ -460,23 +459,20 @@ class Game {
                     currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy - numberOfTroops;
                     currentPlayer.supplyTroops = currentPlayer.supplyTroops - numberOfTroops;
                     this.gameStates.setCurrentState("actionPhase");
-                    //if (currentPlayer.troopsToDeploy < 1) {
-                    //    this.gameStates.setCurrentState("actionPhase");
-                    //}
                 } else {
                     // TODO: split error messages
                     throw new Error("Not enough troops available or you do not occupy the location.", "muster()");        
                 }
             } else {
-                throw new Error("It is not your turn right now.", "muster()");    
+                throw new Error("It is not your turn right now.", "muster()");
             }
         } else {
             throw new Error("Cannot muster troops right now.", "muster()");
         }
     }
 
-    move(color, fromLocationName, toLocationName, numberOfTroops) {
-        if (this.gameStates.currentState.name == "actionPhase") {
+    move(color, fromLocationName, toLocationName, numberOfTroops=1, moveLeader=false) {
+        if (this.gameStates.currentState.name == "actionPhaseMove") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 var fromLocation = this.gameMap.getLocation(fromLocationName);
@@ -484,21 +480,34 @@ class Game {
 
                 if (numberOfTroops <= currentPlayer.moveActions + currentPlayer.moveActionsFromLocation[fromLocationName]) {
                     if (fromLocation.isNeighbor(toLocationName)) {
-                        fromLocation.troopsByColor[color] = fromLocation.troopsByColor[color] - numberOfTroops;
-                        toLocation.troopsByColor[color] = toLocation.troopsByColor[color] + numberOfTroops;
+                        if (moveLeader && fromLocation.isLeaderInLocation(color) && numberOfTroops == 1) {
+                            fromLocation.leaderByColor[color] = fromLocation.leaderByColor[color] - numberOfTroops;
+                            toLocation.leaderByColor[color] = toLocation.leaderByColor[color] + numberOfTroops;
+                        } else if (moveLeader) {
+                            throw new Error("Leader must be in location and cannot move other troops at the same time.", "move()");
+                        } else {
+                            fromLocation.troopsByColor[color] = fromLocation.troopsByColor[color] - numberOfTroops;
+                            toLocation.troopsByColor[color] = toLocation.troopsByColor[color] + numberOfTroops;    
+                        }
                         for (var i=0; i < numberOfTroops; i++) {
                             if (currentPlayer.moveActionsFromLocation[fromLocationName] > 0) {
-                                currentPlayer.moveActionsFromLocation[fromLocationName]--;
+                                currentPlayer.moveActionsFromLocation[fromLocationName] - 1;
                             } else {
-                                currentPlayer.moveActions = currentPlayer.moveActions--;
+                                currentPlayer.moveActions = currentPlayer.moveActions - 1;
                             }
                         }
-                        //if (currentPlayer.getTotalMoveActions() < 1) {
-                        //    this.gameStates.setCurrentState("actionPhase");
-                        //}    
+                        this.gameStates.setCurrentState("actionPhase");
+                    } else {
+                        throw new Error(toLocationName + " is not a neighbor of " + fromLocationName + ".", "move()");        
                     }
+                } else {
+                    throw new Error("You don't have that many troops available to move.", "move()");    
                 }
+            } else {
+                throw new Error("It is not your turn right now.", "move()");
             }
+        } else {
+            throw new Error("Cannot move troops right now.", "move()");
         }
     }
 
@@ -575,48 +584,77 @@ class Game {
         }
     }
 
-    attack(color, locationName, targetColor, schemeDeck) {
+    attack(color, locationName, target, schemeDeckNumber=1) {
         var troopsLost = 0;
-        if (this.gameStates.currentState.name == "actionPhase") {
+        
+        if (this.gameStates.currentState.name == "actionPhaseAttack") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 var location = this.gameMap.getLocation(locationName);
 
-                if ((location.troopsByColor[color] > 0 || location.leaderByColor[color] > 0) && 
-                   (location.troopsByColor[targetColor] > 0 || location.leaderByColor[targetColor] > 0)) {
-
-                    if (location.troopsByColor[targetColor] > 0) {
-                        location.troopsByColor[targetColor]--;
+                if ((location.troopsByColor[color] > 0 || location.leaderByColor[color] > 0)) {
+                    if (target == "rebel") {
+                        if (location.rebels.length > 0) {
+                            var reward = location.rebels.shift();
+                            if (reward == "coin") {
+                                currentPlayer.boat.money = currentPlayer.boat.money + 1;
+                            } else if (reward == "2 coins") {
+                                currentPlayer.boat.money = currentPlayer.boat.money + 2;
+                            } else {
+                                currentPlayer.boat.addGoodToBoatOrDock(reward);
+                            }
+                            currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;                            
+                        } else {
+                            throw new Error("There are no rebels  to attack in " + locationName + ".", "attack()");
+                        }
                     } else {
-                        location.leaderByColor[targetColor]--;
-                    }
-
-                    var schemeCardsToDraw = 1;
-                    if (location.doesRule(targetColor)) {
-                        schemeCardsToDraw++;
-                    }
-                    if (location.countStrongholds(targetColor) > 0) {
-                        schemeCardsToDraw++;
-                    }
-                    for (var i=0; i<schemeCardsToDraw; i++) {
-                        var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
-                        deaths = card.deaths;
-                        if (deaths > location.troopsByColor[color]) {
-                            deaths = location.troopsByColor[color];
+                        var targetColor = target;
+                        if ((location.troopsByColor[targetColor] > 0 || location.leaderByColor[targetColor] > 0)) {
+                            var schemeCardsToDraw = 1;
+                            if (location.doesRule(targetColor)) {
+                                schemeCardsToDraw++;
+                            }
+        
+                            if (location.troopsByColor[targetColor] > 0) {
+                                location.troopsByColor[targetColor]--;
+                            } else {
+                                location.leaderByColor[targetColor]--;
+                            }
+        
+                            if (location.countStrongholds(targetColor) > 0) {
+                                schemeCardsToDraw++;
+                            }
+                            var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
+                            for (var i=0; i<schemeCardsToDraw; i++) {
+                                var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
+                                var deaths = card.deaths;
+                                if (deaths > location.troopsByColor[color]) {
+                                    deaths = location.troopsByColor[color];
+                                }
+                                location.troopsByColor[color] = location.troopsByColor[color] - deaths;
+                                if (deaths > 0) {
+                                    troopsLost = deaths;
+                                    break;
+                                }
+                            }
+                            // TODO: go up on the war track
+                            
+                        } else {
+                            throw new Error(target + " does not have troops to attack in " + locationName + ".", "attack()");
                         }
-                        location.troopsByColor[color] = location.troopsByColor[color] - deaths;
-                        if (deaths > 0) {
-                            troopsLost = deaths;
-                            break;
-                        }
                     }
-
-                    //if (currentPlayer.attackActions < 1) {
-                    //    this.gameStates.setCurrentState("actionPhase");
-                    //}
-                }
+                    currentPlayer.attackActions = currentPlayer.attackActions - 1;
+                    this.gameStates.setCurrentState("actionPhase");
+                } else {
+                    throw new Error("You do not have troops in " + locationName + ".", "attack()");
+                }                
+            } else {
+                throw new Error("Not your turn right now.", "attack()");
             }
+        } else {
+            throw new Error("Cannot move attack right now.", "attack()");
         }
+        console.log("attack(): troopsLost=" + troopsLost);
         return troopsLost;
     }
 
@@ -725,14 +763,21 @@ class Game {
     }
 
     beginActionPhaseAction(color, action) {
+        console.log("beginActionPhaseAction(): " + color + " " + action);
         var actionToStateMap = {};
         actionToStateMap["musterAction"] = "actionPhaseMuster";
+        actionToStateMap["moveAction"] = "actionPhaseMove";
+        actionToStateMap["attackAction"] = "actionPhaseAttack";
         actionToStateMap["cancel"] = "actionPhase";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 this.gameStates.setCurrentState(actionToStateMap[action]);
+            } else {
+                throw new Error("Not your turn.", "beginActionPhaseAction()");
             }
+        } else {
+            throw new Error("Cannot begin action, not in actionPhase.", "beginActionPhaseAction()");
         }
     }
 
