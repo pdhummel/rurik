@@ -6,14 +6,17 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 * define scheme cards
 * show leader in supply
+* game log
+* messages and error messages in UI
 
 * action phase
   * pick scheme cards
   * use conversion token
   * play scheme card
-  * tax action
-  * build action
+  * build action - church, stable, tavern
   * leader abilities
+  * move goods between dock and boat
+  * advance war track from attack
 
 
 * player view
@@ -77,6 +80,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * muster action
 * move action
 * attack action
+* tax action
+* build action
 
 
 

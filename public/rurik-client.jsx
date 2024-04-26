@@ -358,6 +358,16 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       hide("attackDiv");
     }
+    if (currentState == "actionPhaseTax" && currentPlayer == myColor) {
+      showTaxDiv();
+    } else {
+      hide("taxDiv");
+    }
+    if (currentState == "actionPhaseBuild" && currentPlayer == myColor) {
+      showBuildDiv();
+    } else {
+      hide("buildDiv");
+    }
 }
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
@@ -399,12 +409,15 @@ function refreshMapResponseHandler(response) {
     for (var b=0; b<3; b++) {
       // Ex: AzovBuilding1
       var buildingElementId = locationName + "Building" + (b+1);
-      var buildingElement = document.getElementById(buildingElementId);
-      if (b < locationData.buildings) {
+      var buildingElementImgId = locationName + "BuildingImg" + (b+1);
+      //var buildingElement = document.getElementById(buildingElementId);
+      var buildingElementImg = document.getElementById(buildingElementImgId);
+      if (b < locationData.buildings.length) {
         var buildingName = locationData.buildings[b].name;
         var buildingColor = locationData.buildings[b].color;
         var buildingImage = "/assets/" + buildingName + "-" + buildingColor + ".png";
-        buildingElement.src = buildingImage;
+        buildingElementImg.alt = buildingImage;
+        buildingElementImg.src = buildingImage;
         show(buildingElementId);
       } else {
         hide(buildingElementId);
@@ -863,7 +876,8 @@ function performActionPhaseAction() {
       }
   }
   if (actionPhaseActionValue == "musterAction" || actionPhaseActionValue == "moveAction" || 
-      actionPhaseActionValue == "attackAction") {
+      actionPhaseActionValue == "attackAction" || actionPhaseActionValue =="taxAction" ||
+      actionPhaseActionValue == "buildAction") {
     beginAction(gameId, color, actionPhaseActionValue);
   }
   if (actionPhaseActionValue == "endTurnAction") {
@@ -1029,6 +1043,86 @@ function attack() {
 }
 
 function cancelAttack() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "action": "cancel" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+
+function showTaxDiv() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  callApi('/game/' + gameId + '/player/' + color + '/location', "get", "", showTaxHandler);
+}
+function showTaxHandler(response) {
+  console.log("showTaxHandler(): " + JSON.stringify(response.data));
+  var selectTaxLocation = document.getElementById("selectTaxLocation");
+  clearOptions(selectTaxLocation);
+  var locations = response.data["occupies"];
+  // TODO: filter out locations that don't have any resources.
+  for (var i=0; i<locations.length; i++) {
+    var locationName = locations[i];
+    var option = document.createElement("option");
+    option.innerText = locationName;
+    option.value = locationName;
+    selectTaxLocation.append(option);
+  }
+  show("taxDiv");
+}
+
+function tax() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  
+  var taxLocation = getSelectedValue("selectTaxLocation");
+  var marketCoin = 'N';
+  var marketCoinYN = document.getElementById("marketCoinYN");
+  if (marketCoinYN.checked) {
+    marketCoin = getValue("moveLeaderYN");
+  }
+
+  var data = '{ "locationName": "' + taxLocation + '", "marketCoinYN": "' + marketCoin + '" }';
+  callApi("/game/" + gameId + "/player/" + color + "/tax", "post", data, placeTroopResponseHandler);
+}
+
+function cancelTax() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "action": "cancel" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+
+function showBuildDiv() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  callApi('/game/' + gameId + '/player/' + color + '/location', "get", "", showBuildHandler);
+}
+function showBuildHandler(response) {
+  console.log("showBuildHandler(): " + JSON.stringify(response.data));
+  var selectBuildLocation = document.getElementById("selectBuildLocation");
+  clearOptions(selectBuildLocation);
+  var locations = response.data["occupies"];
+  for (var i=0; i<locations.length; i++) {
+    var locationName = locations[i];
+    var option = document.createElement("option");
+    option.innerText = locationName;
+    option.value = locationName;
+    selectBuildLocation.append(option);
+  }
+  show("buildDiv");
+}
+
+function build() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  
+  var buildLocation = getSelectedValue("selectBuildLocation");
+  var building = getSelectedValue("selectBuilding");
+  var data = '{ "locationName": "' + buildLocation + '", "building": "' + building + '" }';
+  callApi("/game/" + gameId + "/player/" + color + "/build", "post", data, placeTroopResponseHandler);
+}
+
+function cancelBuild() {
   var gameId = getInnerHtmlValue("gameId");
   var color = getInnerHtmlValue("myColor");
   var data = '{ "action": "cancel" }';

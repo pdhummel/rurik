@@ -406,6 +406,72 @@ app.post('/game/:id/player/:color/attack', (req, res) => {
   }     
 });
 
+app.post('/game/:id/player/:color/tax', (req, res) => {
+  console.log("post " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  var color = req.params.color;
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var player = game.getPlayer(color);
+  if (player === undefined) {
+    res.status(404).send('Player not found for color ' + color);
+    return;
+  }
+  var locationName = req.body.locationName;
+  var location = game.gameMap.getLocation(locationName);
+  if (location === undefined) {
+    res.status(404).send('Location not found, ' + locationName);
+  }
+  var marketCoin = false;
+  var marketCoinYN = req.body.marketCoinYN;
+  if (marketCoinYN == 'Y') {
+    marketCoin = true;
+  }
+
+  try {
+    game.tax(color, locationName, true, marketCoin);
+    res.send(game.gameMap.locations);
+    return;
+  } catch(error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
+    return;
+  }     
+});
+
+
+app.post('/game/:id/player/:color/build', (req, res) => {
+  console.log("post " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  var color = req.params.color;
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var player = game.getPlayer(color);
+  if (player === undefined) {
+    res.status(404).send('Player not found for color ' + color);
+    return;
+  }
+  var locationName = req.body.locationName;
+  var location = game.gameMap.getLocation(locationName);
+  if (location === undefined) {
+    res.status(404).send('Location not found, ' + locationName);
+  }
+
+  var building = req.body.building;
+  try {
+    game.build(color, locationName, building);
+    res.send(game.gameMap.locations);
+    return;
+  } catch(error) {
+    console.log(error.message);
+    res.status(400).send(error.message);
+    return;
+  }     
+});
 
 app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
   console.log("get " + req.path + " " + req.params);

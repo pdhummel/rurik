@@ -230,3 +230,52 @@ curl -X DELETE -H "Content-Type: application/json" \
 "${server}/game/${game_id}/player/blue/turn"
 
 
+echo "Second player retrieve advisor"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "red", "advisor": "2", "forfeitAction": "N", "row": 2  }' \
+"${server}/game/${game_id}/advisorRetrieve/tax"
+
+echo "Second player select tax action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "taxAction"  }' \
+"${server}/game/${game_id}/player/red/turn"
+
+echo "Second player tax action"
+curl -X POST -H "Content-Type: application/json" \
+--data '{ "locationName": "Polotsk", "marketCoinYN": "N" }' \
+"${server}/game/${game_id}/player/red/tax"
+
+echo "Second player end turn"
+curl -X DELETE -H "Content-Type: application/json" \
+"${server}/game/${game_id}/player/red/turn"
+
+
+echo "First player retrieve advisor"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "blue", "advisor": "4", "forfeitAction": "N", "row": 1  }' \
+"${server}/game/${game_id}/advisorRetrieve/tax"
+
+echo "First player select tax action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "taxAction"  }' \
+"${server}/game/${game_id}/player/blue/turn"
+
+echo "First player tax action"
+curl -X POST -H "Content-Type: application/json" \
+--data '{ "locationName": "Novgorod", "marketCoinYN": "N" }' \
+"${server}/game/${game_id}/player/blue/tax"
+
+echo "First player select tax action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "taxAction"  }' \
+"${server}/game/${game_id}/player/blue/turn"
+
+echo "First player tax action"
+curl -X POST -H "Content-Type: application/json" \
+--data '{ "locationName": "Rostov", "marketCoinYN": "N" }' \
+"${server}/game/${game_id}/player/blue/tax"
+
+echo "First player end turn"
+curl -X DELETE -H "Content-Type: application/json" \
+"${server}/game/${game_id}/player/blue/turn"
+

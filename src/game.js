@@ -36,7 +36,7 @@ class GameStatus {
             this.clientName = clientPlayer.name;
             this.clientPosition = clientPlayer.position;
         }
-        if (this.currentState != "waitingForPlayers") {
+        if (this.currentState != "waitingForPlayers" && currentGameState != undefined) {
             this.round = game.currentRound;
             //this.auctionBoard = game.auctionBoard;
             var currentPlayer = game.players.getCurrentPlayer();
@@ -310,8 +310,7 @@ class Game {
                         auctionSpace = auctionSpaces.pop();
                         console.log("takeMainAction(): pop " + auctionSpace.actionName);
                     } else {
-                        // TODO: throw exception
-                        console.log("takeMainAction(): TODO: exception");
+                        throw new Error("Could not retrieve advisor.", "takeMainAction()");        
                     }
 
                     // remove advisor from auctionSpace
@@ -472,6 +471,7 @@ class Game {
     }
 
     move(color, fromLocationName, toLocationName, numberOfTroops=1, moveLeader=false) {
+        console.log("move(): " + color + ": from " + fromLocationName + " to " + toLocationName);
         if (this.gameStates.currentState.name == "actionPhaseMove") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
@@ -512,7 +512,8 @@ class Game {
     }
 
     tax(color, locationName, toBoat=true, marketCoinNotResource=false) {
-        if (this.gameStates.currentState.name == "actionPhase") {
+        console.log("tax(): " + color + ": " + locationName);
+        if (this.gameStates.currentState.name == "actionPhaseTax") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 var location = this.gameMap.getLocation(locationName);
@@ -523,6 +524,7 @@ class Game {
                     }
                     if (currentPlayer.taxActions >= taxActionsRequired && location.resourceCount > 0) {
                         var resource = location.defaultResource;
+                        location.resourceCount = location.resourceCount - 1;
                         currentPlayer.taxActions = currentPlayer.taxActions - taxActionsRequired;
                         if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
                             currentPlayer.boat.addGoodToBoat(resource);
@@ -541,17 +543,24 @@ class Game {
                                 }                                
                             }
                         }
+                        this.gameStates.setCurrentState("actionPhase");
+                    } else {
+                        throw new Error("Location has no resources or you do not have enough tax actions.", "tax()");        
                     }    
+                } else {
+                    throw new Error("You cannot tax a location that you don't occupy.", "tax()");    
                 }
-                //if (currentPlayer.taxActions < 1) {
-                //    this.gameStates.setCurrentState("actionPhase");
-                //}                
+            } else {
+                throw new Error("It is not your turn right now.", "tax()");
             }
+        } else {
+            throw new Error("Cannot tax right now.", "tax()");
         }
     }
 
     build(color, locationName, buildingName) {
-        if (this.gameStates.currentState.name == "actionPhase") {
+        console.log("build(): " + color + ": " + locationName + " " + buildingName);
+        if (this.gameStates.currentState.name == "actionPhaseBuild") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
                 var location = this.gameMap.getLocation(locationName);
@@ -563,24 +572,35 @@ class Game {
                     if (currentPlayer.buildActions >= buildActionsRequired) {
                         if (currentPlayer.buildings[buildingName] > 1) {
                             currentPlayer.buildings[buildingName]--;
-                            location.buildings.push(buildingName);
+                            location.addBuilding(color, buildingName);
+                            currentPlayer.buildActions = currentPlayer.buildActions - buildActionsRequired;
 
+                            this.gameStates.setCurrentState("actionPhase");
                             if (buildingName == "stable") {
                                 currentPlayer.moveActionsFromLocation[locationName] = 2;
-                            } else if (buildingName = "tavern") {
+                            } else if (buildingName == "church") {
+                                // TODO: conversion
+                            } else if (buildingName == "tavern") {
+                                // TODO: test tavern
                                 currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
                                 this.gameStates.setCurrentState("oneTimeScheme");
                             }
 
-                            //if (currentPlayer.buildActions < 1) {
-                            //    this.gameStates.setCurrentState("actionPhase");
-                            //}
-    
+                        } else {
+                            throw new Error("Building not available to player.", "build()");
                         }
-
-                    }                    
+                    } else {
+                        throw new Error("You do not have enough build actions.", "build()");
+                    }                
+                } else {
+                    // TODO: break this down
+                    throw new Error("You do not occupy this location, or the location already has 3 buildings or already has the same building.", "build()");    
                 }
+            } else {
+                throw new Error("It is not your turn right now.", "build()");
             }
+        } else {
+            throw new Error("Cannot build right now.", "build()");
         }
     }
 
@@ -765,10 +785,12 @@ class Game {
     beginActionPhaseAction(color, action) {
         console.log("beginActionPhaseAction(): " + color + " " + action);
         var actionToStateMap = {};
+        actionToStateMap["cancel"] = "actionPhase";
         actionToStateMap["musterAction"] = "actionPhaseMuster";
         actionToStateMap["moveAction"] = "actionPhaseMove";
         actionToStateMap["attackAction"] = "actionPhaseAttack";
-        actionToStateMap["cancel"] = "actionPhase";
+        actionToStateMap["taxAction"] = "actionPhaseTax";
+        actionToStateMap["buildAction"] = "actionPhaseBuild";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {

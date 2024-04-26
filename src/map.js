@@ -43,7 +43,7 @@ class Location {
 
     addBuilding(color, buildingName) {
         if (this.buildings.length < 3) {
-            hasMatch = this.hasBuilding(buildingName);
+            var hasMatch = this.hasBuilding(buildingName);
             if (! hasMatch) {
                 var building = new Building(color, buildingName)
                 this.buildings.push(building);
@@ -52,9 +52,9 @@ class Location {
     }
 
     hasBuilding(buildingName) {
-        hasMatch = false;
+        var hasMatch = false;
         for (var i=0; i<this.buildings.length; i++) {
-            if (buildings[i].name == buildingName) {
+            if (this.buildings[i].name == buildingName) {
                 hasMatch = true;
             }
         }
@@ -64,7 +64,7 @@ class Location {
     countStrongholds(color) {
         var strongholds = 0;
         for (var i=0; i<this.buildings.length; i++) {
-            if (buildings[i].name == "stronghold" && buildings[i].color == color) {
+            if (this.buildings[i].name == "stronghold" && this.buildings[i].color == color) {
                 strongholds++;
             }
         }
@@ -74,7 +74,7 @@ class Location {
     doesPlayerHaveMarket(color) {
         var hasMarket = false;
         for (var i=0; i<this.buildings.length; i++) {
-            if (buildings[i].name == "market" && buildings[i].color == color) {
+            if (this.buildings[i].name == "market" && this.buildings[i].color == color) {
                 hasMarket = true;
             }
         }
@@ -84,7 +84,7 @@ class Location {
     doesPlayerHaveBuilding(color) {
         var hasBuilding = false;
         for (var i=0; i<this.buildings.length; i++) {
-            if (buildings[i].color == color) {
+            if (this.buildings[i].color == color) {
                 hasBuilding = true;
             }
         }
