@@ -4,7 +4,9 @@ const GamePlayers = require('./player.js');
 const AvailableLeaders = require('./leader.js');
 const GameStates = require('./state.js');
 const Cards = require('./cards.js');
+const ClaimBoard = require('./claims.js');
 const Validator = require('./validations.js');
+
 
 
 class GameStatus {
@@ -108,6 +110,7 @@ class Game {
         this.auctionBoard = null;
         this.gameMap = new GameMap();
         this.cards = new Cards();
+        this.claimBoard = new ClaimBoard();
         this.targetNumberOfPlayers = targetNumberOfPlayers;
         this.players = new GamePlayers(targetNumberOfPlayers);
         this.availableLeaders = new AvailableLeaders();
@@ -657,8 +660,13 @@ class Game {
                                     break;
                                 }
                             }
-                            // TODO: go up on the war track
-                            
+                            var warPoints = this.claimBoard.claimsByPlayer[color]["warfare"];
+                            warPoints++;
+                            this.claimBoard.claimsByPlayer[color]["warfare"] = warPoints;
+                            if (this.claimBoard.warfareRewards[warPoints] != undefined && this.claimBoard.warfareRewards[warPoints] != null) {
+                                // TODO: warfare rewards
+                                // "2 wood", "2 coins", "2 fish", "fur", "schemeCard", "victoryPoint"
+                            }
                         } else {
                             throw new Error(target + " does not have troops to attack in " + locationName + ".", "attack()");
                         }

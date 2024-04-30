@@ -4,7 +4,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 ## TODO
 
-* define scheme cards
 * show leader in supply
 * game log
 * messages and error messages in UI
@@ -82,6 +81,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * attack action
 * tax action
 * build action
+* define scheme cards
 
 
 
