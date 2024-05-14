@@ -17,6 +17,7 @@ class GameStatus {
         this.name = game.name;
         this.playerNames = "";
         this.currentPlayer = null;
+        this.clientPlayer = null;
         this.numberOfPlayers = game.players.players.length;
         this.targetNumberOfPlayers = game.targetNumberOfPlayers;
         var currentGameState = game.gameStates.getCurrentState();
@@ -33,10 +34,10 @@ class GameStatus {
             this.firstPlayer = firstPlayer.color;
         }
         if (!(clientColor == undefined && clientColor == null || clientColor.length < 1)) {
-            var clientPlayer = game.getPlayer(clientColor);
-            this.clientLeader = clientPlayer.leader;
-            this.clientName = clientPlayer.name;
-            this.clientPosition = clientPlayer.position;
+            this.clientPlayer = game.getPlayer(clientColor);
+            this.clientLeader = this.clientPlayer.leader;
+            this.clientName = this.clientPlayer.name;
+            this.clientPosition = this.clientPlayer.position;
         }
         if (this.currentState != "waitingForPlayers" && currentGameState != undefined) {
             this.round = game.currentRound;
@@ -128,571 +129,554 @@ class Game {
     joinGame(name, color, position, isPlayerAi=false) {
         Validator.validateColor(color);
         Validator.validateTablePosition(position);
-        if (this.gameStates.currentState.name == "waitingForPlayers") {
-            if (this.players.players.length < this.players.targetNumberOfPlayers) {
-                var player = this.players.addPlayer(name, color, position, isPlayerAi, this.cards);
-                console.log("joinGame(): before resetMoveActionsFromLocation");
-                player.resetMoveActionsFromLocation(this.gameMap.locations);
-                console.log("joinGame(): exit: " + name + ", " + color);
-            } else {
-                throw new Error("Game is full and already has " + this.players.targetNumberOfPlayers + " players.", "joinGame()");    
-            }
-        } else {
-            throw new Error("Game is no longer accepting players.", "joinGame()");
-        }           
+        this.validateGameStatus("waitingForPlayers", "joinGame", "Game is no longer accepting players.");
+        if (this.players.players.length > this.players.targetNumberOfPlayers) {
+            throw new Error("Game is full and already has " + this.players.targetNumberOfPlayers + " players.", "joinGame");
+        }
+
+        var player = this.players.addPlayer(name, color, position, isPlayerAi, this.cards);
+        console.log("joinGame(): before resetMoveActionsFromLocation");
+        player.resetMoveActionsFromLocation(this.gameMap.locations);
+        console.log("joinGame(): exit: " + name + ", " + color);
     }
 
-    startGame() {        
-        if (this.gameStates.currentState.name == "waitingForPlayers") {
-            // Allows person to play w/o opponent
-            if (this.players.getNumberOfPlayers() > 0) {
-                this.players.sortPlayers();
-                this.auctionBoard = new AuctionBoard(this.players.getNumberOfPlayers());
-                this.gameMap.setLocationsForGame(this.players.getNumberOfPlayers());
-                this.gameStates.setCurrentState("waitingForFirstPlayerSelection");
-                console.log("startGame(): exit");
-            } else {
-                throw new Error("Cannot start game without players.", "startGame()");
-            }
-        }        
+    startGame() {  
+        this.validateGameStatus("waitingForPlayers", "startGame");
+        // Allows person to play w/o opponent
+        if (this.players.getNumberOfPlayers() == 0) {
+            throw new Error("Cannot start the game without players.", "startGame");
+        }
+
+        this.players.sortPlayers();
+        this.auctionBoard = new AuctionBoard(this.players.getNumberOfPlayers());
+        this.gameMap.setLocationsForGame(this.players.getNumberOfPlayers());
+        this.gameStates.setCurrentState("waitingForFirstPlayerSelection");
+        console.log("startGame(): exit");
     }
 
     selectFirstPlayer(color) {
         Validator.validateColor(color);
-        if (this.gameStates.currentState.name == "waitingForFirstPlayerSelection") {
-            var player = this.players.getPlayerByColor(color);
-            this.players.setFirstPlayer(player);
-            this.players.setCurrentPlayer(player);
-            this.gameStates.setCurrentState("waitingForLeaderSelection");
-        } else {
-            throw new Error("Cannot select first player right now.", "selectFirstPlayer()");
-        }
+        this.validateGameStatus("waitingForFirstPlayerSelection", "selectFirstPlayer");
+        var player = this.players.getPlayerByColor(color);
+        this.players.setFirstPlayer(player);
+        this.players.setCurrentPlayer(player);
+        this.gameStates.setCurrentState("waitingForLeaderSelection");
     }
 
     selectRandomFirstPlayer() {
-        if (this.gameStates.currentState.name == "waitingForFirstPlayerSelection") {
-            var randomPlayer = this.players.getRandomPlayer();
-            this.players.setFirstPlayer(randomPlayer);
-            this.players.setCurrentPlayer(randomPlayer);
-            this.gameStates.setCurrentState("waitingForLeaderSelection");
-        } else {
-            throw new Error("Cannot select first player right now.", "selectRandomFirstPlayer()");
-        }
+        this.validateGameStatus("waitingForFirstPlayerSelection", "selectRandomFirstPlayer");
+        var randomPlayer = this.players.getRandomPlayer();
+        this.players.setFirstPlayer(randomPlayer);
+        this.players.setCurrentPlayer(randomPlayer);
+        this.gameStates.setCurrentState("waitingForLeaderSelection");
     }    
 
     chooseLeader(color, leaderName) {
+        console.log("chooseLeader(): " + color);
         Validator.validateColor(color);
-        if (this.gameStates.currentState.name == "waitingForLeaderSelection") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                var leader = this.availableLeaders.chooseLeader(leaderName);
-                currentPlayer.setLeader(leader);
-                var nextPlayer = this.players.getNextPlayer(currentPlayer);
-                if (nextPlayer.leader == null) {
-                    this.players.setCurrentPlayer(nextPlayer);
-                } else {
-                    var firstPlayer = this.players.getFirstPlayer()
-                    this.players.setCurrentPlayer(firstPlayer);
-                    this.gameStates.setCurrentState("waitingForSecretAgendaSelection");
-                }
-            } else {
-                throw new Error(currentPlayer.color + " should choose leader before " + color + ".", "chooseLeader()");    
-            }
+        this.validateGameStatus("waitingForLeaderSelection", "chooseLeader");
+        var currentPlayer = this.validateCurrentPlayer(color, "chooseLeader");
+
+        var leader = this.availableLeaders.chooseLeader(leaderName);
+        currentPlayer.setLeader(leader);
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);
+        if (nextPlayer.leader == null) {
+            this.players.setCurrentPlayer(nextPlayer);
         } else {
-            throw new Error("Cannot choose leader right now.", "chooseLeader()");
+            var firstPlayer = this.players.getFirstPlayer()
+            this.players.setCurrentPlayer(firstPlayer);
+            this.gameStates.setCurrentState("waitingForSecretAgendaSelection");
         }
     }
 
 
     selectSecretAgenda(color, cardName) {
-        if (this.gameStates.currentState.name == "waitingForSecretAgendaSelection") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                for (var i=0; i<currentPlayer.temporarySecretAgenda.length; i++) {
-                    if (cardName == currentPlayer.temporarySecretAgenda[i].name) {
-                        currentPlayer.secretAgenda.push(currentPlayer.temporarySecretAgenda[i]);
-                        currentPlayer.temporarySecretAgenda = [];
-                        break;
-                    }
-                }
-                var nextPlayer = this.players.getNextPlayer(currentPlayer);
-                if (nextPlayer.secretAgenda.length < 1) {
-                    this.players.setCurrentPlayer(nextPlayer);
-                } else {
-                    this.players.setCurrentPlayer(this.players.firstPlayer);
-                    this.gameStates.setCurrentState("waitingForTroopPlacement");
-                }
+        this.validateGameStatus("waitingForSecretAgendaSelection", "selectSecretAgenda");
+        var currentPlayer = this.validateCurrentPlayer(color, "selectSecretAgenda");
+        for (var i=0; i<currentPlayer.temporarySecretAgenda.length; i++) {
+            if (cardName == currentPlayer.temporarySecretAgenda[i].name) {
+                currentPlayer.secretAgenda.push(currentPlayer.temporarySecretAgenda[i]);
+                currentPlayer.temporarySecretAgenda = [];
+                break;
             }
-
+        }
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);
+        if (nextPlayer.secretAgenda.length < 1) {
+            this.players.setCurrentPlayer(nextPlayer);
+        } else {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            this.gameStates.setCurrentState("waitingForTroopPlacement");
         }
     }
 
     placeInitialTroop(color, locationName) {
-        if (this.gameStates.currentState.name == "waitingForTroopPlacement") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                this.gameMap.locationByName[locationName].addTroop(color);
-                currentPlayer.troopsToDeploy--;
-                var nextPlayer = this.players.getNextPlayer(currentPlayer);
-                if (nextPlayer.troopsToDeploy > 0) {
-                    this.players.setCurrentPlayer(nextPlayer);
-                } else {
-                    this.players.setCurrentPlayer(this.players.firstPlayer);
-                    this.gameStates.setCurrentState("waitingForLeaderPlacement");
-                    this.players.setTroopsToDeploy(1);
-                }
-            }
+        this.validateGameStatus("waitingForTroopPlacement", "placeInitialTroop");
+        var currentPlayer = this.validateCurrentPlayer(color, "placeInitialTroop");
+
+        this.gameMap.locationByName[locationName].addTroop(color);
+        currentPlayer.troopsToDeploy--;
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);
+        if (nextPlayer.troopsToDeploy > 0) {
+            this.players.setCurrentPlayer(nextPlayer);
+        } else {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            this.gameStates.setCurrentState("waitingForLeaderPlacement");
+            this.players.setTroopsToDeploy(1);
         }
     }
 
     placeLeader(color, locationName) {
-        if (this.gameStates.currentState.name == "waitingForLeaderPlacement") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                this.gameMap.locationByName[locationName].addLeader(color);
-                currentPlayer.troopsToDeploy--;
-                var nextPlayer = this.players.getNextPlayer(currentPlayer);
-                if (nextPlayer.troopsToDeploy > 0) {
-                    this.players.setCurrentPlayer(nextPlayer);
-                } else {
-                    this.players.setCurrentPlayer(this.players.firstPlayer);
-                    var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
-                    this.players.setAdvisors(advisors);
-                    this.gameStates.setCurrentState("strategyPhase");
-                }
-            }
+        this.validateGameStatus("waitingForLeaderPlacement", "placeLeader");
+        var currentPlayer = this.validateCurrentPlayer(color, "placeLeader");
+        this.gameMap.locationByName[locationName].addLeader(color);
+        currentPlayer.troopsToDeploy--;
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);
+        if (nextPlayer.troopsToDeploy > 0) {
+            this.players.setCurrentPlayer(nextPlayer);
+        } else {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
+            this.players.setAdvisors(advisors);
+            this.gameStates.setCurrentState("strategyPhase");
         }
     }
 
     playAdvisor(color, columnName, advisor, bidCoins=0) {
         console.log("playAdvisor():", color, columnName, advisor, bidCoins);
-        if (this.gameStates.currentState.name == "strategyPhase") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                if (currentPlayer.isAdvisorAvailable(advisor)) {
-                    if (currentPlayer.boat.money < bidCoins) {
-                        // TODO: validation error
-                        return;
-                    }
-                    // TODO: check for 2 advisors from the same player
-                    this.auctionBoard.auctionBid(columnName, color, advisor, bidCoins);
-                    currentPlayer.boat.money = currentPlayer.boat.money - bidCoins;
-                    currentPlayer.useAdvisor(advisor);
-                    var nextPlayer = this.players.getNextPlayer(currentPlayer);
-                    if (nextPlayer.advisors.length > 0) {
-                        this.players.setCurrentPlayer(nextPlayer);
-                    } else {
-                        this.players.setCurrentPlayer(this.players.firstPlayer);
-                        var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
-                        this.players.setAdvisors(advisors);
-                        this.players.mapAdvisorsToAuctionSpaces(this.auctionBoard);
-                        this.gameStates.setCurrentState("retrieveAdvisor");
-                    }
-                }
-            }
+        this.validateGameStatus("strategyPhase", "playAdvisor");
+        var currentPlayer = this.validateCurrentPlayer(color, "playAdvisor");
+        if (! currentPlayer.isAdvisorAvailable(advisor)) {
+            throw new Error("No advisor is available.", "playAdvisor");
         }
+        if (currentPlayer.boat.money < bidCoins) {
+            throw new Error("Bid exceeded money available.", "playAdvisor");
+        }
+        // TODO: check for 2 advisors from the same player
+        this.auctionBoard.auctionBid(columnName, color, advisor, bidCoins);
+        currentPlayer.boat.money = currentPlayer.boat.money - bidCoins;
+        currentPlayer.useAdvisor(advisor);
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);
+        if (nextPlayer.advisors.length > 0) {
+            this.players.setCurrentPlayer(nextPlayer);
+        } else {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
+            this.players.setAdvisors(advisors);
+            this.players.mapAdvisorsToAuctionSpaces(this.auctionBoard);
+            this.gameStates.setCurrentState("retrieveAdvisor");
+        }
+
     }
 
     // retrieve advisor
     takeMainAction(color, advisor, actionColumnName, row, forfeitAction=false) {
         console.log("takeMainAction(): ", color, advisor, actionColumnName, row, forfeitAction);
-        if (this.gameStates.currentState.name == "retrieveAdvisor") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.tookMainActionForTurn == false) {
-                // TODO: figure out how to differentiate if there are 2 with the same advisor number 
-                // in the same column - for now, process top to bottom.
-                
-                if (currentPlayer.advisors.length > 0 && advisor == currentPlayer.advisors[0]) {
-                    currentPlayer.advisors.shift();
-                    var auctionSpaces = currentPlayer.advisorsToAuctionSpace[advisor];
-                    var auctionSpace = null;
-                    if (auctionSpaces.length > 0 && auctionSpaces[0].actionName == actionColumnName) {
-                        auctionSpace = auctionSpaces.shift();
-                        console.log("takeMainAction(): shift " + auctionSpace.actionName);
-                    } else if (auctionSpaces.length > 1 && auctionSpaces[1].actionName == actionColumnName) {
-                        auctionSpace = auctionSpaces.pop();
-                        console.log("takeMainAction(): pop " + auctionSpace.actionName);
-                    } else {
-                        throw new Error("Could not retrieve advisor.", "takeMainAction()");        
-                    }
+        this.validateGameStatus("retrieveAdvisor", "takeMainAction");
+        var currentPlayer = this.validateCurrentPlayer(color, "takeMainAction");
+        if (currentPlayer.tookMainActionForTurn == true) {
+            this.throwError("Player already too main action for this turn.", "takeMainAction");
+        }
 
-                    // remove advisor from auctionSpace
-                    auctionSpace.color = null;
-                    auctionSpace.advisor = 0;
-                    auctionSpace.bidCoins = 0;
-                    console.log("takeMainAction(): advisor removed");
+        if (currentPlayer.advisors.length < 1 || advisor != currentPlayer.advisors[0]) {
+            console.log("takeMainAction(): advisor does not match: " + advisor + " " + currentPlayer.color + " " + currentPlayer.advisors);
+        }
 
-                    if (forfeitAction == true) {
-                        currentPlayer.boat.money++;
-                    } else {
-                        if (auctionSpace.extraCoin > currentPlayer.boat.money) {
-                            throw new Error("Not enough money to take action.", "takeMainAction()");        
-                        } else {
-                            currentPlayer.boat.money = currentPlayer.boat.money - auctionSpace.extraCoin;
-                        }
-                        if (actionColumnName == "build") {
-                            currentPlayer.buildActions = currentPlayer.buildActions + auctionSpace.quantity;
-                        } else if (actionColumnName == "tax") {
-                            currentPlayer.taxActions = currentPlayer.taxActions + auctionSpace.quantity;
-                        } else if (actionColumnName == "move") {
-                            currentPlayer.moveActions = currentPlayer.moveActions + auctionSpace.quantity;
-                        } else if (actionColumnName == "attack") {
-                            currentPlayer.attackActions = currentPlayer.attackActions + auctionSpace.quantity;
-                        } else if (actionColumnName == "muster") {
-                            var quantity = auctionSpace.quantity;
-                            if (quantity > currentPlayer.supplyTroops) {
-                                quantity = currentPlayer.supplyTroops;
-                            }
-                            currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy + quantity;
-                            //this.gameStates.setCurrentState("muster");
-                        } else if (actionColumnName == "scheme") {
-                            currentPlayer.schemeCardsToDraw = auctionSpace.quantity;
-                            if (auctionSpace.quantity = 3) {
-                                currentPlayer.assignFirstPlayer = true;
-                            }
-                            this.gameStates.setCurrentState("scheme");
-                        }
-    
-                    }
-                    console.log("takeMainAction(): tookMainActionForTurn");
-                    currentPlayer.tookMainActionForTurn = true;
-                    if (currentPlayer.tookMainActionForTurn && this.gameStates.getCurrentState().name == "retrieveAdvisor") {
-                        this.gameStates.setCurrentState("actionPhase");
-                    }
+        // TODO: figure out how to differentiate if there are 2 with the same advisor number 
+        // in the same column - for now, process top to bottom.
+        
+        if (currentPlayer.advisors.length > 0 && advisor == currentPlayer.advisors[0]) {
+            currentPlayer.advisors.shift();
+            var auctionSpaces = currentPlayer.advisorsToAuctionSpace[advisor];
+            var auctionSpace = null;
+            if (auctionSpaces.length > 0 && auctionSpaces[0].actionName == actionColumnName) {
+                auctionSpace = auctionSpaces.shift();
+                console.log("takeMainAction(): shift " + auctionSpace.actionName);
+            } else if (auctionSpaces.length > 1 && auctionSpaces[1].actionName == actionColumnName) {
+                auctionSpace = auctionSpaces.pop();
+                console.log("takeMainAction(): pop " + auctionSpace.actionName);
+            } else {
+                throw new Error("Could not retrieve advisor.", "takeMainAction()");        
+            }
+
+            // remove advisor from auctionSpace
+            auctionSpace.color = null;
+            auctionSpace.advisor = 0;
+            auctionSpace.bidCoins = 0;
+            console.log("takeMainAction(): advisor removed");
+
+            if (forfeitAction == true) {
+                currentPlayer.boat.money++;
+            } else {
+                if (auctionSpace.extraCoin > currentPlayer.boat.money) {
+                    throw new Error("Not enough money to take action.", "takeMainAction()");        
                 } else {
-                    console.log("takeMainAction(): advisor does not match: " + advisor + " " + currentPlayer.color + " " + currentPlayer.advisors);
+                    currentPlayer.boat.money = currentPlayer.boat.money - auctionSpace.extraCoin;
+                }
+                if (actionColumnName == "build") {
+                    currentPlayer.buildActions = currentPlayer.buildActions + auctionSpace.quantity;
+                } else if (actionColumnName == "tax") {
+                    currentPlayer.taxActions = currentPlayer.taxActions + auctionSpace.quantity;
+                } else if (actionColumnName == "move") {
+                    currentPlayer.moveActions = currentPlayer.moveActions + auctionSpace.quantity;
+                } else if (actionColumnName == "attack") {
+                    currentPlayer.attackActions = currentPlayer.attackActions + auctionSpace.quantity;
+                } else if (actionColumnName == "muster") {
+                    var quantity = auctionSpace.quantity;
+                    if (quantity > currentPlayer.supplyTroops) {
+                        quantity = currentPlayer.supplyTroops;
+                    }
+                    currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy + quantity;
+                } else if (actionColumnName == "scheme") {
+                    currentPlayer.schemeCardsToDraw = auctionSpace.quantity;
+                    if (auctionSpace.quantity = 3) {
+                        this.gameStates.setCurrentState("schemeFirstPlayer");
+                    } else {
+                        this.gameStates.setCurrentState("drawSchemeCards");
+                    }
                 }
 
+            }
+            console.log("takeMainAction(): tookMainActionForTurn");
+            currentPlayer.tookMainActionForTurn = true;
+            if (currentPlayer.tookMainActionForTurn && this.gameStates.getCurrentState().name == "retrieveAdvisor") {
+                this.gameStates.setCurrentState("actionPhase");
             }
         }
     }
 
-    assignFirstPlayer(color) {
-        if (this.gameStates.currentState.name == "scheme") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.assignFirstPlayer) {
-                this.players.setNextFirstPlayerByColor(color);
-                currentPlayer.assignFirstPlayer = false;
-                if (currentPlayer.temporarySchemeCards.length < 1) {
-                    this.gameStates.setCurrentState("actionPhase");
-                }
-            }
-        }            
+    schemeFirstPlayer(currentPlayerColor, firstPlayerColor) {
+        this.validateGameStatus("schemeFirstPlayer", "schemeFirstPlayer");
+        this.validateCurrentPlayer(currentPlayerColor, "schemeFirstPlayer");
+        this.players.setNextFirstPlayerByColor(firstPlayerColor);
+        this.gameStates.setCurrentState("drawSchemeCards");
     }
-
 
     drawSchemeCards(color, schemeDeck) {
-        if (this.gameStates.currentState.name == "scheme") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.schemeCardsToDraw > 0) {
-                currentPlayer.canKeepSchemeCard = true;
-                if (currentPlayer.schemeCardsToDraw == 1) {
-                    var card = this.cards.drawSchemeCard(schemeDeck);
-                    currentPlayer.temporarySchemeCards.push(card);
-                    this.selectSchemeCard(color, card);
-                } else {
-                    for (var i=0; currentPlayer.schemeCardsToDraw; i++) {
-                        var card = this.cards.drawSchemeCard(schemeDeck);
-                        currentPlayer.temporarySchemeCards.push(card);
-                    }
-                }
-
-                currentPlayer.schemeCardsToDraw == 0;
-            }
+        this.validateGameStatus("drawSchemeCards", "drawSchemeCards");
+        var currentPlayer = this.validateCurrentPlayer(color, "drawSchemeCards");
+        if (currentPlayer.schemeCardsToDraw < 1) {
+            this.throwError("You don't have any scheme cards to draw.", "drawSchemeCards");
         }
+
+        currentPlayer.canKeepSchemeCard = true;
+        if (currentPlayer.schemeCardsToDraw == 1) {
+            var card = this.cards.drawSchemeCard(schemeDeck);
+            currentPlayer.temporarySchemeCards.push(card);
+            this.selectSchemeCardToKeep(color, card);
+        } else {
+            for (var i=0; i<currentPlayer.schemeCardsToDraw; i++) {
+                var card = this.cards.drawSchemeCard(schemeDeck);
+                currentPlayer.temporarySchemeCards.push(card);
+                currentPlayer.returnSchemeDeck = schemeDeck;
+            }
+            this.gameStates.setCurrentState("selectSchemeCard");
+        }
+        currentPlayer.schemeCardsToDraw == 0;
     }
 
     selectSchemeCardToKeep(color, schemeCard) {
-        if (this.gameStates.currentState.name == "scheme") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.temporarySchemeCards.length > 0 && 
-                currentPlayer.canKeepSchemeCard) {
-                var tempCards = [];
-                for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
-                    if (schemeCard.isEqual(currentPlayer.temporarySchemeCards[i])) {
-                        currentPlayer.schemeCards.push(currentPlayer.temporarySchemeCards[i]);
-                        currentPlayer.canKeepSchemeCard = false;
-                    } else {
-                        tempCards.push(currentPlayer.temporarySchemeCards[i]);
-                    }
-                }                
-                currentPlayer.temporarySchemeCards = tempCards;
-                if (currentPlayer.temporarySchemeCards.length < 1 && !currentPlayer.assignFirstPlayer) {
-                    this.gameStates.setCurrentState("actionPhase");
-                }
+        if (this.gameStates.currentState.name != "drawSchemeCards" && 
+            this.gameStates.currentState.name != "selectSchemeCard") {
+            this.throwError("Cannot do that right now, because state is " + this.gameStates.currentState.name + ".", "selectSchemeCardToKeep");
+        }
+            
+        var currentPlayer = this.validateCurrentPlayer(color, "selectSchemeCardToKeep");
+        if (currentPlayer.temporarySchemeCards.length < 1 || ! currentPlayer.canKeepSchemeCard) {
+            this.throwError("You have no scheme cards to keep.", "selectSchemeCardToKeep");
+        }
+        var tempCards = [];
+        for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
+            if (schemeCard.isEqual(currentPlayer.temporarySchemeCards[i])) {
+                currentPlayer.schemeCards.push(currentPlayer.temporarySchemeCards[i]);
+                currentPlayer.canKeepSchemeCard = false;
+            } else {
+                tempCards.push(currentPlayer.temporarySchemeCards[i]);
             }
-        }    
+        }                
+        currentPlayer.temporarySchemeCards = tempCards;
+        if (currentPlayer.temporarySchemeCards.length < 1) {
+            this.gameStates.setCurrentState("actionPhase");
+        }
+
     }
 
     selectSchemeCardToReturn(color, schemeDeck, schemeCard) {
-        if (this.gameStates.currentState.name == "scheme") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.temporarySchemeCards.length > 0) {
-                var tempCards = [];
-                for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
-                    if (schemeCard.isEqual(currentPlayer.temporarySchemeCards[i])) {
-                        schemeDeck.unshift(currentPlayer.temporarySchemeCards[i]);
-                    } else {
-                        tempCards.push(currentPlayer.temporarySchemeCards[i]);
-                    }
-                }                
-                currentPlayer.temporarySchemeCards = tempCards;
-                if (currentPlayer.temporarySchemeCards.length == 1 && currentPlayer.canKeepSchemeCard) {
-                    var card = currentPlayer.temporarySchemeCards.pop();
-                    currentPlayer.schemeCards.push(card);
-                    currentPlayer.canKeepSchemeCard = false;
-                }
-                if (currentPlayer.temporarySchemeCards.length < 1 && !currentPlayer.assignFirstPlayer) {
-                    this.gameStates.setCurrentState("actionPhase");
-                }
+        console.log("selectSchemeCardToReturn(): " + schemeCard + " " + schemeDeck);
+        this.validateGameStatus("selectSchemeCard", "selectSchemeCardToReturn");
+        var currentPlayer = this.validateCurrentPlayer(color, "selectSchemeCardToReturn");
+        if (currentPlayer.temporarySchemeCards.length < 1) {
+            this.throwError("You have no scheme cards to keep.", "selectSchemeCardToKeep");
+        }
+
+        var tempCards = [];
+        var found = false;
+        for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
+            if (schemeCard.isEqual(currentPlayer.temporarySchemeCards[i]) && found == false) {
+                schemeDeck.unshift(currentPlayer.temporarySchemeCards[i]);
+                found = true;
+            } else {
+                tempCards.push(currentPlayer.temporarySchemeCards[i]);
             }
-        }    
+        }                
+        currentPlayer.temporarySchemeCards = tempCards;
+        if (currentPlayer.temporarySchemeCards.length == 1 && currentPlayer.canKeepSchemeCard) {
+            var card = currentPlayer.temporarySchemeCards.pop();
+            currentPlayer.schemeCards.push(card);
+            currentPlayer.canKeepSchemeCard = false;
+        }
+        if (currentPlayer.temporarySchemeCards.length < 1) {
+            this.gameStates.setCurrentState("actionPhase");
+        }
     }
 
     muster(color, locationName, numberOfTroops) {
         console.log("muster(): " + color + " " + locationName + " " + numberOfTroops);
-        if (this.gameStates.currentState.name == "actionPhaseMuster") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                var location = this.gameMap.getLocation(locationName);
-                if (location.troopsByColor[color] > 0 && numberOfTroops <= currentPlayer.troopsToDeploy &&
-                    numberOfTroops <= currentPlayer.supplyTroops) {
-                    location.troopsByColor[color] = location.troopsByColor[color] + numberOfTroops;
-                    currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy - numberOfTroops;
-                    currentPlayer.supplyTroops = currentPlayer.supplyTroops - numberOfTroops;
-                    this.gameStates.setCurrentState("actionPhase");
-                } else {
-                    // TODO: split error messages
-                    throw new Error("Not enough troops available or you do not occupy the location.", "muster()");        
-                }
-            } else {
-                throw new Error("It is not your turn right now.", "muster()");
-            }
-        } else {
-            throw new Error("Cannot muster troops right now.", "muster()");
+        this.validateGameStatus("actionPhaseMuster", "muster");
+        var currentPlayer = this.validateCurrentPlayer(color, "muster");
+        var location = this.gameMap.getLocation(locationName);
+        if (location.troopsByColor[color] < 1) {
+            this.throwError("Cannot muster troops in a location you do not occupy.", "muster");
         }
+        if (numberOfTroops > currentPlayer.troopsToDeploy || numberOfTroops > currentPlayer.supplyTroops) {
+            throw new Error("Not enough troops available.", "muster");
+        }
+        
+        location.troopsByColor[color] = location.troopsByColor[color] + numberOfTroops;
+        currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy - numberOfTroops;
+        currentPlayer.supplyTroops = currentPlayer.supplyTroops - numberOfTroops;
+        this.gameStates.setCurrentState("actionPhase");
     }
 
     move(color, fromLocationName, toLocationName, numberOfTroops=1, moveLeader=false) {
         console.log("move(): " + color + ": from " + fromLocationName + " to " + toLocationName);
-        if (this.gameStates.currentState.name == "actionPhaseMove") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                var fromLocation = this.gameMap.getLocation(fromLocationName);
-                var toLocation = this.gameMap.getLocation(toLocationName);
+        this.validateGameStatus("actionPhaseMove", "move");
+        var currentPlayer = this.validateCurrentPlayer(color, "move");
 
-                if (numberOfTroops <= currentPlayer.moveActions + currentPlayer.moveActionsFromLocation[fromLocationName]) {
-                    if (fromLocation.isNeighbor(toLocationName)) {
-                        if (moveLeader && fromLocation.isLeaderInLocation(color) && numberOfTroops == 1) {
-                            fromLocation.leaderByColor[color] = fromLocation.leaderByColor[color] - numberOfTroops;
-                            toLocation.leaderByColor[color] = toLocation.leaderByColor[color] + numberOfTroops;
-                        } else if (moveLeader) {
-                            throw new Error("Leader must be in location and cannot move other troops at the same time.", "move()");
-                        } else {
-                            fromLocation.troopsByColor[color] = fromLocation.troopsByColor[color] - numberOfTroops;
-                            toLocation.troopsByColor[color] = toLocation.troopsByColor[color] + numberOfTroops;    
-                        }
-                        for (var i=0; i < numberOfTroops; i++) {
-                            if (currentPlayer.moveActionsFromLocation[fromLocationName] > 0) {
-                                currentPlayer.moveActionsFromLocation[fromLocationName] - 1;
-                            } else {
-                                currentPlayer.moveActions = currentPlayer.moveActions - 1;
-                            }
-                        }
-                        this.gameStates.setCurrentState("actionPhase");
-                    } else {
-                        throw new Error(toLocationName + " is not a neighbor of " + fromLocationName + ".", "move()");        
-                    }
-                } else {
-                    throw new Error("You don't have that many troops available to move.", "move()");    
-                }
-            } else {
-                throw new Error("It is not your turn right now.", "move()");
-            }
-        } else {
-            throw new Error("Cannot move troops right now.", "move()");
+        var fromLocation = this.gameMap.getLocation(fromLocationName);
+        var toLocation = this.gameMap.getLocation(toLocationName);
+
+        if (numberOfTroops > currentPlayer.moveActions + currentPlayer.moveActionsFromLocation[fromLocationName]) {
+            throw new Error("You don't have that many troops available to move.", "move()");
         }
+        if (! fromLocation.isNeighbor(toLocationName)) {
+            throw new Error(toLocationName + " is not a neighbor of " + fromLocationName + ".", "move()");
+        }
+
+        if (moveLeader && fromLocation.isLeaderInLocation(color) && numberOfTroops == 1) {
+            fromLocation.leaderByColor[color] = fromLocation.leaderByColor[color] - numberOfTroops;
+            toLocation.leaderByColor[color] = toLocation.leaderByColor[color] + numberOfTroops;
+        } else if (moveLeader) {
+            throw new Error("Leader must be in location and cannot move other troops at the same time.", "move()");
+        } else {
+            fromLocation.troopsByColor[color] = fromLocation.troopsByColor[color] - numberOfTroops;
+            toLocation.troopsByColor[color] = toLocation.troopsByColor[color] + numberOfTroops;    
+        }
+        for (var i=0; i < numberOfTroops; i++) {
+            if (currentPlayer.moveActionsFromLocation[fromLocationName] > 0) {
+                currentPlayer.moveActionsFromLocation[fromLocationName] - 1;
+            } else {
+                currentPlayer.moveActions = currentPlayer.moveActions - 1;
+            }
+        }
+        this.gameStates.setCurrentState("actionPhase");
+
     }
 
     tax(color, locationName, toBoat=true, marketCoinNotResource=false) {
         console.log("tax(): " + color + ": " + locationName);
-        if (this.gameStates.currentState.name == "actionPhaseTax") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                var location = this.gameMap.getLocation(locationName);
-                if (location.doesOccupy(color)) {
-                    var taxActionsRequired = 2;
-                    if (location.doesRule(color)) {
-                        taxActionsRequired = 1;
-                    }
-                    if (currentPlayer.taxActions >= taxActionsRequired && location.resourceCount > 0) {
-                        var resource = location.defaultResource;
-                        location.resourceCount = location.resourceCount - 1;
-                        currentPlayer.taxActions = currentPlayer.taxActions - taxActionsRequired;
-                        if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
-                            currentPlayer.boat.addGoodToBoat(resource);
-                        } else {
-                            currentPlayer.boat.addGoodToDock(resource);
-                        }
-                        // check for market
-                        if (location.doesPlayerHaveMarket(color)) {
-                            if (marketCoinNotResource) {
-                                currentPlayer.boat.money++;
-                            } else {
-                                if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
-                                    currentPlayer.boat.addGoodToBoat(resource);
-                                } else {
-                                    currentPlayer.boat.addGoodToDock(resource);
-                                }                                
-                            }
-                        }
-                        this.gameStates.setCurrentState("actionPhase");
-                    } else {
-                        throw new Error("Location has no resources or you do not have enough tax actions.", "tax()");        
-                    }    
-                } else {
-                    throw new Error("You cannot tax a location that you don't occupy.", "tax()");    
-                }
-            } else {
-                throw new Error("It is not your turn right now.", "tax()");
-            }
-        } else {
-            throw new Error("Cannot tax right now.", "tax()");
+        this.validateGameStatus("actionPhaseTax", "tax");
+        var currentPlayer = this.validateCurrentPlayer(color, "tax");
+
+        var location = this.gameMap.getLocation(locationName);
+        if (! location.doesOccupy(color)) {
+            throw new Error("You cannot tax a location that you don't occupy.", "tax()");
         }
+
+        var taxActionsRequired = 2;
+        if (location.doesRule(color)) {
+            taxActionsRequired = 1;
+        }
+
+        if (currentPlayer.taxActions < taxActionsRequired) {
+            throw new Error("You do not have enough tax actions.", "tax");
+        }
+        if (location.resourceCount < 1) {
+            throw new Error("Location has no resources.", "tax");
+        }
+
+        location.resourceCount = location.resourceCount - 1;
+        currentPlayer.taxActions = currentPlayer.taxActions - taxActionsRequired;
+        if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
+            currentPlayer.boat.addGoodToBoat(resource);
+        } else {
+            currentPlayer.boat.addGoodToDock(resource);
+        }
+        // check for market
+        if (location.doesPlayerHaveMarket(color)) {
+            if (marketCoinNotResource) {
+                currentPlayer.boat.money++;
+            } else {
+                if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
+                    currentPlayer.boat.addGoodToBoat(resource);
+                } else {
+                    currentPlayer.boat.addGoodToDock(resource);
+                }                                
+            }
+        }
+        this.gameStates.setCurrentState("actionPhase");
+ 
     }
 
     build(color, locationName, buildingName) {
         console.log("build(): " + color + ": " + locationName + " " + buildingName);
-        if (this.gameStates.currentState.name == "actionPhaseBuild") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                var location = this.gameMap.getLocation(locationName);
-                if (location.doesOccupy(color) && location.buildings.length < 3 && ! location.hasBuilding(buildingName)) {
-                    var buildActionsRequired = 2;
-                    if (location.doesRule(color)) {
-                        buildActionsRequired = 1;
-                    }                    
-                    if (currentPlayer.buildActions >= buildActionsRequired) {
-                        if (currentPlayer.buildings[buildingName] > 1) {
-                            currentPlayer.buildings[buildingName]--;
-                            location.addBuilding(color, buildingName);
-                            currentPlayer.buildActions = currentPlayer.buildActions - buildActionsRequired;
+        this.validateGameStatus("actionPhaseBuild", "build");
+        var currentPlayer = this.validateCurrentPlayer(color, "build");
 
-                            this.gameStates.setCurrentState("actionPhase");
-                            if (buildingName == "stable") {
-                                currentPlayer.moveActionsFromLocation[locationName] = 2;
-                            } else if (buildingName == "church") {
-                                // TODO: conversion
-                            } else if (buildingName == "tavern") {
-                                // TODO: test tavern
-                                currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
-                                this.gameStates.setCurrentState("oneTimeScheme");
-                            }
-
-                        } else {
-                            throw new Error("Building not available to player.", "build()");
-                        }
-                    } else {
-                        throw new Error("You do not have enough build actions.", "build()");
-                    }                
-                } else {
-                    // TODO: break this down
-                    throw new Error("You do not occupy this location, or the location already has 3 buildings or already has the same building.", "build()");    
-                }
-            } else {
-                throw new Error("It is not your turn right now.", "build()");
-            }
-        } else {
-            throw new Error("Cannot build right now.", "build()");
+        var location = this.gameMap.getLocation(locationName);
+        if (!location.doesOccupy(color)) {
+            throw new Error("You do not occupy this location.", "build");
         }
+        if (location.buildings.length >= 3) {
+            throw new Error("The location already has 3 buildings.", "build");
+        }
+        if (location.hasBuilding(buildingName)) {
+            throw new Error("The location already has the same building.", "build");
+        }
+
+        var buildActionsRequired = 2;
+        if (location.doesRule(color)) {
+            buildActionsRequired = 1;
+        }
+        if (currentPlayer.buildActions < buildActionsRequired) {
+            throw new Error("You do not have enough build actions.", "build()");
+        }
+        if (currentPlayer.buildings[buildingName] < 1) {
+            throw new Error("Building not available to player.", "build()");
+        }
+
+        currentPlayer.buildings[buildingName]--;
+        location.addBuilding(color, buildingName);
+        currentPlayer.buildActions = currentPlayer.buildActions - buildActionsRequired;
+
+        this.gameStates.setCurrentState("actionPhase");
+        if (buildingName == "stable") {
+            currentPlayer.moveActionsFromLocation[locationName] = 2;
+        } else if (buildingName == "church") {
+            // TODO: conversion
+        } else if (buildingName == "tavern") {
+            // TODO: test tavern
+            currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
+            this.gameStates.setCurrentState("oneTimeScheme");
+        }
+
     }
 
     attack(color, locationName, target, schemeDeckNumber=1) {
+        console.log("attack(): " + color + ": " + locationName + " " + target);
+        this.validateGameStatus("actionPhaseAttack", "attack");
+        var currentPlayer = this.validateCurrentPlayer(color, "attack");
         var troopsLost = 0;
-        
-        if (this.gameStates.currentState.name == "actionPhaseAttack") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                var location = this.gameMap.getLocation(locationName);
+        var location = this.gameMap.getLocation(locationName);
+        if ((location.troopsByColor[color] < 1 && location.leaderByColor[color] < 1)) {
+            throw new Error("You do not have troops in " + locationName + ".", "attack()");
+        }
 
-                if ((location.troopsByColor[color] > 0 || location.leaderByColor[color] > 0)) {
-                    if (target == "rebel") {
-                        if (location.rebels.length > 0) {
-                            var reward = location.rebels.shift();
-                            if (reward == "coin") {
-                                currentPlayer.boat.money = currentPlayer.boat.money + 1;
-                            } else if (reward == "2 coins") {
-                                currentPlayer.boat.money = currentPlayer.boat.money + 2;
-                            } else {
-                                currentPlayer.boat.addGoodToBoatOrDock(reward);
-                            }
-                            currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;                            
-                        } else {
-                            throw new Error("There are no rebels  to attack in " + locationName + ".", "attack()");
-                        }
-                    } else {
-                        var targetColor = target;
-                        if ((location.troopsByColor[targetColor] > 0 || location.leaderByColor[targetColor] > 0)) {
-                            var schemeCardsToDraw = 1;
-                            if (location.doesRule(targetColor)) {
-                                schemeCardsToDraw++;
-                            }
-        
-                            if (location.troopsByColor[targetColor] > 0) {
-                                location.troopsByColor[targetColor]--;
-                            } else {
-                                location.leaderByColor[targetColor]--;
-                            }
-        
-                            if (location.countStrongholds(targetColor) > 0) {
-                                schemeCardsToDraw++;
-                            }
-                            var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
-                            for (var i=0; i<schemeCardsToDraw; i++) {
-                                var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
-                                var deaths = card.deaths;
-                                if (deaths > location.troopsByColor[color]) {
-                                    deaths = location.troopsByColor[color];
-                                }
-                                location.troopsByColor[color] = location.troopsByColor[color] - deaths;
-                                if (deaths > 0) {
-                                    troopsLost = deaths;
-                                    break;
-                                }
-                            }
-                            var warPoints = this.claimBoard.claimsByPlayer[color]["warfare"];
-                            warPoints++;
-                            this.claimBoard.claimsByPlayer[color]["warfare"] = warPoints;
-                            if (this.claimBoard.warfareRewards[warPoints] != undefined && this.claimBoard.warfareRewards[warPoints] != null) {
-                                // TODO: warfare rewards
-                                // "2 wood", "2 coins", "2 fish", "fur", "schemeCard", "victoryPoint"
-                            }
-                        } else {
-                            throw new Error(target + " does not have troops to attack in " + locationName + ".", "attack()");
-                        }
-                    }
-                    currentPlayer.attackActions = currentPlayer.attackActions - 1;
-                    this.gameStates.setCurrentState("actionPhase");
+        if (target == "rebel") {
+            if (location.rebels.length > 0) {
+                var reward = location.rebels.shift();
+                if (reward == "coin") {
+                    currentPlayer.boat.money = currentPlayer.boat.money + 1;
+                } else if (reward == "2 coins") {
+                    currentPlayer.boat.money = currentPlayer.boat.money + 2;
                 } else {
-                    throw new Error("You do not have troops in " + locationName + ".", "attack()");
-                }                
+                    currentPlayer.boat.addGoodToBoatOrDock(reward);
+                }
+                currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;                            
             } else {
-                throw new Error("Not your turn right now.", "attack()");
+                throw new Error("There are no rebels  to attack in " + locationName + ".", "attack()");
             }
         } else {
-            throw new Error("Cannot move attack right now.", "attack()");
+            var targetColor = target;
+            if ((location.troopsByColor[targetColor] < 1 && location.leaderByColor[targetColor] < 1)) {
+                throw new Error(target + " does not have troops to attack in " + locationName + ".", "attack()");
+            }
+
+            var schemeCardsToDraw = 1;
+            if (location.doesRule(targetColor)) {
+                schemeCardsToDraw++;
+            }
+
+            if (location.troopsByColor[targetColor] > 0) {
+                location.troopsByColor[targetColor]--;
+            } else {
+                location.leaderByColor[targetColor]--;
+            }
+
+            if (location.countStrongholds(targetColor) > 0) {
+                schemeCardsToDraw++;
+            }
+            var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
+            for (var i=0; i<schemeCardsToDraw; i++) {
+                var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
+                var deaths = card.deaths;
+                if (deaths > location.troopsByColor[color]) {
+                    deaths = location.troopsByColor[color];
+                }
+                location.troopsByColor[color] = location.troopsByColor[color] - deaths;
+                if (deaths > 0) {
+                    troopsLost = deaths;
+                    break;
+                }
+            }
+            var warPoints = this.claimBoard.claimsByPlayer[color]["warfare"];
+            warPoints++;
+            this.claimBoard.claimsByPlayer[color]["warfare"] = warPoints;
+            // TODO: warfare rewards
+            var reward = this.claimBoard.warfareRewards[warPoints];
+            if (reward != undefined && reward != null) {
+                if (reward == "2 wood") {
+                    currentPlayer.boat.addGoodToBoatOrDock("wood");
+                    currentPlayer.boat.addGoodToBoatOrDock("wood");
+                } else if (reward == "2 coins") {
+                    currentPlayer.boat.money++;
+                    currentPlayer.boat.money++;
+                } else if (reward == "fur") {
+                    currentPlayer.boat.addGoodToBoatOrDock("fur");
+                } else if (reward == "schemeCard") {
+                    // TODO: scheme card
+                } else if (reward == "victoryPoint") {
+                    currentPlayer.victoryPoints++;
+                }
+            }
         }
+        currentPlayer.attackActions = currentPlayer.attackActions - 1;
+        this.gameStates.setCurrentState("actionPhase");
+
         console.log("attack(): troopsLost=" + troopsLost);
         return troopsLost;
     }
 
+    transferGood(color, direction, resource) {
+        console.log("transferGood(): " + color + ": " + direction + " " + resource);
+        this.validateGameStatus("actionPhaseTransfer", "transferGood");
+        var currentPlayer = this.validateCurrentPlayer(color, "transferGood");
+        if (direction == "boatToDock") {
+            currentPlayer.boat.moveResourceFromBoatToDock(resource);
+        } else {
+            currentPlayer.boat.moveResourceFromDockToBoat(resource);
+        }
+        this.gameStates.setCurrentState("actionPhase"); 
+    }
+
     drawOneTimeSchemeCard(color, schemeDeck) {
-        if (this.gameStates.currentState.name == "oneTimeScheme") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.oneTimeSchemeCard == null) {
-                var card = this.cards.drawSchemeCard(schemeDeck);
-                this.currentPlayer.oneTimeSchemeCard = card;
-            }
+        this.validateGameStatus("oneTimeScheme", "drawOneTimeSchemeCard");
+        var currentPlayer = this.validateCurrentPlayer(color, "drawOneTimeSchemeCard");
+
+        if (currentPlayer.oneTimeSchemeCard == null) {
+            var card = this.cards.drawSchemeCard(schemeDeck);
+            this.currentPlayer.oneTimeSchemeCard = card;
+        } else {
+            this.throwError("Player cannot draw scheme card.", "drawOneTimeSchemeCard");
         }
     }
 
@@ -760,33 +744,30 @@ class Game {
     }
 
     endTurn(color) {
-        if (this.gameStates.currentState.name == "actionPhase") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color) {
-                if (currentPlayer.advisorCountForTurn > currentPlayer.advisors.length) {
-                    currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
-                    currentPlayer.troopsToDeploy = 0;
-                    currentPlayer.taxActions = 0;
-                    currentPlayer.buildActions = 0;
-                    currentPlayer.moveActions = 0;
-                    currentPlayer.attackActions = 0;
-                    currentPlayer.tookMainActionForTurn = false;
-                    currentPlayer.schemeCardsCanPlay = 1;
-                    currentPlayer.accomplishedDeedForTurn = false;
-                    currentPlayer.convertedGoodsForTurn = false;
-                    currentPlayer.resetMoveActionsFromLocation(this.gameMap.locations);
-                    var nextPlayer = this.players.getNextPlayer(currentPlayer);            
-                    if (nextPlayer.advisors.length > 0) {
-                        this.players.setCurrentPlayer(nextPlayer);
-                        this.gameStates.setCurrentState("retrieveAdvisor");
-                    } else {
-                        this.players.setCurrentPlayer(this.players.firstPlayer);
-                        this.gameStates.setCurrentState("claimPhase");
-                    }
-                } else {
-                    throw "Cannot end turn before playing your advisor."
-                }
-            }
+        this.validateGameStatus("actionPhase", "endTurn");
+        var currentPlayer = this.validateCurrentPlayer(color, "endTurn");
+        if (currentPlayer.advisorCountForTurn <= currentPlayer.advisors.length) {
+            this.throwError("Cannot end turn before playing your advisor.", "endTurn");
+        }
+
+        currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
+        currentPlayer.troopsToDeploy = 0;
+        currentPlayer.taxActions = 0;
+        currentPlayer.buildActions = 0;
+        currentPlayer.moveActions = 0;
+        currentPlayer.attackActions = 0;
+        currentPlayer.tookMainActionForTurn = false;
+        currentPlayer.schemeCardsCanPlay = 1;
+        currentPlayer.accomplishedDeedForTurn = false;
+        currentPlayer.convertedGoodsForTurn = false;
+        currentPlayer.resetMoveActionsFromLocation(this.gameMap.locations);
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);            
+        if (nextPlayer.advisors.length > 0) {
+            this.players.setCurrentPlayer(nextPlayer);
+            this.gameStates.setCurrentState("retrieveAdvisor");
+        } else {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            this.gameStates.setCurrentState("claimPhase");
         }
     }
 
@@ -799,6 +780,7 @@ class Game {
         actionToStateMap["attackAction"] = "actionPhaseAttack";
         actionToStateMap["taxAction"] = "actionPhaseTax";
         actionToStateMap["buildAction"] = "actionPhaseBuild";
+        actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
@@ -831,6 +813,30 @@ class Game {
     getPlayer(color) {
         Validator.validateColor(color);
         return this.players.getPlayerByColor(color);
+    }
+
+
+    validateGameStatus(desiredState, method, message=null) {
+        if (this.gameStates.currentState.name != desiredState) {
+            if (message != null) {
+                this.throwError(message, method);
+            } else {
+                this.throwError("Cannot do that right now, because state is " + this.gameStates.currentState.name + 
+                    " and not " + desiredState + ".", method);    
+            }
+        }
+    }
+
+    validateCurrentPlayer(color, method) {
+        var currentPlayer = this.players.getCurrentPlayer();
+        if (currentPlayer.color != color) {
+            this.throwError("Not your turn, " + color + ". Please wait for " + currentPlayer.color + ".", method);
+        }
+        return currentPlayer;
+    }
+
+    throwError(message, method) {
+        throw new Error(message, method);
     }
     
 }

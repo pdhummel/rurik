@@ -3,6 +3,8 @@ set -e
 
 server=http://localhost:3000
 
+move_or_scheme=scheme
+
 echo "Creating game"
 new_game_response=$(curl -X POST -H "Content-Type: application/json" \
 --data '{"gameName": "Pauls Game"}' \
@@ -109,7 +111,13 @@ curl -X PUT -H "Content-Type: application/json" \
 echo "Second player advisor bid"
 curl -X PUT -H "Content-Type: application/json" \
 --data '{ "color": "red", "advisor": "1"  }' \
-"${server}/game/${game_id}/advisorBid/move"
+"${server}/game/${game_id}/advisorBid/${move_or_scheme}"
+
+echo "Second player advisor bid"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "red", "advisor": "1"  }' \
+"${server}/game/${game_id}/advisorBid/scheme"
+
 
 echo "First player advisor bid"
 curl -X PUT -H "Content-Type: application/json" \
@@ -141,6 +149,8 @@ curl -X PUT -H "Content-Type: application/json" \
 --data '{ "color": "red", "advisor": "5"  }' \
 "${server}/game/${game_id}/advisorBid/muster"
 
+
+
 echo "First player retrieve advisor"
 curl -X PUT -H "Content-Type: application/json" \
 --data '{ "color": "blue", "advisor": "1", "forfeitAction": "N", "row": 2  }' \
@@ -160,40 +170,51 @@ echo "First player end turn"
 curl -X DELETE -H "Content-Type: application/json" \
 "${server}/game/${game_id}/player/blue/turn"
 
-echo "Second player retrieve advisor"
-curl -X PUT -H "Content-Type: application/json" \
---data '{ "color": "red", "advisor": "1", "forfeitAction": "N", "row": 1  }' \
-"${server}/game/${game_id}/advisorRetrieve/move"
+if [ "${move_or_scheme}" = "move" ];then
+  echo "Second player retrieve advisor"
+  curl -X PUT -H "Content-Type: application/json" \
+  --data '{ "color": "red", "advisor": "1", "forfeitAction": "N", "row": 1  }' \
+  "${server}/game/${game_id}/advisorRetrieve/move"
 
-echo "Second player select move action"
-curl -X PUT -H "Content-Type: application/json" \
---data '{ "action": "moveAction"  }' \
-"${server}/game/${game_id}/player/red/turn"
+  echo "Second player select move action"
+  curl -X PUT -H "Content-Type: application/json" \
+  --data '{ "action": "moveAction"  }' \
+  "${server}/game/${game_id}/player/red/turn"
 
-echo "Second player move troops"
-curl -X POST -H "Content-Type: application/json" \
---data '{ "fromLocationName": "Smolensk", "toLocationName": "Polotsk", "moveLeaderYN": "Y" }' \
-"${server}/game/${game_id}/player/red/move"
+  echo "Second player move troops"
+  curl -X POST -H "Content-Type: application/json" \
+  --data '{ "fromLocationName": "Smolensk", "toLocationName": "Polotsk", "moveLeaderYN": "Y" }' \
+  "${server}/game/${game_id}/player/red/move"
 
-echo "Second player select move action"
-curl -X PUT -H "Content-Type: application/json" \
---data '{ "action": "moveAction"  }' \
-"${server}/game/${game_id}/player/red/turn"
+  echo "Second player select move action"
+  curl -X PUT -H "Content-Type: application/json" \
+  --data '{ "action": "moveAction"  }' \
+  "${server}/game/${game_id}/player/red/turn"
 
-echo "Second player move troops"
-curl -X POST -H "Content-Type: application/json" \
---data '{ "fromLocationName": "Polotsk", "toLocationName": "Novgorod", "moveLeaderYN": "N" }' \
-"${server}/game/${game_id}/player/red/move"
+  echo "Second player move troops"
+  curl -X POST -H "Content-Type: application/json" \
+  --data '{ "fromLocationName": "Polotsk", "toLocationName": "Novgorod", "moveLeaderYN": "N" }' \
+  "${server}/game/${game_id}/player/red/move"
 
-echo "Second player select move action"
-curl -X PUT -H "Content-Type: application/json" \
---data '{ "action": "moveAction"  }' \
-"${server}/game/${game_id}/player/red/turn"
+  echo "Second player select move action"
+  curl -X PUT -H "Content-Type: application/json" \
+  --data '{ "action": "moveAction"  }' \
+  "${server}/game/${game_id}/player/red/turn"
 
-echo "Second player move troops"
-curl -X POST -H "Content-Type: application/json" \
---data '{ "fromLocationName": "Novgorod", "toLocationName": "Rostov", "moveLeaderYN": "N" }' \
-"${server}/game/${game_id}/player/red/move"
+  echo "Second player move troops"
+  curl -X POST -H "Content-Type: application/json" \
+  --data '{ "fromLocationName": "Novgorod", "toLocationName": "Rostov", "moveLeaderYN": "N" }' \
+  "${server}/game/${game_id}/player/red/move"
+fi
+
+if [ "${move_or_scheme}" = "scheme" ];then
+  echo "Second player retrieve advisor"
+  curl -X PUT -H "Content-Type: application/json" \
+  --data '{ "color": "red", "advisor": "1", "forfeitAction": "N", "row": 1  }' \
+  "${server}/game/${game_id}/advisorRetrieve/scheme"
+fi
+
+exit 0
 
 echo "Second player end turn"
 curl -X DELETE -H "Content-Type: application/json" \
@@ -279,3 +300,80 @@ echo "First player end turn"
 curl -X DELETE -H "Content-Type: application/json" \
 "${server}/game/${game_id}/player/blue/turn"
 
+
+echo "Second player retrieve advisor"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "red", "advisor": "4", "forfeitAction": "N", "row": 2  }' \
+"${server}/game/${game_id}/advisorRetrieve/build"
+
+echo "Second player select build action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "buildAction"  }' \
+"${server}/game/${game_id}/player/red/turn"
+
+echo "Second player build action"
+curl -X POST -H "Content-Type: application/json" \
+--data '{ "locationName": "Polotsk", "building": "market" }' \
+"${server}/game/${game_id}/player/red/build"
+
+echo "Second player end turn"
+curl -X DELETE -H "Content-Type: application/json" \
+"${server}/game/${game_id}/player/red/turn"
+
+echo "First player retrieve advisor"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "blue", "advisor": "5", "forfeitAction": "N", "row": 1  }' \
+"${server}/game/${game_id}/advisorRetrieve/build"
+
+echo "First player select build action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "buildAction"  }' \
+"${server}/game/${game_id}/player/blue/turn"
+
+echo "First player build action"
+curl -X POST -H "Content-Type: application/json" \
+--data '{ "locationName": "Rostov", "building": "stronghold" }' \
+"${server}/game/${game_id}/player/blue/build"
+
+echo "First player select build action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "buildAction"  }' \
+"${server}/game/${game_id}/player/blue/turn"
+
+echo "First player build action"
+curl -X POST -H "Content-Type: application/json" \
+--data '{ "locationName": "Novgorod", "building": "market" }' \
+"${server}/game/${game_id}/player/blue/build"
+
+echo "First player end turn"
+curl -X DELETE -H "Content-Type: application/json" \
+"${server}/game/${game_id}/player/blue/turn"
+
+echo "Second player retrieve advisor"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "red", "advisor": "5", "forfeitAction": "N", "row": 1  }' \
+"${server}/game/${game_id}/advisorRetrieve/muster"
+
+echo "Second player select muster action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "musterAction"  }' \
+"${server}/game/${game_id}/player/red/turn"
+
+echo "Second player muster troops"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "red", "numberOfTroops": 2  }' \
+"${server}/game/${game_id}/location/Smolensk/troops"
+
+echo "Second player select muster action"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "action": "musterAction"  }' \
+"${server}/game/${game_id}/player/red/turn"
+
+echo "Second player muster troops"
+curl -X PUT -H "Content-Type: application/json" \
+--data '{ "color": "red", "numberOfTroops": 1  }' \
+"${server}/game/${game_id}/location/Polotsk/troops"
+
+echo "Second player end turn"
+curl -X DELETE -H "Content-Type: application/json" \
+"${server}/game/${game_id}/player/red/turn"

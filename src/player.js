@@ -169,14 +169,11 @@ class GamePlayers {
         this.mapAdvisorsToAuctionSpacesByAction(auctionBoard, "tax");
         this.mapAdvisorsToAuctionSpacesByAction(auctionBoard, "scheme");
     }
-
-
 }
 
 class Player {
     constructor(name, color, tablePosition, isPlayerAi) {
         this.boat = new BoatMat();
-        // TODO: validate fields
         this.name = name;
         this.color = color;
         this.tablePosition = tablePosition; // N, E, S, W
@@ -185,13 +182,15 @@ class Player {
         this.secretAgenda = [];
         this.temporarySecretAgenda = [];
         this.deedCards = [];
+        this.victoryPoints = 0;
 
         this.schemeCards = [];
         this.temporarySchemeCards = [];
+        this.returnSchemeDeck = 1;
         this.schemeCardsToDraw = 0;
         this.canKeepSchemeCard = false;
 
-        this.assignFirstPlayer = false;
+        //this.assignFirstPlayer = false;
         this.troopsToDeploy = 3;
 
         this.advisors = [];

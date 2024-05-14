@@ -15,7 +15,10 @@ class GameStates {
         this.gameStates["actionPhaseAttack"] = new GameState("actionPhaseAttack", ["attack", "cancel"]);
         this.gameStates["actionPhaseTax"] = new GameState("actionPhaseTax", ["tax", "cancel"]);
         this.gameStates["actionPhaseBuild"] = new GameState("actionPhaseBuild", ["build", "cancel"]);
-        this.gameStates["scheme"] = new GameState("scheme", ["drawSchemeCards", "selectSchemeCard", "assignFirstPlayer"]);
+        this.gameStates["actionPhaseTransfer"] = new GameState("actionPhaseTransfer", ["transfer", "cancel"]);
+        this.gameStates["selectSchemeCard"] = new GameState("selectSchemeCard", ["returnSchemeCard"]);
+        this.gameStates["schemeFirstPlayer"] = new GameState("schemeFirstPlayer", ["assignFirstPlayer"]);
+        this.gameStates["drawSchemeCards"] = new GameState("drawSchemeCards", ["drawSchemeCards"]);
         this.gameStates["claimPhase"] = new GameState("claimPhase", ["chooseDeedCard"]);
         this.gameStates["endGame"] = new GameState("endGame", []);
 

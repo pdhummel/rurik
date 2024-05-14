@@ -119,12 +119,24 @@ class Cards {
     }
 
     drawSchemeCard(schemeDeck) {
-        var card = schemeDeck.shift();
+        var schemeDeckList = null;
+        if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
+            schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
+        } else {
+            schemeDeckList = schemeDeck;
+        }
+        var card = schemeDeckList.shift();
         return card;
     }
 
     drawAndDiscardSchemeCard(schemeDeck) {
-        var card = schemeDeck.shift();
+        var schemeDeckList = null;
+        if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
+            schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
+        } else {
+            schemeDeckList = schemeDeck;
+        }
+        var card = schemeDeckList.shift();
         this.discardedSchemeCards.push(card);
         return card;
     }

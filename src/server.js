@@ -607,6 +607,85 @@ app.get('/game/:id/player/:color/location', (req, res) => {
   res.send(locationMap);
 });
 
+app.put('/game/:id/player/:color/boat', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var player = game.getPlayer(color);
+  if (player == undefined) {
+    res.status(404).send('Player not found');
+    return;
+  }
+  var direction = req.body.direction;
+  var resource = req.body.resource;
+  game.transferGood(color, direction, resource);
+  res.send(player);
+});
+
+app.put('/game/:id/player/:color/schemeFirstPlayer', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var player = game.getPlayer(color);
+  if (player == undefined) {
+    res.status(404).send('Player not found');
+    return;
+  }
+  var firstPlayerColor = req.body.firstPlayerColor;
+  var otherPlayer = game.getPlayer(firstPlayerColor);
+  if (otherPlayer == undefined) {
+    res.status(404).send('Player not found for ' + firstPlayerColor);
+    return;
+  }
+
+  game.schemeFirstPlayer(color, firstPlayerColor);
+  res.send(player);
+});
+
+app.put('/game/:id/player/:color/drawSchemeCards', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var player = game.getPlayer(color);
+  if (player == undefined) {
+    res.status(404).send('Player not found');
+    return;
+  }
+  var schemeDeck = req.body.schemeDeck;
+  game.drawSchemeCards(color, schemeDeck);
+  res.send(player);
+});
+
+app.delete('/game/:id/player/:color/schemeCard', (req, res) => {
+  console.log("delete " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var player = game.getPlayer(color);
+  if (player == undefined) {
+    res.status(404).send('Player not found');
+    return;
+  }
+  var schemeCard = req.body.schemeCard;
+  var schemeDeck = player.returnSchemeDeck;
+  game.selectSchemeCardToReturn(color, schemeDeck, schemeCard);
+  res.send(player);
+});
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -368,6 +368,29 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       hide("buildDiv");
     }
+    if (currentState == "actionPhaseTransfer" && currentPlayer == myColor) {
+      showTransferGoodsDiv();
+    } else {
+      hide("transferGoodsDiv");
+    }
+    if (currentState == "schemeFirstPlayer" && currentPlayer == myColor) {
+      show("schemeFirstPlayerDiv");
+      show("pickSchemeDeckDiv");
+      setInnerHtml("pickFirstPlayer", "1");
+    } else {
+      hide("schemeFirstPlayerDiv");
+      hide("pickSchemeDeckDiv");
+    }
+    if (currentState == "selectSchemeCard" && currentPlayer == myColor) {
+      showReturnSchemeCard(response.data.clientPlayer);
+    } else {
+      hide("returnSchemeCardDiv");
+    }
+
+    // TODO: fix this
+    if (response.data.clientPlayer != undefined && response.data.clientPlayer != null) {
+      setInnerHtml("cardDisplayDiv", response.data.clientPlayer.schemeCards);
+    }
 }
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
@@ -519,7 +542,7 @@ function rejoinGameResponseHandler(response) {
     leftSideDiv.style.display = "block";
     refreshGameStatus();
     setInnerHtml("myName", name);
-    setInnerHtml("myPosition", position);
+    //setInnerHtml("myPosition", position);
     show("statusDiv");
     hide("gameListDiv");
     hide("createGameDiv");
@@ -604,6 +627,12 @@ function placeTroopResponseHandler(response) {
   hide("placeInitialTroopsDiv");
   refreshGameStatus();  
 }
+
+function refreshGameHandler(response) {
+  console.log("refreshGameHandler(): " + JSON.stringify(response.data));
+  refreshGameStatus();  
+}
+
 
 function refreshPlayer() {
   var gameId = getInnerHtmlValue("gameId");
@@ -877,7 +906,7 @@ function performActionPhaseAction() {
   }
   if (actionPhaseActionValue == "musterAction" || actionPhaseActionValue == "moveAction" || 
       actionPhaseActionValue == "attackAction" || actionPhaseActionValue =="taxAction" ||
-      actionPhaseActionValue == "buildAction") {
+      actionPhaseActionValue == "buildAction" || actionPhaseActionValue == "transferGoodsAction") {
     beginAction(gameId, color, actionPhaseActionValue);
   }
   if (actionPhaseActionValue == "endTurnAction") {
@@ -998,7 +1027,7 @@ function moveTroops() {
     moveLeaderYN = getValue("moveLeaderYN");
   }
   var data = '{ "fromLocationName": "' + fromLocation + '", "toLocationName": "' + toLocation + '", "moveLeaderYN": "' + moveLeader + '" }';
-  callApi("/game/" + gameId + "/player/" + color + "/move", "post", data, placeTroopResponseHandler);
+  callApi("/game/" + gameId + "/player/" + color + "/move", "post", data, refreshGameHandler);
 }
 
 function cancelMoveTroops() {
@@ -1039,7 +1068,7 @@ function attack() {
   var target = getSelectedValue("selectTargetToAttack");
   var schemeDeckNumber = getSelectedRadioButton("attackSchemeDeck");
   var data = '{ "attackLocationName": "' + attackLocation + '", "target": "' + target + '", "schemeDeckNumber": "' + schemeDeckNumber + '" }';
-  callApi("/game/" + gameId + "/player/" + color + "/attack", "post", data, placeTroopResponseHandler);
+  callApi("/game/" + gameId + "/player/" + color + "/attack", "post", data, refreshGameHandler);
 }
 
 function cancelAttack() {
@@ -1082,7 +1111,7 @@ function tax() {
   }
 
   var data = '{ "locationName": "' + taxLocation + '", "marketCoinYN": "' + marketCoin + '" }';
-  callApi("/game/" + gameId + "/player/" + color + "/tax", "post", data, placeTroopResponseHandler);
+  callApi("/game/" + gameId + "/player/" + color + "/tax", "post", data, refreshGameHandler);
 }
 
 function cancelTax() {
@@ -1119,7 +1148,7 @@ function build() {
   var buildLocation = getSelectedValue("selectBuildLocation");
   var building = getSelectedValue("selectBuilding");
   var data = '{ "locationName": "' + buildLocation + '", "building": "' + building + '" }';
-  callApi("/game/" + gameId + "/player/" + color + "/build", "post", data, placeTroopResponseHandler);
+  callApi("/game/" + gameId + "/player/" + color + "/build", "post", data, refreshGameHandler);
 }
 
 function cancelBuild() {
@@ -1127,4 +1156,73 @@ function cancelBuild() {
   var color = getInnerHtmlValue("myColor");
   var data = '{ "action": "cancel" }';
   callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+
+
+function showTransferGoodsDiv() {
+  show("transferGoodsDiv");
+}
+
+function transferGoods() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var direction = getSelectedRadioButton("transferGoodsDirection");
+  var resource = getSelectedValue("resourceToTransfer");
+  var data = '{ "direction": "' + direction + '", "resource": "' + resource + '" }';
+  callApi("/game/" + gameId + "/player/" + color + "/boat", "put", data, refreshGameHandler);
+}
+
+function cancelTransfer() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "action": "cancel" }';
+  callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+}
+
+function chooseSchemeDeck() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var pickFirstPlayer = getInnerHtmlValue("pickFirstPlayer");
+  if (pickFirstPlayer == "1") {
+    var firstPlayerColor = getSelectedValue("firstPlayerColor");
+    var data = '{ "firstPlayerColor": "' + firstPlayerColor + '" }';
+    callApi("/game/" + gameId + "/player/" + color + "/schemeFirstPlayer", "put", data, schemeFirstPlayerHandler);
+  } else {
+    var schemeDeck = getSelectedRadioButton("schemeDeck");
+    var data = '{ "schemeDeck": "' + schemeDeck + '" }';
+    callApi("/game/" + gameId + "/player/" + color + "/drawSchemeCards", "put", data, chooseSchemeDeckHandler);
+  }
+}
+function schemeFirstPlayerHandler(response) {
+  console.log("schemeFirstPlayerHandler(): " + JSON.stringify(response.data));
+  setInnerHtml("pickFirstPlayer", 0);
+  chooseSchemeDeck();
+}
+function chooseSchemeDeckHandler(response) {
+  console.log("chooseSchemeDeckHandler(): " + JSON.stringify(response.data));
+  refreshGameStatus();
+}
+
+
+function showReturnSchemeCard(player) {
+  console.log("showReturnSchemeCard():" + JSON.stringify(player));
+  var temporarySchemeCards = player.temporarySchemeCards;
+  var selectSchemeCard = document.getElementById("selectReturnSchemeCard");
+  clearOptions(selectSchemeCard);
+  for (var i=0; i<temporarySchemeCards.length; i++) {
+    var schemeCard = temporarySchemeCards[i];
+    var option = document.createElement("option");
+    option.value = schemeCard.id;
+    option.innerText = schemeCard.id;
+    selectSchemeCard.append(option);
+  }
+  show("returnSchemeCardDiv");
+}
+
+function returnSchemeCard() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var schemeCard = getSelectedValue("selectReturnSchemeCard");
+  var data = '{ "schemeCard": "' + schemeCard + '"}';
+  callApi("/game/" + gameId + "/player/" + color + "/schemeCard", "delete", data, refreshGameHandler);
 }

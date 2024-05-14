@@ -7,6 +7,9 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show leader in supply
 * game log
 * messages and error messages in UI
+* show round indicator on map board
+* show upcoming advisors on map board
+
 
 * action phase
   * pick scheme cards
@@ -14,8 +17,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * play scheme card
   * build action - church, stable, tavern
   * leader abilities
-  * move goods between dock and boat
-  * advance war track from attack
+  * gain resources from war track on attack
 
 
 * player view
@@ -59,6 +61,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 * unit tests - mocha+chai
 * integration tests
+* refactor/redesign psychotic apis
+
 
 
 ## Complete
@@ -82,7 +86,21 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * tax action
 * build action
 * define scheme cards
+* move goods between dock and boat
+* advance war track from attack
 
+
+## APIs
+
+
+| Path | Method | Return | Purpose |
+| :--- | :--- | :--- | :--- |
+| /game | get | game list | list games |
+| /game | post | game | create game |
+| /game/:id | get | game | get game |
+| /gameStatus/:id | get | gameStatus | X - get game status |
+| /game/:id/player | post | player | player join game |
+| /game/:id/player | put | player | player rejoin game |
 
 
 ## Notes
