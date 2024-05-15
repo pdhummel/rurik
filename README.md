@@ -87,7 +87,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * build action
 * define scheme cards
 * move goods between dock and boat
-* advance war track from attack
+* advance war track after attack
 
 
 ## APIs
@@ -96,11 +96,19 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 | Path | Method | Return | Purpose |
 | :--- | :--- | :--- | :--- |
 | /game | get | game list | list games |
-| /game | post | game | create game |
-| /game/:id | get | game | get game |
-| /gameStatus/:id | get | gameStatus | X - get game status |
-| /game/:id/player | post | player | player join game |
-| /game/:id/player | put | player | player rejoin game |
+| /game | post | Game | create game |
+| /game/:id | get | Game | get game |
+| /gameStatus/:id | get | GameStatus | X - get game status |
+| /game/:id/player | post | Player | player join game |
+| /game/:id/player | put | Player | player rejoin game |
+| /game/:id/player | get | Player | get player |
+| | | |
+| | | get advisor board |
+| | | player place advisor |
+| | | player retrieve advisor |
+| | | get map |
+| | | get cards - scheme decks, deed cards |
+| | | get claim board |
 
 
 ## Notes

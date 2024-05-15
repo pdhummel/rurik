@@ -387,9 +387,9 @@ function refreshGameStatusResponseHandler(response) {
       hide("returnSchemeCardDiv");
     }
 
-    // TODO: fix this
+    // TODO: make this nice
     if (response.data.clientPlayer != undefined && response.data.clientPlayer != null) {
-      setInnerHtml("cardDisplayDiv", response.data.clientPlayer.schemeCards);
+      setInnerHtml("personalCardDisplayDiv", JSON.stringify(response.data.clientPlayer.schemeCards));
     }
 }
 function leaderResponseHandler(response) {

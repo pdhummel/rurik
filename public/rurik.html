@@ -18,7 +18,7 @@
 <body onload="onLoad()">
   <div>
     <!-- width:55% -->
-    <div id="leftSideDiv" style="float:left; display: none; width: 5%; position:relative; top: 0; left: 0; z-index: 1 ">
+    <div id="leftSideDiv" style="float:left; background: rgb(199, 231, 242); display: none; width: 5%; position:relative; top: 0; left: 0; z-index: 1 ">
       <img height="700px" src="/assets/rurik_map.jpg" alt="Rurik map" />
       <div id="Pskov" style="position:absolute; top: 100px; left: 55px; z-index: 1 ">
         <div style="display:flex;"><span id="Pskov_red_troops" class="red numberBox" style="display: none">0</span><span id="Pskov_red_leader" class="red numberCircle" style="display: none">0</span></div>
@@ -218,13 +218,15 @@
     </div>
     
     <!-- width:45% -->
-    <div id="rightSideDiv" style="float:right; width:95%">
+    <!--  background: url('/assets/rurik-mountain-castle.jpg') -->
+    <!--<img height="700px" src="/assets/rurik-mountain-castle.jpg" />-->
+    <div id="rightSideDiv" style="float:right; width:95%; height:700px; background: rgb(199, 231, 242);">
       <form>
         <div id="statusDiv" style="display:none;">
           <table>
             <tr>
               <td><div style="position: relative; top:0px; left: 0px">
-                <img src="/assets/compass.jpg" height="100px" />
+                <img src="/assets/compass.png" height="100px" />
                     <span id="N_position" class="white numberBox" style="position:absolute; top: 0px; left: 42px; z-index: 1; opacity: 1; display: none">N</span>
                     <span id="E_position" class="white numberBox" style="position:absolute; top: 40px; left: 85px; z-index: 1; opacity: 1; display: none">E</span>
                     <span id="S_position" class="white numberBox" style="position:absolute; top: 85px; left: 42px; z-index: 1; opacity: 1; display: none">S</span>
@@ -577,10 +579,10 @@
       <tr><td>
       <div id="boatDiv" style="display: none;">
         <br/>
-        <div style="background-image: url('assets/dock.png'); background-size: contain; background-repeat: no-repeat;">
+        <div style="background-image: url('assets/dock.png'); background-size: cover; background-repeat: no-repeat;">
           <br/>
           <div style="display:flex; height: 35px;">
-            <span style="width: 20px"></span>
+            <span style="width: 30px"></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/wood.png" alt="wood" height="35px" width="30px" /><span id="dockWood" class="centered">0</span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/stone.jpg" alt="stone" height="35px" width="30px" /><span id="dockStone" class="centered">0</span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="dockFur" class="centered">0</span></span>
@@ -592,10 +594,10 @@
           <br/>
         </div>
 
-        <div style="background-image: url('assets/boat.png'); background-size: contain; background-repeat: no-repeat;">
+        <div style="background-image: url('assets/boat.png'); background-size: cover; background-repeat: no-repeat;">
           <br/>
           <div style="display:flex; height: 35px;">
-            <span style="width: 20px"></span>
+            <span style="width: 30px"></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/wood.png" alt="wood" height="35px" width="30px" /><span id="boatWood" class="centered">0</span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/stone.jpg" alt="stone" height="35px" width="30px" /><span id="boatStone" class="centered">0</span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="boatFur" class="centered">0</span></span>
@@ -603,7 +605,7 @@
             <span class="container"><img style="border-radius: 50%;" src="/assets/fish.jpg" alt="fish" height="35px" width="30px" /><span id="boatFish" class="centered">0</span></span>
           </div>
           <div style="display:flex; height: 35px;">
-            <span style="width: 20px"></span>
+            <span style="width: 30px"></span>
             <img style="border-radius: 50%; opacity: .70" src="/assets/wood.png" alt="wood" width="30px" />
             <img style="border-radius: 50%; opacity: .50" src="/assets/stone.jpg" alt="stone" width="30px" />
             <span style="width: 30px"></span>
@@ -611,15 +613,15 @@
             <img style="border-radius: 50%; opacity: .70" src="/assets/fish.jpg" alt="fish" width="30px" />
           </div>
           <div style="display:flex; height: 35px;">
-            <span style="width: 20px"></span>
-            <img style="border-radius: 50%;opacity: .30" src="/assets/wood.png" alt="wood" width="30px" />
+            <span style="width: 30px"></span>
+            <img style="border-radius: 50%;opacity: .50" src="/assets/wood.png" alt="wood" width="30px" />
             <span style="width: 30px"></span>
             <span style="width: 30px"></span>
             <span style="width: 30px"></span>
-            <img style="border-radius: 50%;opacity: .30" src="/assets/fish.jpg" alt="fish" width="30px" />
+            <img style="border-radius: 50%;opacity: .50" src="/assets/fish.jpg" alt="fish" width="30px" />
           </div>
           <div style="display:flex; height: 35px;">
-            <span style="width: 20px"></span>
+            <span style="width: 30px"></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatStoneCoin" class="centered"></span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatWoodCoin" class="centered"></span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFishCoin" class="centered"></span></span>
@@ -627,7 +629,7 @@
             <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFurCoin" class="centered"></span></span>          
           </div>
           <div style="display:flex; height: 35px;">
-            <span style="width: 20px"></span>
+            <span style="width: 30px"></span>
             <span style="width: 30px"></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatWoodTradeboom" class="centered"></span></span>
             <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatFishTradeboom" class="centered"></span></span>
@@ -660,9 +662,14 @@
       </td>
       </tr>
       </table>
-
+      <div id="personalCardDisplayDiv" style="display:block">
+      </div>
+      </br>
       <div id="cardDisplayDiv" style="display:block">
-        
+        Scheme Deck 1: </br>
+        Scheme Deck 2: </br>
+        Scheme Deck Discard: </br>
+        Deed Cards: </br>
       </div>
 
     </div>    

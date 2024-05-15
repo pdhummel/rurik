@@ -400,8 +400,8 @@ class Game {
 
     }
 
-    selectSchemeCardToReturn(color, schemeDeck, schemeCard) {
-        console.log("selectSchemeCardToReturn(): " + schemeCard + " " + schemeDeck);
+    selectSchemeCardToReturn(color, schemeDeckNumber, schemeCardId) {
+        console.log("selectSchemeCardToReturn(): " + schemeCardId + " " + schemeDeck);
         this.validateGameStatus("selectSchemeCard", "selectSchemeCardToReturn");
         var currentPlayer = this.validateCurrentPlayer(color, "selectSchemeCardToReturn");
         if (currentPlayer.temporarySchemeCards.length < 1) {
@@ -410,8 +410,9 @@ class Game {
 
         var tempCards = [];
         var found = false;
+        var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
         for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
-            if (schemeCard.isEqual(currentPlayer.temporarySchemeCards[i]) && found == false) {
+            if (schemeCardId == currentPlayer.temporarySchemeCards[i].id && found == false) {
                 schemeDeck.unshift(currentPlayer.temporarySchemeCards[i]);
                 found = true;
             } else {
@@ -434,7 +435,7 @@ class Game {
         this.validateGameStatus("actionPhaseMuster", "muster");
         var currentPlayer = this.validateCurrentPlayer(color, "muster");
         var location = this.gameMap.getLocation(locationName);
-        if (location.troopsByColor[color] < 1) {
+        if (location.troopsByColor[color] < 1 && location.leaderByColor[color] < 1) {
             this.throwError("Cannot muster troops in a location you do not occupy.", "muster");
         }
         if (numberOfTroops > currentPlayer.troopsToDeploy || numberOfTroops > currentPlayer.supplyTroops) {
@@ -504,7 +505,9 @@ class Game {
             throw new Error("Location has no resources.", "tax");
         }
 
+        console.log("tax(): after validations");
         location.resourceCount = location.resourceCount - 1;
+        var resource = location.defaultResource;
         currentPlayer.taxActions = currentPlayer.taxActions - taxActionsRequired;
         if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
             currentPlayer.boat.addGoodToBoat(resource);
@@ -524,7 +527,7 @@ class Game {
             }
         }
         this.gameStates.setCurrentState("actionPhase");
- 
+        console.log("tax(): exit");
     }
 
     build(color, locationName, buildingName) {
