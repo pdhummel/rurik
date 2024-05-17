@@ -9,6 +9,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * messages and error messages in UI
 * show round indicator on map board
 * show upcoming advisors on map board
+* first player bear token
 
 
 * action phase
@@ -21,7 +22,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 * player view
-  * show scheme cards for self
   * show deed cards for self
   * show secret agenda
   * show captured rebel armies
@@ -88,6 +88,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * define scheme cards
 * move goods between dock and boat
 * advance war track after attack
+* show scheme cards for self
 
 
 ## APIs

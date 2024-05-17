@@ -28,6 +28,21 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
 
 function onLoad() {
   listGames();
+
+  var coll = document.getElementsByClassName("collapsible");
+  var i;
+  
+  for (i = 0; i < coll.length; i++) {
+    coll[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var content = this.nextElementSibling;
+      if (content.style.display === "block") {
+        content.style.display = "none";
+      } else {
+        content.style.display = "block";
+      }
+    });
+  }
 }
 
 function hide(divId) {
@@ -253,6 +268,7 @@ function refreshGameStatusResponseHandler(response) {
 
     if (gameRound != undefined) {
       setInnerHtml("gameRound", gameRound);
+      show("cardDisplayToggle");
     }
     if (clientLeader != undefined && clientLeader != null && 
         clientLeader.name != undefined && clientLeader.name != null && clientLeader.name.length > 0) {
@@ -389,8 +405,13 @@ function refreshGameStatusResponseHandler(response) {
 
     // TODO: make this nice
     if (response.data.clientPlayer != undefined && response.data.clientPlayer != null) {
-      setInnerHtml("personalCardDisplayDiv", JSON.stringify(response.data.clientPlayer.schemeCards));
+      var schemeCards = response.data.clientPlayer.schemeCards;
+      for (var i=0; i<schemeCards.length; i++) {
+        var schemeCard = schemeCards[i];
+        outputSchemeCard("personalSchemeCardDiv" + i, schemeCard.id);
+      }
     }
+    
 }
 function leaderResponseHandler(response) {
   console.log("leaderResponseHandler(): " + JSON.stringify(response.data));
@@ -513,8 +534,8 @@ function joinGameResponseHandler(response) {
 
     var leftSideDiv = document.getElementById("leftSideDiv");
     var rightSideDiv = document.getElementById("rightSideDiv");
-    rightSideDiv.style.width = "45%";
-    leftSideDiv.style.width = "55%";
+    rightSideDiv.style.width = "47%";
+    leftSideDiv.style.width = "50%";
     leftSideDiv.style.display = "block";
     refreshGameStatus();
     show("statusDiv");
@@ -537,8 +558,8 @@ function rejoinGameResponseHandler(response) {
   var name = response.data.name;
   var position = response.data.tablePosition;
   if (name != undefined && position != undefined) {
-    rightSideDiv.style.width = "45%";
-    leftSideDiv.style.width = "55%";
+    rightSideDiv.style.width = "47%";
+    leftSideDiv.style.width = "50%";
     leftSideDiv.style.display = "block";
     refreshGameStatus();
     setInnerHtml("myName", name);
@@ -1215,6 +1236,7 @@ function showReturnSchemeCard(player) {
     option.value = schemeCard.id;
     option.innerText = schemeCard.id;
     selectSchemeCard.append(option);
+    outputSchemeCard("returnSchemeCardDiv"+i, schemeCard.id);
   }
   show("returnSchemeCardDiv");
 }
@@ -1225,4 +1247,78 @@ function returnSchemeCard() {
   var schemeCard = getSelectedValue("selectReturnSchemeCard");
   var data = '{ "schemeCard": "' + schemeCard + '"}';
   callApi("/game/" + gameId + "/player/" + color + "/schemeCard", "delete", data, refreshGameHandler);
+}
+
+function outputSchemeCard(cardDivName, schemeCardId) {
+  var parts = schemeCardId.split("-");
+  var deaths = parts.pop();
+  var cost = parts.pop();
+  var tableHtml = '<table id="' + cardDivName + 'Table" style="height: 160px; width: 95px; border:1px solid black; background-size: contain; background-position: center; background-repeat: no-repeat; background-image: url("/assets/shield.png"); opacity:1;"></table>';
+  setInnerHtml(cardDivName, tableHtml);
+  var table = document.getElementById(cardDivName + "Table");
+  table.style.background = '#235664';
+  table.style.backgroundImage = 'url("/assets/shield.png")';
+  table.style.backgroundSize = 'contain';
+  table.style.backgroundRepeat = 'no-repeat';
+  table.style.backgroundPosition = 'center';
+  var tr = document.createElement('tr');
+  if (cost > 0) {
+    tr.innerHTML = '<td width="30px"></td><td><img width="30px" src="/assets/spend-coin.png" /></td><td  width="30px"></td>';
+  } else {
+    tr.innerHTML = '<td width="30px"></td><td width="30px" height="30px"></td><td width="30px"></td>';
+  }
+  table.appendChild(tr);
+
+  var reward = parts.shift();
+  tr = document.createElement('tr');
+  // buildOrAttack, taxOrMuster
+  if (reward.indexOf("Or") == -1) {
+    tr.innerHTML = '<td></td><td><img width="30px" src="/assets/scheme-' + reward + '.png" /></td><td></td>';
+  } else {
+    var orRewards = reward.split("Or");
+    var reward1 = orRewards[0].toLowerCase(); 
+    var reward2 = orRewards[1].toLowerCase(); 
+    tr.innerHTML = '<td><img width="30px" src="/assets/scheme-' + reward1 + '.png" /></td><td>OR</td><td><img width="30px" src="/assets/scheme-' + reward2 + '.png" /></td>';
+  }
+  table.appendChild(tr);
+
+  tr = document.createElement('tr');
+  var rewards = parts;
+  var lastRow = '';
+  if (rewards.length > 0) {
+    console.log(" rewards.length=" + rewards.length);
+    if (rewards.length == 1) {
+      reward = rewards.shift();
+      if (reward.indexOf("Or") == -1) {
+        console.log("No Or");
+        lastRow = '<td></td><td><img width="30px" src="/assets/scheme-' + reward + '.png" /></td><td></td>'
+      } else {
+        console.log("OR");
+        var orRewards = reward.split("Or");
+        var reward1 = orRewards[0].toLowerCase(); 
+        var reward2 = orRewards[1].toLowerCase(); 
+        lastRow = '<td><img width="30px" src="/assets/scheme-' + reward1 + '.png" /></td><td>OR</td><td><img width="30px" src="/assets/scheme-' + reward2 + '.png" /></td>';
+      }
+    } else if (rewards.length == 2) {
+      console.log("2");
+      var reward1 = rewards.shift();
+      var reward2 = rewards.shift();
+      lastRow = '<td><img width="30px" src="/assets/scheme-' + reward1 + '.png" /></td><td></td><td><img width="30px" src="/assets/scheme-' + reward2 + '.png" /></td>';
+    } 
+  } else {
+    console.log("nothing");
+      lastRow = lastRow + '<td height="30px"></td>'
+  }
+  tr.innerHTML = lastRow;
+  table.appendChild(tr);
+
+  tr = document.createElement('tr');
+  if (deaths == 1) {
+    tr.innerHTML = '<td></td><td><img width="30px" src="/assets/scheme-rebel.png" /></td><td></td>'
+  } else if (deaths == 2) {
+    tr.innerHTML = '<td><img width="30px" src="/assets/scheme-rebel.png" /></td><td></td><td><img width="30px" src="/assets/scheme-rebel.png" /></td>'
+  } else {
+    tr.innerHTML = '<td height="30px"></td><td></td><td></td>';
+  }
+  table.appendChild(tr);
 }
