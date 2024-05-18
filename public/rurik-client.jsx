@@ -31,6 +31,7 @@ function onLoad() {
 
   var myCardsModal = setupPopupWindow("myCardsModal", "myCardsButton", "closeMyCardsModal");
   var gameCardsModal = setupPopupWindow("gameCardsModal", "gameCardsButton", "closeGameCardsModal");
+  var boatAndSupplyModal = setupPopupWindow("boatAndSupplyModal", "boatAndSupplyButton", "closeBoatAndSupplyModal");
 
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = function(event) {

@@ -92,6 +92,11 @@ div#map {
   padding: 20px;
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
+  /* style="background-size: 100% auto; background-repeat: no-repeat; background-image: url('/assets/snow-castle.png');" */
+  background-size: 100% auto;
+  background-repeat:  no-repeat;
+  background-image: url('/assets/winter-mountains.jpg');
+
 }
 
 /* The Close Button */

@@ -507,15 +507,16 @@
       </br>
 
 
-      <div id="personalCardsDiv" style="display:none">
+      <div id="personalCardsDiv" style="display:none; ">
         <!-- Trigger/Open The Modal -->
-        <button id="myCardsButton" style="display: inline-block; ">Show My Cards</button>
         <button id="gameCardsButton" style="display: inline-block; ">Show Game Cards</button>
+        <button id="myCardsButton" style="display: inline-block; ">Show My Cards</button>
+        <button id="boatAndSupplyButton" style="display: inline-block; ">Boat and Supply</button>
   
         <!-- The Modal -->
-        <div id="myCardsModal" class="modal">
+        <div id="myCardsModal" class="modal" >
 
-          <div id="myCardsContent" class="modal-content">
+          <div id="myCardsContent" class="modal-content" >
             <span id="closeMyCardsModal" class="close">&times;</span>
             My Scheme Cards: 
             <table>
@@ -632,99 +633,99 @@
         <tr><td>1</td><td>2 Regions</td><td>2 Adjacent Regions</td><td>3 Goods on Boat</td></tr>
       </table>
 
-      <table>
-      <tr><td>
 
-      <div id="boatDiv" style="display: none;">
-        <br/>
-        <div style="background-image: url('assets/dock.png'); background-size: cover; background-repeat: no-repeat;">
-          <br/>
-          <div style="display:flex; height: 35px;">
-            <span style="width: 30px"></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/wood.png" alt="wood" height="35px" width="30px" /><span id="dockWood" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/stone.jpg" alt="stone" height="35px" width="30px" /><span id="dockStone" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="dockFur" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/honey.png" alt="honey" height="35px" width="30px" /><span id="dockHoney" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/fish.jpg" alt="fish" height="35px" width="30px" /><span id="dockFish" class="centered">0</span></span>
-            <span class="container-b"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="tradeBoon" class="centered">0</span></span>
-            <span style="width: 20px"></span> 
-          </div>
-          <br/>
-        </div>
+      <div id="boatAndSupplyModal" class="modal">
+        <div id="boatAndSupplyContent" class="modal-content">
+          <span id="closeBoatAndSupplyModal" class="close">&times;</span>
 
-        <div style="background-image: url('assets/boat.png'); background-size: cover; background-repeat: no-repeat;">
-          <br/>
-          <div style="display:flex; height: 35px;">
-            <span style="width: 30px"></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/wood.png" alt="wood" height="35px" width="30px" /><span id="boatWood" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/stone.jpg" alt="stone" height="35px" width="30px" /><span id="boatStone" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="boatFur" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/honey.png" alt="honey" height="35px" width="30px" /><span id="boatHoney" class="centered">0</span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/fish.jpg" alt="fish" height="35px" width="30px" /><span id="boatFish" class="centered">0</span></span>
-          </div>
-          <div style="display:flex; height: 35px;">
-            <span style="width: 30px"></span>
-            <img style="border-radius: 50%; opacity: .70" src="/assets/wood.png" alt="wood" width="30px" />
-            <img style="border-radius: 50%; opacity: .50" src="/assets/stone.jpg" alt="stone" width="30px" />
-            <span style="width: 30px"></span>
-            <img style="border-radius: 50%; opacity: .50" src="/assets/honey.png" alt="honey" width="30px" />
-            <img style="border-radius: 50%; opacity: .70" src="/assets/fish.jpg" alt="fish" width="30px" />
-          </div>
-          <div style="display:flex; height: 35px;">
-            <span style="width: 30px"></span>
-            <img style="border-radius: 50%;opacity: .50" src="/assets/wood.png" alt="wood" width="30px" />
-            <span style="width: 30px"></span>
-            <span style="width: 30px"></span>
-            <span style="width: 30px"></span>
-            <img style="border-radius: 50%;opacity: .50" src="/assets/fish.jpg" alt="fish" width="30px" />
-          </div>
-          <div style="display:flex; height: 35px;">
-            <span style="width: 30px"></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatStoneCoin" class="centered"></span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatWoodCoin" class="centered"></span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFishCoin" class="centered"></span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatHoneyCoin" class="centered"></span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFurCoin" class="centered"></span></span>          
-          </div>
-          <div style="display:flex; height: 35px;">
-            <span style="width: 30px"></span>
-            <span style="width: 30px"></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatWoodTradeboom" class="centered"></span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatFishTradeboom" class="centered"></span></span>
-            <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatHoneyTradeboom" class="centered"></span></span>
-            <span style="width: 30px"></span>
-          </div>
+          <table>
+            <tr><td>
+              <div id="boatDiv" style="display: none;">
+                <br/>
+                <div style="background-image: url('assets/dock.png'); background-size: cover; background-repeat: no-repeat;">
+                  <br/>
+                  <div style="display:flex; height: 35px;">
+                    <span style="width: 30px"></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/wood.png" alt="wood" height="35px" width="30px" /><span id="dockWood" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/stone.jpg" alt="stone" height="35px" width="30px" /><span id="dockStone" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="dockFur" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/honey.png" alt="honey" height="35px" width="30px" /><span id="dockHoney" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/fish.jpg" alt="fish" height="35px" width="30px" /><span id="dockFish" class="centered">0</span></span>
+                    <span class="container-b"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="tradeBoon" class="centered">0</span></span>
+                    <span style="width: 20px"></span> 
+                  </div>
+                  <br/>
+                </div>
+
+                <div style="background-image: url('assets/boat.png'); background-size: cover; background-repeat: no-repeat;">
+                  <br/>
+                  <div style="display:flex; height: 35px;">
+                    <span style="width: 30px"></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/wood.png" alt="wood" height="35px" width="30px" /><span id="boatWood" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/stone.jpg" alt="stone" height="35px" width="30px" /><span id="boatStone" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/beaver.jpg" alt="fur" height="35px" width="30px" /><span id="boatFur" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/honey.png" alt="honey" height="35px" width="30px" /><span id="boatHoney" class="centered">0</span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/fish.jpg" alt="fish" height="35px" width="30px" /><span id="boatFish" class="centered">0</span></span>
+                  </div>
+                  <div style="display:flex; height: 35px;">
+                    <span style="width: 30px"></span>
+                    <img style="border-radius: 50%; opacity: .70" src="/assets/wood.png" alt="wood" width="30px" />
+                    <img style="border-radius: 50%; opacity: .50" src="/assets/stone.jpg" alt="stone" width="30px" />
+                    <span style="width: 30px"></span>
+                    <img style="border-radius: 50%; opacity: .50" src="/assets/honey.png" alt="honey" width="30px" />
+                    <img style="border-radius: 50%; opacity: .70" src="/assets/fish.jpg" alt="fish" width="30px" />
+                  </div>
+                  <div style="display:flex; height: 35px;">
+                    <span style="width: 30px"></span>
+                    <img style="border-radius: 50%;opacity: .50" src="/assets/wood.png" alt="wood" width="30px" />
+                    <span style="width: 30px"></span>
+                    <span style="width: 30px"></span>
+                    <span style="width: 30px"></span>
+                    <img style="border-radius: 50%;opacity: .50" src="/assets/fish.jpg" alt="fish" width="30px" />
+                  </div>
+                  <div style="display:flex; height: 35px;">
+                    <span style="width: 30px"></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatStoneCoin" class="centered"></span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatWoodCoin" class="centered"></span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFishCoin" class="centered"></span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatHoneyCoin" class="centered"></span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/coin.png" alt="coin" height="35px" width="30px" /><span id="boatFurCoin" class="centered"></span></span>          
+                  </div>
+                  <div style="display:flex; height: 35px;">
+                    <span style="width: 30px"></span>
+                    <span style="width: 30px"></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatWoodTradeboom" class="centered"></span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatFishTradeboom" class="centered"></span></span>
+                    <span class="container"><img style="border-radius: 50%;" src="/assets/tradeboom.png" alt="tradeboom" height="35px" width="30px" /><span id="boatHoneyTradeboom" class="centered"></span></span>
+                    <span style="width: 30px"></span>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td style="width: 20px"></td>
+            <td>
+              <div id="supplyDiv" style="display: none">
+                <div style="display:flex; height: 50px;">
+                  <span class="container">
+                    <img src="/assets/coin.png" alt="coin" width="40px" height="45px" />
+                    <span id="playerCoins" class="centered">0</span>
+                  </span><br/>
+                </div>
+                <div style="display:flex; height: 50px;">
+                  <span class="container-b"><img id="tavernImage" src="/assets/tavern-blue.png" alt="tavern" height="45px" width="40px" /><span id="tavernCount" class="centered">0</span></span>
+                  <span class="container-b"><img id="marketImage" src="/assets/market-blue.png" alt="market" height="45px" width="40px" /><span id="marketCount" class="centered">0</span></span>
+                  <span class="container-b"><img id="strongholdImage" src="/assets/stronghold-blue.png" alt="stronghold" height="45px" width="40px" /><span id="strongholdCount" class="centered">0</span></span>
+                  <span class="container-b"><img id="churchImage" src="/assets/church-blue.png" alt="church" height="45px" width="40px" /><span id="churchCount" class="centered">0</span></span>
+                  <span class="container-b"><img id="stableImage" src="/assets/stable-blue.png" alt="stable" height="45px" width="40px" /><span id="stableCount" class="centered">0</span></span>
+                </div><br/>
+                <div style="display:flex; height: 50px;">
+                  <span class="container-b"><img id="troopImage" src="/assets/troop-blue.png" alt="troops" height="45px" width="40px" /><span id="troopCount" class="centered">0</span></span>
+                </div><br/>
+              </div>
+            </td></tr>
+          </table>
         </div>
       </div>
-
-
-      
-      </td>
-      <td style="width: 20px"></td>
-      <td>
-      <div id="supplyDiv" style="display: none">
-        <div style="display:flex; height: 50px;">
-          <span class="container">
-            <img src="/assets/coin.png" alt="coin" width="40px" height="45px" />
-            <span id="playerCoins" class="centered">0</span>
-          </span><br/>
-        </div>
-        <div style="display:flex; height: 50px;">
-          <span class="container-b"><img id="tavernImage" src="/assets/tavern-blue.png" alt="tavern" height="45px" width="40px" /><span id="tavernCount" class="centered">0</span></span>
-          <span class="container-b"><img id="marketImage" src="/assets/market-blue.png" alt="market" height="45px" width="40px" /><span id="marketCount" class="centered">0</span></span>
-          <span class="container-b"><img id="strongholdImage" src="/assets/stronghold-blue.png" alt="stronghold" height="45px" width="40px" /><span id="strongholdCount" class="centered">0</span></span>
-          <span class="container-b"><img id="churchImage" src="/assets/church-blue.png" alt="church" height="45px" width="40px" /><span id="churchCount" class="centered">0</span></span>
-          <span class="container-b"><img id="stableImage" src="/assets/stable-blue.png" alt="stable" height="45px" width="40px" /><span id="stableCount" class="centered">0</span></span>
-        </div><br/>
-        <div style="display:flex; height: 50px;">
-          <span class="container-b"><img id="troopImage" src="/assets/troop-blue.png" alt="troops" height="45px" width="40px" /><span id="troopCount" class="centered">0</span></span>
-        </div><br/>
-      </div>
-
-
-      </td>
-      </tr>
-      </table>
 
     </div>
   </div>
