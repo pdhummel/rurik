@@ -29,19 +29,80 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
 function onLoad() {
   listGames();
 
-  var coll = document.getElementsByClassName("collapsible");
-  var i;
-  
-  for (i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function() {
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      if (content.style.display === "block") {
-        content.style.display = "none";
-      } else {
-        content.style.display = "block";
-      }
-    });
+  var myCardsModal = setupPopupWindow("myCardsModal", "myCardsButton", "closeMyCardsModal");
+  var gameCardsModal = setupPopupWindow("gameCardsModal", "gameCardsButton", "closeGameCardsModal");
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.onclick = function(event) {
+    if (event.target == myCardsModal || event.target == gameCardsModal) {
+      myCardsModal.style.display = "none";
+      gameCardsModal.style.display = "none";
+    }
+  }
+}
+
+function setupPopupWindow(windowId, openWindowButtonId, closeWindowId) {
+  // Get the modal
+  var modal = document.getElementById(windowId);
+
+  // Get the button that opens the modal
+  var openWindowButton = document.getElementById(openWindowButtonId);
+
+  // Get the <span> element that closes the modal
+  var closeWindowSpan = document.getElementById(closeWindowId);
+
+  // When the user clicks on the button, open the modal
+  openWindowButton.onclick = function() {
+    modal.style.display = "block";
+  }
+
+  // When the user clicks on <span> (x), close the modal
+  closeWindowSpan.onclick = function() {
+    modal.style.display = "none";
+  }
+
+  dragElement(modal);
+  return modal;
+}
+
+function dragElement(elmnt) {
+  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+  if (document.getElementById(elmnt.id + "header")) {
+    /* if present, the header is where you move the DIV from:*/
+    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
+  } else {
+    /* otherwise, move the DIV from anywhere inside the DIV:*/
+    elmnt.onmousedown = dragMouseDown;
+  }
+
+  function dragMouseDown(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // get the mouse cursor position at startup:
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    document.onmouseup = closeDragElement;
+    // call a function whenever the cursor moves:
+    document.onmousemove = elementDrag;
+  }
+
+  function elementDrag(e) {
+    e = e || window.event;
+    e.preventDefault();
+    // calculate the new cursor position:
+    pos1 = pos3 - e.clientX;
+    pos2 = pos4 - e.clientY;
+    pos3 = e.clientX;
+    pos4 = e.clientY;
+    // set the element's new position:
+    elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+    elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+  }
+
+  function closeDragElement() {
+    /* stop moving when mouse button is released:*/
+    document.onmouseup = null;
+    document.onmousemove = null;
   }
 }
 
@@ -268,7 +329,7 @@ function refreshGameStatusResponseHandler(response) {
 
     if (gameRound != undefined) {
       setInnerHtml("gameRound", gameRound);
-      show("cardDisplayToggle");
+      //show("gameCardsButton");
     }
     if (clientLeader != undefined && clientLeader != null && 
         clientLeader.name != undefined && clientLeader.name != null && clientLeader.name.length > 0) {
@@ -284,6 +345,7 @@ function refreshGameStatusResponseHandler(response) {
     if (currentState == "waitingForPlayers") {
       show("startGameDiv");
       hide("boatDiv");
+      hide("personalCardsDiv");
       hide("supplyDiv");
     } else {
       document.getElementById("tavernImage").src = "/assets/tavern-" + myColor + ".png";
@@ -294,6 +356,7 @@ function refreshGameStatusResponseHandler(response) {
       document.getElementById("troopImage").src = "/assets/troop-" + myColor + ".png";
       hide("startGameDiv");
       show("boatDiv");
+      show("personalCardsDiv");
       show("supplyDiv");
     }
     if (currentState == "waitingForFirstPlayerSelection") {
@@ -1230,13 +1293,21 @@ function showReturnSchemeCard(player) {
   var temporarySchemeCards = player.temporarySchemeCards;
   var selectSchemeCard = document.getElementById("selectReturnSchemeCard");
   clearOptions(selectSchemeCard);
-  for (var i=0; i<temporarySchemeCards.length; i++) {
-    var schemeCard = temporarySchemeCards[i];
-    var option = document.createElement("option");
-    option.value = schemeCard.id;
-    option.innerText = schemeCard.id;
-    selectSchemeCard.append(option);
-    outputSchemeCard("returnSchemeCardDiv"+i, schemeCard.id);
+  for (var i=0; i<3; i++) {
+    if (i < temporarySchemeCards.length) {
+      var schemeCard = temporarySchemeCards[i];
+      var option = document.createElement("option");
+      option.value = schemeCard.id;
+      var parts = schemeCard.id.split("-");
+      var deaths = parts.pop();
+      var cost = parts.pop();
+      var schemeDescription = parts.join("+");
+      option.innerText = i+1 + ") " + schemeDescription;
+      selectSchemeCard.append(option);
+      outputSchemeCard("returnSchemeCardDiv"+i, schemeCard.id);
+    } else {
+      setInnerHtml("returnSchemeCardDiv"+i, "");
+    }
   }
   show("returnSchemeCardDiv");
 }

@@ -505,17 +505,53 @@
       </div>
 
       </br>
-      <button id="cardDisplayToggle" type="button" class="collapsible" style="display:none">Game Cards</button>
-      <div id="cardDisplayDiv" style="display:none">
-        Scheme Cards:
-        <table>
-          <tr>
-            <td><img height="50px" src="/assets/scheme-card-back.png" /></td>
-            <td><img height="50px" src="/assets/scheme-card-back.png" /></td>
-            <td><div id="schemeDiscardDiv"></div></td>
-          </tr>
-        </table>
-        Deed Cards: </br>
+
+
+      <div id="personalCardsDiv" style="display:none">
+        <!-- Trigger/Open The Modal -->
+        <button id="myCardsButton" style="display: inline-block; ">Show My Cards</button>
+        <button id="gameCardsButton" style="display: inline-block; ">Show Game Cards</button>
+  
+        <!-- The Modal -->
+        <div id="myCardsModal" class="modal">
+
+          <div id="myCardsContent" class="modal-content">
+            <span id="closeMyCardsModal" class="close">&times;</span>
+            My Scheme Cards: 
+            <table>
+              <tr>
+                <td><div id="personalSchemeCardDiv0"></div></td>
+                <td><div id="personalSchemeCardDiv1"></div></td>
+                <td><div id="personalSchemeCardDiv2"></div></td>
+                <td><div id="personalSchemeCardDiv3"></div></td>
+                <td><div id="personalSchemeCardDiv4"></div></td>
+                <td><div id="personalSchemeCardDiv5"></div></td>
+                <td><div id="personalSchemeCardDiv6"></div></td>
+                <td><div id="personalSchemeCardDiv7"></div></td>
+                <td><div id="personalSchemeCardDiv8"></div></td>
+                <td><div id="personalSchemeCardDiv9"></div></td>
+              </tr>
+            </table>
+            My Deed Cards: </br>
+            My Secret Agenda Card:</br>
+          </div>
+        </div>
+      </div>
+
+      
+      <div id="gameCardsModal" class="modal">
+        <div id="gameCardsContent" class="modal-content">
+          <span id="closeGameCardsModal" class="close">&times;</span>
+          Scheme Cards:
+          <table>
+            <tr>
+              <td><img height="50px" src="/assets/scheme-card-back.png" /></td>
+              <td><img height="50px" src="/assets/scheme-card-back.png" /></td>
+              <td><div id="schemeDiscardDiv"></div></td>
+            </tr>
+          </table>
+          Deed Cards: </br>  
+        </div>
 
       </div>
       
@@ -598,6 +634,7 @@
 
       <table>
       <tr><td>
+
       <div id="boatDiv" style="display: none;">
         <br/>
         <div style="background-image: url('assets/dock.png'); background-size: cover; background-repeat: no-repeat;">
@@ -659,6 +696,9 @@
           </div>
         </div>
       </div>
+
+
+      
       </td>
       <td style="width: 20px"></td>
       <td>
@@ -680,33 +720,14 @@
           <span class="container-b"><img id="troopImage" src="/assets/troop-blue.png" alt="troops" height="45px" width="40px" /><span id="troopCount" class="centered">0</span></span>
         </div><br/>
       </div>
+
+
       </td>
       </tr>
       </table>
-      <div id="personalCardsDiv" style="display:block">
-        </br>
-        My Scheme Cards: 
-        <table>
-          <tr>
-            <td><div id="personalSchemeCardDiv0"></div></td>
-            <td><div id="personalSchemeCardDiv1"></div></td>
-            <td><div id="personalSchemeCardDiv2"></div></td>
-            <td><div id="personalSchemeCardDiv3"></div></td>
-            <td><div id="personalSchemeCardDiv4"></div></td>
-            <td><div id="personalSchemeCardDiv5"></div></td>
-            <td><div id="personalSchemeCardDiv6"></div></td>
-            <td><div id="personalSchemeCardDiv7"></div></td>
-            <td><div id="personalSchemeCardDiv8"></div></td>
-            <td><div id="personalSchemeCardDiv9"></div></td>
-          </tr>
-        </table>
-        My Deed Cards: </br>
-        My Secret Agenda Card:</br>
-      </div>
-      </br>
 
-
-    </div>    
+    </div>
   </div>
+
 </body>
 </html>
