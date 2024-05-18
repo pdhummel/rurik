@@ -5,27 +5,37 @@ var games = new Games();
 
 const express = require('express');
 var bodyParser = require('body-parser');
-
+const path = require("path");
 const app = express();
-var path    = require("path");
+
 const port = 3000;
 
-
+app.set("view engine", "ejs");
 
 // set static directories
-app.use(express.static(path.join(__dirname, '../public')));
+//app.use(express.static(path.join(__dirname, '../public')));
+//app.use(express.static(path.join(__dirname, 'public')));
+app.use('/', express.static('public'));
 app.use(bodyParser.json());
 
-app.get('/api-tester', function (req, res) {
-    res.sendFile(path.join(__dirname + '../public/api-tester.html'));
-});
-app.get('/view/rurik', function (req, res) {
-  res.sendFile(path.join(__dirname + '../public/rurik.html'));
-});
+//app.get('/api-tester', function (req, res) {
+//    res.sendFile(path.join(__dirname + '../public/api-tester.html'));
+//});
+//app.get('/view/rurik', function (req, res) {
+//  res.sendFile(path.join(__dirname + '../public/rurik.html'));
+//});
 
+//app.get('/view/rurik', function (req, res) {
+  //res.sendFile(path.join(__dirname + '../public/rurik.html'));
+//  res.render("rurik");
+//});
 
-app.get('/', (req, res) => {
-  res.send('Server for "Rurik: Dawn of Kiev."');
+//app.get('/', (req, res) => {
+//  res.send('Server for "Rurik: Dawn of Kiev."');
+//});
+
+app.get("/", (req, res) => {
+  res.render("index"); // index refers to index.ejs
 });
 
 

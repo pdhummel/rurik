@@ -1,0 +1,89 @@
+<div id="placeAdvisorDiv" style="display:none;">
+  Action: <select id="selectAction">
+    <option>muster</option>
+    <option>move</option>
+    <option>attack</option>
+    <option>tax</option>
+    <option>build</option>
+    <option>scheme</option>
+  </select>
+  Advisor: <select id="selectAdvisor"></select>
+  Coins: <input id="bidCoins" type="text" size="2" maxlength="3">
+  <input type="button" value="Place Advisor" onclick="javascript:placeAdvisor();"/><br/>
+</div>
+
+
+
+<div id="advisors" style="display: none">
+  <div id="advisorRow" style="display:flex;">
+    <!--<span id="advisor1" style="display: block;"><img height="40px" src="/assets/one-blue.png" alt="advisor 1" /></span>-->
+  </div>        
+</div>
+
+<table id="strategyBoard-1-2" style="display: none">
+    <tr style="background-color: #826223;">
+      <th>Muster</th><th>Move</th><th>Attack</th><th>Tax</th><th>Build</th><th>Scheme</th>
+    </tr>
+    <tr style="background-color: #e0c692;">
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-muster-r1.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-muster-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-muster-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-move-r1.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-move-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /><span id="sb-1-2-move-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-attack-r1.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-attack-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /><span id="sb-1-2-attack-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-tax-r1.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-tax-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /><span id="sb-1-2-tax-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-build-r1.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-build-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /><span id="sb-1-2-build-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-scheme-r1.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-scheme-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /><span id="sb-1-2-scheme-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+    <tr style="background-color: #826223;">
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-muster-r2.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-muster-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-muster-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-move-r2.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-move-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-move-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-attack-r2.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-attack-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /><span id="sb-1-2-attack-r2-coin" class="top-centered" style="height: 50px"></span></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-tax-r2.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-tax-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-tax-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-build-r2.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-build-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-build-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-scheme-r2.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-scheme-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-scheme-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+    <tr style="background-color: #e0c692;">
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-muster-r3.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-muster-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-muster-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-move-r3.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-move-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-move-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-attack-r3.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-attack-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-attack-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-tax-r3.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-tax-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-tax-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-build-r3.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-build-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-build-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-1-2-scheme-r3.png" /><span class="centered" style="height: 50px"><img id="sb-1-2-scheme-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-1-2-scheme-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+  </table>
+
+  <table id="strategyBoard-3-4" style="display: none">
+    <tr style="background-color: #826223;">
+      <th>Muster</th><th>Move</th><th>Attack</th><th>Tax</th><th>Build</th><th>Scheme</th>
+    </tr>
+    <tr style="background-color: #e0c692;">
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-muster-r1.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-muster-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-muster-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-move-r1.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-move-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-move-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-attack-r1.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-attack-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-attack-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-tax-r1.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-tax-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-attack-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-build-r1.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-build-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-build-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-scheme-r1.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-scheme-r1-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-scheme-r1-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+    <tr style="background-color: #826223;">
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-muster-r2.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-muster-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-muster-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-move-r2.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-move-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-move-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-attack-r2.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-attack-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-attack-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-tax-r2.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-tax-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-tax-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-build-r2.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-build-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-build-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-scheme-r2.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-scheme-r2-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-scheme-r2-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+    <tr style="background-color: #e0c692;">
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-muster-r3.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-muster-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-muster-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-move-r3.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-move-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-move-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-attack-r3.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-attack-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-attack-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-tax-r3.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-tax-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-tax-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-build-r3.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-build-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-build-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-scheme-r3.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-scheme-r3-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-scheme-r3-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+    <tr style="background-color: #826223;">
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-muster-r4.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-muster-r4-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-muster-r4-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-move-r4.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-move-r4-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-move-r4-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-attack-r4.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-attack-r4-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-attack-r4-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-tax-r4.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-tax-r4-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-tax-r4-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-build-r4.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-build-r4-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-build-r4-coin" class="top-centered" style="height: 50px"></span></span></td>
+      <td><span class="container"><img width="50px" src="/assets/sb-3-4-scheme-r4.png" /><span class="centered" style="height: 50px"><img id="sb-2-3-scheme-r4-advisor" height="40px" style="display:none;" src="/assets/one-blue.png" alt="advisor" /></span><span id="sb-3-4-scheme-r4-coin" class="top-centered" style="height: 50px"></span></span></td>
+    </tr>
+  </table>

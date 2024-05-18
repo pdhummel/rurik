@@ -1,0 +1,61 @@
+<div id="gameListDiv">
+    <div id="gameListData"></div>
+    <br/>
+  </div>
+  <div id="createGameDiv">
+    Game Name: <input id="gameName" type="text" />
+    <input type="button" value="Create Game" onclick="javascript:createGame();"/><br/>
+    <br/>
+  </div>
+  <div id="joinGameDiv" style="display:none;">
+    Player Name: <input id="playerName" type="text">          
+    <select id="selectGameId"></select>
+    <select id="selectColor">
+      <option>blue</option>
+      <option>red</option>
+      <option>white</option>
+      <option>yellow</option>
+    </select>
+    <select id="selectPosition">
+      <option value="N">North</option>
+      <option value="E">East</option>
+      <option value="S">South</option>
+      <option value="W">West</option>
+    </select>
+    <input type="button" value="Join Game" onclick="javascript:joinGame();"/><br/>
+    <br/>
+  </div>
+
+  <div id="startGameDiv" style="display:none;">
+    <input type="button" value="Start Game" onclick="javascript:startGame();"/><br/>
+  </div>
+  <div id="pickFirstPlayerDiv" style="display:none;">
+    <select id="selectFirstPlayerColor">
+      <option>blue</option>
+      <option>red</option>
+      <option>white</option>
+      <option>yellow</option>
+    </select>
+    <input type="button" value="Pick First Player" onclick="javascript:pickFirstPlayer();"/>
+    <input type="button" value="Pick Random First Player" onclick="javascript:pickRandomFirstPlayer();"/><br/>
+  </div>
+  <div id="leaderSelectionDiv" style="display:none;">
+    <select id="selectLeader"></select>
+    <input type="button" value="Select Leader" onclick="javascript:chooseLeader();"/><br/>
+    <br/>
+  </div>
+  <div id="chooseSecretAgendaDiv" style="display:none;">
+    <input type="radio" id="secretAgenda1" name="secretAgenda" value="">
+    <label id="secretAgenda1Label" for="secretAgenda1"></label><br>
+    <input type="radio" id="secretAgenda2" name="secretAgenda" value="">
+    <label id="secretAgenda2Label" for="secretAgenda2"></label><br>
+    <input type="button" value="Select Secret Agenda" onclick="javascript:chooseSecretAgenda();"/><br/>
+    <br/>
+  </div>
+
+  <div id="placeInitialTroopsDiv" style="display:none;">
+    <select id="selectLocation"></select>
+    <input id="placeTroopButton" type="button" value="Place Troop" onclick="javascript:placeTroop();"/><br/>
+    <br/>
+  </div>
+

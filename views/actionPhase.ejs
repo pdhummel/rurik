@@ -1,0 +1,181 @@
+<div id="musterTroopsDiv" style="display:none;">
+    Muster:</br>
+    <select id="selectMusterTroopsLocation"></select>
+    <select id="selectMusterTroopCount"></select>
+    <input id="musterTroopButton" type="button" value="Muster Troops" onclick="javascript:musterTroops();"/>
+    <input id="cancelMusterButton" type="button" value="Cancel" onclick="javascript:cancelMusterTroops();"/><br/>
+    <br/>
+  </div>
+
+  <div id="moveTroopsDiv" style="display:none;">
+    Move 1 troop to a neighboring location.</br>
+    From: <select id="selectMoveFromLocation"></select>
+    To: <select id="selectMoveToLocation"></select></br>
+    <input type="checkbox" id="moveLeaderYN" value="Y"/>
+    <label for="moveLeaderYN">Move leader instead of troops - "from" location.</label><br/>
+    <input id="moveTroopButton" type="button" value="Move Troops" onclick="javascript:moveTroops();"/>
+    <input id="cancelMoveButton" type="button" value="Cancel" onclick="javascript:cancelMoveTroops();"/><br/>
+    <br/>
+  </div>
+
+  <div id="attackDiv" style="display:none;">
+    Attack:</br>
+    Location: <select id="selectAttackLocation"></select>
+    Target: <select id="selectTargetToAttack">
+      <option>rebel</option>
+      <option>blue</option>
+      <option>red</option>
+      <option>yellow</option>
+      <option>white</option>
+    </select></br>
+    <input type="radio" id="attackSchemeDeck1" name="attackSchemeDeck" value="1" checked>
+    <label id="attackSchemeDeckLabel1" for="attackSchemeDeck1">Casualty Scheme Deck 1</label><br>
+    <input type="radio" id="attackSchemeDeck2" name="attackSchemeDeck" value="2">
+    <label id="attackSchemeDeckLabel2" for="attackSchemeDeck2">Casualty Scheme Deck 2</label><br>
+
+    <input id="attackButton" type="button" value="Attack" onclick="javascript:attack();"/>
+    <input id="cancelAttackButton" type="button" value="Cancel" onclick="javascript:cancelAttack();"/><br/>
+    <br/>
+  </div>
+
+  <div id="taxDiv" style="display:none;">
+    Tax:</br>
+    Location: <select id="selectTaxLocation"></select></br>
+    <input type="checkbox" id="marketCoinYN" value="Y"/>
+    <label for="marketCoinYN">Take coin instead of resource for market bonus.</label><br/>
+    <input id="taxButton" type="button" value="Tax" onclick="javascript:tax();"/>
+    <input id="cancelTaxButton" type="button" value="Cancel" onclick="javascript:cancelTax();"/><br/>
+    <br/>
+  </div>
+
+  <div id="buildDiv" style="display:none;">
+    Build:</br>
+    Location: <select id="selectBuildLocation"></select></br>
+    Building: <select id="selectBuilding">
+      <option>market</option>
+      <option>stronghold</option>
+      <option>church</option>
+      <option>tavern</option>
+      <option>stable</option>            
+    </select></br>
+    <input id="buildButton" type="button" value="Build" onclick="javascript:build();"/>
+    <input id="cancelBuildButton" type="button" value="Cancel" onclick="javascript:cancelBuild();"/><br/>
+    <br/>
+  </div>
+
+
+
+<div id="retrieveAdvisorDiv" style="display:none">
+  <input type="radio" id="advisor1" name="advisor" value="" checked>
+  <label id="advisor1Label" for="advisor1"></label><br/>
+  <span id="showAdvisor2" style="display:none">
+    <input type="radio" id="advisor2" name="advisor" value="" >
+    <label id="advisor2Label" for="advisor2" ></label><br/>
+  </span>
+  <input type="checkbox" id="forfeitActionYN" value="Y"/>
+  <label for="forfeitActionYN">Forfeit action for 1 coin.</label><br/>
+  <input type="button" value="Retrieve Advisor" onclick="javascript:retrieveAdvisor();"/><br/>
+  <br/>
+</div>
+
+<div id="transferGoodsDiv" style="display:none">
+  Transfer Goods:
+  <select id="resourceToTransfer">
+    <option>wood</option>
+    <option>stone</option>
+    <option>fur</option>
+    <option>honey</option>
+    <option>fish</option>
+  </select>
+  </br>
+  <input type="radio" id="dockToBoat" name="transferGoodsDirection" value="dockToBoat" checked>
+  <label id="dockToBoatLabel" for="dockToBoat"></label>Dock to Boat<br/>
+  <input type="radio" id="boatToDock" name="transferGoodsDirection" value="boatToDock">
+  <label id="boatToDockLabel" for="boatToDock">Boat to Dock</label><br/>
+  <input id="transferButton" type="button" value="Transfer" onclick="javascript:transferGoods();"/>
+  <input id="cancelTransferButton" type="button" value="Cancel" onclick="javascript:cancelTransfer();"/><br/>
+  <br/>
+</div>
+
+
+<div id="pickSchemeDeckDiv" style="display:none">
+  <span id="pickFirstPlayer" style="display:none">0</span>
+  <div id="schemeFirstPlayerDiv" style="display:none">
+    Scheme First Player for next Round:
+    <select id="firstPlayerColor">
+      <option>blue</option>
+      <option>red</option>
+      <option>white</option>
+      <option>yellow</option>
+    </select>
+    <br/>
+  </div>
+  Select Scheme Deck to Draw Cards:</br>
+  <input type="radio" id="schemeDeck1" name="schemeDeck" value="1" checked>
+  <label id="schemeDeck1Label" for="schemeDeck1"></label>Scheme Deck 1<br/>
+  <input type="radio" id="schemeDeck2" name="schemeDeck" value="2">
+  <label id="schemeDeck2Label" for="schemeDeck2">Scheme Deck 2</label><br/>
+
+  <input id="chooseSchemeDeckButton" type="button" value="Choose" onclick="javascript:chooseSchemeDeck();"/>
+  <br/>
+</div>
+
+<div id="returnSchemeCardDiv" style="display:none">
+  Return Scheme Card to Deck:</br>
+  <table>
+    <tr>
+      <td><div id="returnSchemeCardDiv0"></div></td>
+      <td><div id="returnSchemeCardDiv1"></div></td>
+      <td><div id="returnSchemeCardDiv2"></div></td>
+    </tr>
+  </table>
+  <div id="returnSchemeCardDivRadioButtons"></div>
+  <select id="selectReturnSchemeCard"></select>
+  <input type="button" value="Return" onclick="javascript:returnSchemeCard();"/>
+</div>
+
+<div id="actionPhaseDiv" style="display:none">
+  <b>Action Phase</b><br/>
+  <span id="musterOption" style="display:block">
+    <input type="radio" id="musterAction" name="actionPhaseAction" value="musterAction">
+    <label id="musterActionLabel" for="musterAction">Muster: <span id="musterActions">0</span> troop(s) available.</label><br/>
+  </span>
+  <span id="moveOption" style="display:block">
+    <input type="radio" id="moveAction" name="actionPhaseAction" value="moveAction">
+    <label id="moveActionLabel" for="moveAction">Move: <span id="moveActions">0</span> action(s) available.</label><br/>
+  </span>
+  <span id="attackOption" style="display:block">
+    <input type="radio" id="attackAction" name="actionPhaseAction" value="attackAction">
+    <label id="attackActionLabel" for="attackAction">Attack: <span id="attackActions">0</span> action(s) available.</label><br/>
+  </span>
+  <span id="taxOption" style="display:block">
+    <input type="radio" id="taxAction" name="actionPhaseAction" value="taxAction">
+    <label id="taxActionLabel" for="taxAction">Tax: <span id="taxActions">0</span> action(s) available.</label><br/>
+  </span>
+  <span id="buildOption" style="display:block">
+    <input type="radio" id="buildAction" name="actionPhaseAction" value="buildAction">
+    <label id="buildActionLabel" for="buildAction">Build: <span id="buildActions">0</span> action(s) available.</label><br/>
+  </span>
+  <span id="schemeOption" style="display:block">
+    <input type="radio" id="schemeAction" name="actionPhaseAction" value="schemeAction">
+    <label id="schemeActionLabel" for="schemeAction">Play a scheme card.</label><br/>
+  </span>
+  <span id="transferGoodsOption" style="display:block">
+    <input type="radio" id="transferGoodsAction" name="actionPhaseAction" value="transferGoodsAction">
+    <label id="transferGoodsActionLabel" for="transferGoodsAction">Transfer Goods.</label><br/>
+  </span>
+  <span id="convertGoodsOption" style="display:block">
+    <input type="radio" id="convertGoodsAction" name="actionPhaseAction" value="convertGoodsAction">
+    <label id="convertGoodsActionLabel" for="convertGoodsAction">Convert Goods.</label><br/>
+  </span>
+  <span id="accomplishDeedOption" style="display:block">
+    <input type="radio" id="accomplishDeedAction" name="actionPhaseAction" value="accomplishDeedAction">
+    <label id="accomplishDeedActionLabel" for="accomplishDeedAction">Accomplish Deed.</label><br/>
+  </span>
+  <input type="radio" id="endTurnAction" name="actionPhaseAction" value="endTurnAction" checked>
+  <label id="endTurnActionLabel" for="endTurnAction">End Turn.</label><br/>
+  <input type="button" value="Perform Action" onclick="javascript:performActionPhaseAction();"/><br/>
+  <br/>
+</div>
+
+</br>

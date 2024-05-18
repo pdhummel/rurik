@@ -398,7 +398,10 @@ function refreshGameStatusResponseHandler(response) {
       } else {
         hide("placeAdvisorDiv");
       }
-    } else if (currentState == "actionPhase" || currentState == "retrieveAdvisor") {
+    } else if (currentState.startsWith("actionPhase") || currentState == "retrieveAdvisor" || 
+      currentState == "selectSchemeCard" || currentState == "selectSchemeCard" || currentState.startsWith("actionPhase") ||
+      currentState == "schemeFirstPlayer" || currentState == "drawSchemeCards"
+    ) {
       if (gameStatus.numberOfPlayers <= 2) {
         show("strategyBoard-1-2");
       } else {
