@@ -5,7 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.min.js"></script>
+  <script src="/common.jsx"></script>
   <script src="/rurik-client.jsx"></script>
+  <script src="/preGameAndSetup.jsx"></script>
+  <script src="/map.jsx"></script>
+  <script src="/actionPhase.jsx"></script>
+  <script src="/strategyPhase.jsx"></script>
+  <script src="/player.jsx"></script>
   <script type="text/javascript">
   </script>
   <link rel="stylesheet" type="text/css" href="/rurik-styles.css"  />
@@ -17,20 +23,16 @@
 </head>
 <body onload="onLoad()">
   <div>
-    <!-- set in javascript width:50% -->
-    <!-- background: rgb(199, 231, 242); -->
+    <!-- leftSideDiv width set in javascript width:50% -->
     <%- include('map.ejs') %>
     
     <!-- set in javascript width:45% -->
     <div id="rightSideDiv" style="float:right; width:100%; height:700px; background-size: cover; background-repeat: no-repeat; background-image: url('/assets/snow-castle.png'); opacity:1;" >
+      <%- include('preGameAndSetup.ejs') %>
 
-        <%- include('gameStatus.ejs') %>
+      <%- include('gameStatus.ejs') %>
 
-        <%- include('preGameAndSetup.ejs') %>
-
-        <%- include('actionPhase.ejs') %>
-
-
+      <%- include('actionPhase.ejs') %>
 
       <%- include('personalCards.ejs') %>
 
@@ -39,8 +41,6 @@
       <%- include('strategyboard.ejs') %>
 
       <%- include('claimboard.ejs') %>
-
-
 
       <%- include('boatAndSupply.ejs') %>
   </div>

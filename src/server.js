@@ -1,5 +1,6 @@
 const Games = require('./game.js');
 const Validator = require('./validations.js');
+//const preGameAndSetupRoutes = require("./routes/preGameAndSetup");
 
 var games = new Games();
 
@@ -8,35 +9,22 @@ var bodyParser = require('body-parser');
 const path = require("path");
 const app = express();
 
+
 const port = 3000;
 
 app.set("view engine", "ejs");
 
 // set static directories
-//app.use(express.static(path.join(__dirname, '../public')));
-//app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', express.static('public'));
+
 app.use(bodyParser.json());
 
-//app.get('/api-tester', function (req, res) {
-//    res.sendFile(path.join(__dirname + '../public/api-tester.html'));
-//});
-//app.get('/view/rurik', function (req, res) {
-//  res.sendFile(path.join(__dirname + '../public/rurik.html'));
-//});
-
-//app.get('/view/rurik', function (req, res) {
-  //res.sendFile(path.join(__dirname + '../public/rurik.html'));
-//  res.render("rurik");
-//});
-
-//app.get('/', (req, res) => {
-//  res.send('Server for "Rurik: Dawn of Kiev."');
-//});
+//app.use(preGameAndSetupRoutes);
 
 app.get("/", (req, res) => {
   res.render("index"); // index refers to index.ejs
 });
+
 
 
 app.get('/game', (req, res) => {
@@ -45,54 +33,31 @@ app.get('/game', (req, res) => {
   res.send(gameList);
 });
 
-
 // create game
 app.post('/game', (req, res) => {
   console.log("post " + req.path);
   var targetPlayers = 4;
   if (req.body.targetPlayers != undefined) {
-    targetPlayers = req.body.targetPlayers;
+      targetPlayers = req.body.targetPlayers;
   }
   var name = req.body.gameName;
   if (name == undefined || name.length < 1) {
-    res.status(400).send("Game name is required.");
-    return;
+      res.status(400).send("Game name is required.");
+      return;
   }
 
   var gameStatus = null;
   try {
-    gameStatus = games.createGame(name, targetPlayers);
+      gameStatus = games.createGame(name, targetPlayers);
   } catch(error) {
-    console.log(error.message);
-    res.status(400).send(error.message);
-    return;
+      console.log(error.message);
+      res.status(400).send(error.message);
+      return;
   } 
 
   res.send(gameStatus);
 });
 
-
-
-app.get('/game/:id', (req, res) => {
-  console.log("get " + req.path + ", id=" + req.params.id);
-
-  var game = games.getGameById(req.params.id);
-  if (game === undefined) {
-    res.status(404).send('Game not found');
-    return;
-  }
-  res.send(game);
-});
-
-app.get('/gameStatus/:id', (req, res) => {
-  console.log("get " + req.path + ", id=" + req.params.id + ", " +  req.query.clientColor);
-  var gameStatus = games.getGameStatus(req.params.id, req.query.clientColor);
-  if (gameStatus === undefined || gameStatus == null) {
-    res.status(404).send('Game not found');
-    return;
-  }    
-  res.send(gameStatus);
-});
 
 
 
@@ -185,37 +150,6 @@ app.put('/game/:id', (req, res) => {
 });
 
 
-// getPlayer
-app.get('/game/:id/player/:color', (req, res) => {
-  console.log("get " + req.path + " " + req.params);
-  var game = games.getGameById(req.params.id);
-  if (game === undefined) {
-    res.status(404).send('Game not found');
-    return;
-  }   
-  var color = req.params["color"];
-  var player = game.getPlayer(color);
-  if (player === undefined) {
-    res.status(404).send('Player not found for color ' + color);
-    return;
-  }
-  //console.log(player);
-  // TODO: if requesting player != player, then protect hidden info.
-  res.send(player);
-});
-
-app.get('/game/:id/map', (req, res) => {
-  console.log("get " + req.path + " " + req.params);
-  var game = games.getGameById(req.params.id);
-  if (game === undefined) {
-    res.status(404).send('Game not found');
-    return;
-  }
-  var locations = game.gameMap.getLocations(game.players.players.length);  
-  res.send(locations);
-});
-
-
 app.put('/game/:id/firstplayer/:color', (req, res) => {
   console.log("put " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
@@ -303,6 +237,67 @@ app.post('/game/:id/player/:color/secretAgenda', (req, res) => {
   }
   res.send(player.secretAgenda);
 });
+  
+
+
+
+
+app.get('/game/:id', (req, res) => {
+  console.log("get " + req.path + ", id=" + req.params.id);
+
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  res.send(game);
+});
+
+app.get('/gameStatus/:id', (req, res) => {
+  console.log("get " + req.path + ", id=" + req.params.id + ", " +  req.query.clientColor);
+  var gameStatus = games.getGameStatus(req.params.id, req.query.clientColor);
+  if (gameStatus === undefined || gameStatus == null) {
+    res.status(404).send('Game not found');
+    return;
+  }    
+  res.send(gameStatus);
+});
+
+
+
+
+
+// getPlayer
+app.get('/game/:id/player/:color', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }   
+  var color = req.params["color"];
+  var player = game.getPlayer(color);
+  if (player === undefined) {
+    res.status(404).send('Player not found for color ' + color);
+    return;
+  }
+  //console.log(player);
+  // TODO: if requesting player != player, then protect hidden info.
+  res.send(player);
+});
+
+app.get('/game/:id/map', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var locations = game.gameMap.getLocations(game.players.players.length);  
+  res.send(locations);
+});
+
+
 
 app.put('/game/:id/location/:location/troops', (req, res) => {
   console.log("put " + req.path + " " + req.params);
