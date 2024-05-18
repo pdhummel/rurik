@@ -72,6 +72,14 @@ class Games {
     constructor() {
         this.games = {};
     }
+
+    static getInstance() {
+        if (Games.self === undefined) {
+            Games.self = new Games();
+        }
+        return Games.self;
+    }
+
     createGame(name, targetNumberOfPlayers) {
         var game = new Game(name, targetNumberOfPlayers);
         console.log("createGame(): gameId=" + game.id);
