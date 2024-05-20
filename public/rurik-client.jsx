@@ -33,6 +33,7 @@ function refreshGameStatus() {
     refreshMap();
     refreshPlayer();
     refreshStrategyBoard();
+    refreshCards();
   }
 }
 function refreshGameStatusResponseHandler(response) {
@@ -233,15 +234,68 @@ function refreshGameStatusResponseHandler(response) {
       hide("returnSchemeCardDiv");
     }
 
-    // TODO: make this nice
     if (response.data.clientPlayer != undefined && response.data.clientPlayer != null) {
-      var schemeCards = response.data.clientPlayer.schemeCards;
-      for (var i=0; i<schemeCards.length; i++) {
-        var schemeCard = schemeCards[i];
-        outputSchemeCard("personalSchemeCardDiv" + i, schemeCard.id);
-      }
+      populateSchemeCards(response.data.clientPlayer);
+    }
+
+    if (currentState == "actionPhasePlaySchemeCard" && currentPlayer == myColor) {
+      show("playSchemeCardDiv");
+    } else {
+      hide("playSchemeCardDiv");
     }
     
+    
+}
+
+function populateSchemeCards(player) {
+  var schemeCards = player.schemeCards;
+  var selectSchemeCard = document.getElementById("selectPlaySchemeCard");
+  clearOptions(selectSchemeCard);
+  for (var i=0; i<10; i++) {
+    setInnerHtml("playSchemeCardDiv"+i, "");
+  }
+  for (var i=0; i<schemeCards.length; i++) {
+    var schemeCard = schemeCards[i];
+    var option = document.createElement("option");
+    option.value = schemeCard.id;
+    var parts = schemeCard.id.split("-");
+    var deaths = parts.pop();
+    var cost = parts.pop();
+    var schemeDescription = parts.join("+");
+    option.innerText = i+1 + ") " + schemeDescription;
+    selectSchemeCard.append(option);
+    outputSchemeCard("personalSchemeCardDiv" + i, schemeCard.id);
+    outputSchemeCard("playSchemeCardDiv" + i, schemeCard.id);
+  }  
+}
+
+function refreshCards() {
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/cards", "get", "", refreshCardsResponseHandler);      
+}
+function refreshCardsResponseHandler(response) {
+  console.log("refreshCardsResponseHandler(): " + JSON.stringify(response.data));
+  var cardsResponse = response.data;
+  setInnerHtml("schemeDeck1Count", cardsResponse['schemeDeck1'].length);
+  setInnerHtml("schemeDeck2Count", cardsResponse['schemeDeck1'].length);
+  if (cardsResponse['discardedSchemeCards'].length > 0) {
+    var schemeCard = cardsResponse['discardedSchemeCards'][cardsResponse.discardedSchemeCards.length -1];
+    outputSchemeCard("schemeDiscardDiv", schemeCard.id);
+  }
+
+  var deedCardsDiv = document.getElementById("deedCardsDiv");
+  deedCardsDiv.innerHTML = "";
+  var rows = [];
+  for (var i=0; i < cardsResponse['deedCards'].length; i++) {
+    var deedCard = cardsResponse['deedCards'][i];
+    var row = [];
+    row.push(deedCard.name);
+    row.push(deedCard.victoryPoints);
+    row.push(deedCard.requirementText);
+    rows.push(row);
+  }
+  var table = createTable(rows, ["Name", "VPs", "Description"]);
+  deedCardsDiv.appendChild(table);
 }
 
 

@@ -146,7 +146,8 @@ function getNextAdvisor() {
     }
     if (actionPhaseActionValue == "musterAction" || actionPhaseActionValue == "moveAction" || 
         actionPhaseActionValue == "attackAction" || actionPhaseActionValue =="taxAction" ||
-        actionPhaseActionValue == "buildAction" || actionPhaseActionValue == "transferGoodsAction") {
+        actionPhaseActionValue == "buildAction" || actionPhaseActionValue == "transferGoodsAction" ||
+        actionPhaseActionValue == "schemeAction") {
       beginAction(gameId, color, actionPhaseActionValue);
     }
     if (actionPhaseActionValue == "endTurnAction") {
@@ -418,6 +419,13 @@ function getNextAdvisor() {
     var data = '{ "action": "cancel" }';
     callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
   }
+
+  function cancelAction() {
+    var gameId = getInnerHtmlValue("gameId");
+    var color = getInnerHtmlValue("myColor");
+    var data = '{ "action": "cancel" }';
+    callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+  }
   
   function chooseSchemeDeck() {
     var gameId = getInnerHtmlValue("gameId");
@@ -476,3 +484,11 @@ function getNextAdvisor() {
     callApi("/game/" + gameId + "/player/" + color + "/schemeCard", "delete", data, refreshGameHandler);
   }
   
+  function playSchemeCard() {
+    var gameId = getInnerHtmlValue("gameId");
+    var color = getInnerHtmlValue("myColor");
+    var schemeCard = getSelectedValue("selectPlaySchemeCard");
+    var data = '{ "schemeCard": "' + schemeCard + '"}';
+    callApi("/game/" + gameId + "/player/" + color + "/schemeCard", "post", data, refreshGameHandler);
+  }
+    

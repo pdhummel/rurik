@@ -267,9 +267,9 @@ class Player {
         return moveActions;
     }
 
-    hasSchemeCard(schemeCard) {
+    hasSchemeCard(schemeCardId) {
         for (var i=0; i<this.schemeCards.length; i++) {
-            if (schemeCard.id == this.schemeCards[i].id) {
+            if (schemeCardId == this.schemeCards[i].id) {
                 return true;
             }
         }

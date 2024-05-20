@@ -146,6 +146,22 @@ app.put('/game/:id/player/:color/boat', (req, res) => {
   res.send(player);
 });
 
+
+
+app.get('/game/:id/cards', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var cards = {};
+  cards["deedCards"] = game.cards.displayedDeedCards;
+  cards["schemeDeck1"] = game.cards.schemeDeck1;
+  cards["schemeDeck2"] = game.cards.schemeDeck2;
+  cards['discardedSchemeCards'] = game.cards.discardedSchemeCards;
+  res.send(cards);
+});
   
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

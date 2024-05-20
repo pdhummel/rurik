@@ -706,24 +706,26 @@ class Game {
     }
 
 
-    playschemeCard(color, schemeCard) {
-        if (this.gameStates.currentState.name == "actionPhase") {
-            var currentPlayer = this.players.getCurrentPlayer();
-            if (currentPlayer.color == color && currentPlayer.schemeCardsCanPlay > 0) {
-                if (currentPlayer.hasSchemeCard(schemeCard) && 
-                    schemeCard.rewardCoinCost <= currentPlayer.boat.money) {
-                    currentPlayer.boat.money = currentPlayer.boat.money - schemeCard.rewardCoinCost;
-                    this.collectSchemeCardReward(currentPlayer, schemeCard);
-                }
-                currentPlayer.schemeCardsCanPlay--;
-            }
+    playSchemeCard(color, schemeCardId) {
+        this.validateGameStatus("actionPhasePlaySchemeCard", "playSchemeCard");
+        var currentPlayer = this.validateCurrentPlayer(color, "playSchemeCard");
+        if (currentPlayer.schemeCardsCanPlay < 1 || currentPlayer.schemeCards.length < 1) {
+            this.throwError("Player cannot play a scheme card.", "playSchemeCard");
         }
+        var schemeCard = this.cards.getSchemeCardById(schemeCardId);
+        if (currentPlayer.hasSchemeCard(schemeCardId) && 
+            schemeCard.rewardCoinCost <= currentPlayer.boat.money) {
+            currentPlayer.boat.money = currentPlayer.boat.money - schemeCard.rewardCoinCost;
+            this.collectSchemeCardReward(currentPlayer, schemeCard);
+        }
+        currentPlayer.schemeCardsCanPlay--;
     }
 
     collectSchemeCardReward(currentPlayer, schemeCard) {
+        //var schemeCard = this.cards.getSchemeCardById(schemeCardId);
         for (var i=0; i<schemeCard.rewards.length; i++) {
             var reward = schemeCard.rewards[i];
-            // coin, tax, muster, move, build, attack
+            // coin, tax, muster, move, build, attack, deedCard, warTrack, buildOrAttack, taxOrMuster
             if (reward == "coin") {
                 currentPlayer.boat.money++;
             } else if (reward == "tax") {
@@ -739,10 +741,20 @@ class Game {
                     currentPlayer.supplyTroops--;
                     currentPlayer.troopsToDeploy++;
                 }
+            } else if (reward == "warTrack") {
+                // TODO
             } else if (reward == "deedCard") {
+                // TODO
+            } else if (reward == "buildOrAttack") {
+                // TODO
+            } else if (reward == "taxOrMuster") {
                 // TODO
             }
         }
+        if (this.gameStates.currentState.name == "actionPhasePlaySchemeCard") {
+            this.gameStates.setCurrentState("actionPhase");
+        }
+
     }
 
     endCurrentAction(color) {
@@ -792,6 +804,7 @@ class Game {
         actionToStateMap["taxAction"] = "actionPhaseTax";
         actionToStateMap["buildAction"] = "actionPhaseBuild";
         actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
+        actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {

@@ -275,6 +275,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     res.send(player);
   });
   
+  // Discard a scheme card and return it to its deck
   app.delete('/game/:id/player/:color/schemeCard', (req, res) => {
     console.log("delete " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
@@ -294,5 +295,23 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     res.send(player);
   });
 
+  // play a scheme card
+  app.post('/game/:id/player/:color/schemeCard', (req, res) => {
+    console.log("post " + req.path + " " + req.params);
+    var game = games.getGameById(req.params.id);
+    if (game === undefined) {
+      res.status(404).send('Game not found');
+      return;
+    }
+    var color = req.params.color;
+    var player = game.getPlayer(color);
+    if (player == undefined) {
+      res.status(404).send('Player not found');
+      return;
+    }
+    var schemeCardId = req.body.schemeCard;
+    game.playSchemeCard(color, schemeCardId);
+    res.send(player);
+  });  
 
 module.exports = app;

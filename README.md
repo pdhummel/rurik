@@ -13,7 +13,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 * action phase
   * use conversion token
-  * play scheme card
+  * handle scheme card rewards - "Or", warTrack, deedCards
   * build action - church, stable, tavern
   * leader abilities
   * gain resources from war track on attack
@@ -28,11 +28,10 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 * claim phase
   * create claim board
-  * create deed cards
 
 * save game state
 * undo action/turn
-  * don't allow undo if scheme cards drawn
+  * don't allow undo if cards are drawn
 * save game
 * load game
 
@@ -88,6 +87,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show scheme cards for self
 * pick scheme cards
 * add templating to split html into multiple files
+* play scheme card
+* create deed cards
 
 
 ## APIs
@@ -131,4 +132,14 @@ nodejs ./src/server.js
 
 https://cloud.oracle.com
 pdhummel
+
+### Deeds
+* payments and sacrifices
+  * pay resource costs
+  * pay a scheme card
+  * sacrifice troops
+  * sacrifice buildings
+* verify achievements
+* collect rewards
+
 

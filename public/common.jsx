@@ -150,8 +150,7 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     return value;
   }
 
-  function populateTable(rows, headings) {
-    document.getElementById("gameListData").innerHTML = "";
+  function createTable(rows, headings) {
     var table = document.createElement('table');
     table.style.borderCollapse = "collapse";
     var tr = document.createElement('tr');
@@ -179,6 +178,11 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
       }
       table.appendChild(tr);
     }
-    document.getElementById("gameListData").appendChild(table);
+    return table;
   }
   
+  function populateTable(rows, headings) {
+    document.getElementById("gameListData").innerHTML = "";
+    var table = createTable(rows, headings);
+    document.getElementById("gameListData").appendChild(table);
+  }
