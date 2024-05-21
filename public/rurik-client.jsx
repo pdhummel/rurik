@@ -252,6 +252,7 @@ function populateSchemeCards(player) {
   var selectSchemeCard = document.getElementById("selectPlaySchemeCard");
   clearOptions(selectSchemeCard);
   for (var i=0; i<10; i++) {
+    setInnerHtml("personalSchemeCardDiv"+i, "");
     setInnerHtml("playSchemeCardDiv"+i, "");
   }
   for (var i=0; i<schemeCards.length; i++) {
@@ -277,10 +278,12 @@ function refreshCardsResponseHandler(response) {
   console.log("refreshCardsResponseHandler(): " + JSON.stringify(response.data));
   var cardsResponse = response.data;
   setInnerHtml("schemeDeck1Count", cardsResponse['schemeDeck1'].length);
-  setInnerHtml("schemeDeck2Count", cardsResponse['schemeDeck1'].length);
+  setInnerHtml("schemeDeck2Count", cardsResponse['schemeDeck2'].length);
   if (cardsResponse['discardedSchemeCards'].length > 0) {
     var schemeCard = cardsResponse['discardedSchemeCards'][cardsResponse.discardedSchemeCards.length -1];
     outputSchemeCard("schemeDiscardDiv", schemeCard.id);
+  } else {
+    setInnerHtml("schemeDiscardDiv", "");
   }
 
   var deedCardsDiv = document.getElementById("deedCardsDiv");

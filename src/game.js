@@ -360,6 +360,7 @@ class Game {
     }
 
     drawSchemeCards(color, schemeDeck) {
+        console.log("drawSchemeCards(): " + color + " " + schemeDeck);
         this.validateGameStatus("drawSchemeCards", "drawSchemeCards");
         var currentPlayer = this.validateCurrentPlayer(color, "drawSchemeCards");
         if (currentPlayer.schemeCardsToDraw < 1) {
@@ -713,10 +714,20 @@ class Game {
             this.throwError("Player cannot play a scheme card.", "playSchemeCard");
         }
         var schemeCard = this.cards.getSchemeCardById(schemeCardId);
+        
         if (currentPlayer.hasSchemeCard(schemeCardId) && 
             schemeCard.rewardCoinCost <= currentPlayer.boat.money) {
             currentPlayer.boat.money = currentPlayer.boat.money - schemeCard.rewardCoinCost;
             this.collectSchemeCardReward(currentPlayer, schemeCard);
+            this.cards.discardedSchemeCards.push(schemeCard);
+            var playerSchemeCards = [];
+            for (var i=0; i < currentPlayer.schemeCards.length; i++) {
+                var playerSchemeCard = currentPlayer.schemeCards[i];
+                if (playerSchemeCard.id != schemeCard.id) {
+                    playerSchemeCards.push(playerSchemeCard);
+                }
+            }
+            currentPlayer.schemeCards = playerSchemeCards;
         }
         currentPlayer.schemeCardsCanPlay--;
     }

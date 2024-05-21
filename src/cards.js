@@ -179,7 +179,7 @@ class Cards {
         this.addSchemeCard(["tax", "tax"], 1, 1);
         this.addSchemeCard(["coin", "coin"], 0, 0);
         this.addSchemeCard(["taxOrMuster", "taxOrMuster"], 0, 2);
-        for (var i=0; i<(schemeCards.length /2); i++) {
+        for (var i=0; i<16; i++) {
             var r = Math.floor(Math.random() * schemeCards.length);
             var schemeCard = schemeCards[r];
             this.schemeDeck1.push(schemeCard);
@@ -187,6 +187,7 @@ class Cards {
             schemeCards.pop();
         }
         this.schemeDeck2 = schemeCards;
+        console.log("setupSchemeCards(): " + this.schemeDeck1.length + " " + this.schemeDeck2.length);
     }
 
     addSchemeCard(rewards, rewardCoinCost=0, deaths=0) {
@@ -200,6 +201,7 @@ class Cards {
     }
 
     drawSchemeCard(schemeDeck) {
+        console.log("drawSchemeCard(): " + schemeDeck);
         var schemeDeckList = null;
         if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
             schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
@@ -207,10 +209,12 @@ class Cards {
             schemeDeckList = schemeDeck;
         }
         var card = schemeDeckList.shift();
+        console.log("drawSchemeCard(): " + this.schemeDeck1.length + " " + this.schemeDeck2.length);
         return card;
     }
 
     drawAndDiscardSchemeCard(schemeDeck) {
+        console.log("drawAndDiscardSchemeCard(): " + schemeDeck);
         var schemeDeckList = null;
         if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
             schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
@@ -228,6 +232,7 @@ class Cards {
 
     // 1 or 2
     getSchemeDeckByNumber(num) {
+        console.log("getSchemeDeckByNumber(): " + num);
         if (num == 1) {
             return this.schemeDeck1;
         } else {
