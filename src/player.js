@@ -59,13 +59,25 @@ class GamePlayers {
     }
 
     setFirstPlayer(player) {
+        if (this.firstPlayer != undefined) {
+            this.firstPlayer.isFirstPlayer = false;
+        }
         this.firstPlayer = player;
+        player.isFirstPlayer = true;
     }
     setFirstPlayerByColor(color) {
+        if (this.firstPlayer != undefined) {
+            this.firstPlayer.isFirstPlayer = false;
+        }
         this.firstPlayer = this.playersByColor[color];
+        this.firstPlayer.isFirstPlayer = true;
     }
     setNextFirstPlayerByColor(color) {
+        if (this.nextFirstPlayer != undefined) {
+            this.nextFirstPlayer.isNextFirstPlayer = false;
+        }
         this.nextFirstPlayer = this.playersByColor[color];
+        this.nextFirstPlayer.isNextFirstPlayer = true;
     }
 
     setCurrentPlayer(player) {
@@ -183,6 +195,7 @@ class Player {
         this.temporarySecretAgenda = [];
         this.deedCards = [];
         this.victoryPoints = 0;
+        this.capturedRebels = 0;
 
         this.schemeCards = [];
         this.temporarySchemeCards = [];
@@ -190,7 +203,6 @@ class Player {
         this.schemeCardsToDraw = 0;
         this.canKeepSchemeCard = false;
 
-        //this.assignFirstPlayer = false;
         this.troopsToDeploy = 3;
 
         this.advisors = [];
@@ -207,6 +219,9 @@ class Player {
         this.moveActions = 0;
         this.attackActions = 0;
         this.moveActionsFromLocation = {};
+
+        this.isFirstPlayer = false;
+        this.isNextFirstPlayer = false;
 
         // 12 - 3 to deploy.
         this.supplyTroops = 9;

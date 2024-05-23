@@ -46,12 +46,34 @@ function refreshPlayer() {
     setInnerHtml("playerCoins", money);
     var supplyTroops = response.data["supplyTroops"];
     setInnerHtml("troopCount", supplyTroops);
+    var capturedRebels = response.data["capturedRebels"];
+    setInnerHtml("rebelCount", capturedRebels);
     var buildings = response.data["buildings"];
     setInnerHtml("tavernCount", buildings["tavern"]);
     setInnerHtml("stableCount", buildings["stable"]);
     setInnerHtml("marketCount", buildings["market"]);
     setInnerHtml("strongholdCount", buildings["stronghold"]);
     setInnerHtml("churchCount", buildings["church"]);
+    if (response.data.isFirstPlayer) {
+      show("firstPlayerBear");
+    } else {
+      hide("firstPlayerBear");
+    }
+    if (response.data["boat"]["canPlayAttackConversionTile"]) {
+      show("convertTroopAndMoneyForAttack");
+    } else {
+      hide("convertTroopAndMoneyForAttack");
+    }
+    if (response.data["boat"]["canPlayMusterConversionTile"]) {
+      show("convertHoneyOrFishAndAnyForMuster");
+    } else {
+      hide("convertHoneyOrFishAndAnyForMuster");
+    }
+    if (response.data["boat"]["canPlayBuildConversionTile"]) {
+      show("convertWoodOrStoneAndAnyForBuild");
+    } else {
+      hide("convertWoodOrStoneAndAnyForBuild");
+    }
   }
   
   

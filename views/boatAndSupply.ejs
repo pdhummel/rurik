@@ -73,7 +73,9 @@
               <span class="container">
                 <img src="/assets/coin.png" alt="coin" width="40px" height="45px" />
                 <span id="playerCoins" class="centered">0</span>
-              </span><br/>
+              </span>
+              <img id="firstPlayerBear" src="/assets/bear.png" style="display: block" alt="bear" height="45px" />
+              <br/>
             </div>
             <div style="display:flex; height: 50px;">
               <span class="container-b"><img id="tavernImage" src="/assets/tavern-blue.png" alt="tavern" height="45px" width="40px" /><span id="tavernCount" class="centered">0</span></span>
@@ -84,7 +86,13 @@
             </div><br/>
             <div style="display:flex; height: 50px;">
               <span class="container-b"><img id="troopImage" src="/assets/troop-blue.png" alt="troops" height="45px" width="40px" /><span id="troopCount" class="centered">0</span></span>
+              <span class="container"><img id="rebelImage" src="/assets/rebel.png" alt="rebel" height="45px" width="40px" /><span id="rebelCount" class="centered">0</span></span>
             </div><br/>
+            <table border="1" style="border-collapse: collapse; border: 1px solid black">
+              <tr id="convertTroopAndMoneyForAttack" style="display: block"><td height="30px"><img src="/assets/rebel.png" height="25px"  />+<img src="/assets/coin.png" height="25px"  />+<img src="/assets/coin.png" height="25px" /> -> <img src="/assets/scheme-attack.png" height="25px" /></td></tr>
+              <tr id="convertWoodOrStoneAndAnyForBuild" style="display: block"><td height="30px"><img src="/assets/honey.png" height="25px"  />/<img src="/assets/fish.png" height="25px" width="25px" />+<img src="/assets/tradeboom.png" height="25px" /> -> <img src="/assets/scheme-muster.png" height="25px" /></td></tr>
+              <tr id="convertHoneyOrFishAndAnyForMuster" style="display: block"><td height="30px"><img src="/assets/wood.png" height="25px"  />/<img src="/assets/stone.png" height="25px" width="25px"  />+<img src="/assets/tradeboom.png" height="25px" /> -> <img src="/assets/scheme-build.png" height="25px" /></td></tr>
+            </table>
           </div>
         </td></tr>
       </table>
