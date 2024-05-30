@@ -74,6 +74,21 @@ function refreshPlayer() {
     } else {
       hide("convertWoodOrStoneAndAnyForBuild");
     }
+    var deedCards = response.data.deedCards;
+    var deedCardsDiv = document.getElementById("myDeedCardsDiv");
+    deedCardsDiv.innerHTML = "";
+    var rows = [];
+    for (var i=0; i < deedCards.length; i++) {
+      var deedCard = deedCards[i];
+      var row = [];
+      row.push(deedCard.name);
+      row.push(deedCard.victoryPoints);
+      row.push(deedCard.requirementText);
+      rows.push(row);
+    }
+    var table = createTable(rows, ["Name", "VPs", "Description"]);
+    deedCardsDiv.appendChild(table);  
+    show("myDeedCardsDiv");
   }
   
   

@@ -86,6 +86,21 @@ class Cards {
         this.deedCardDeck.push(card);
     }
 
+    takeDeedCard(player, deedCardName) {
+        console.log("takeDeedCard(): " + player.color + " " + deedCardName);
+        var newDeedCardDisplay = [];
+        for (var i=0; i< this.displayedDeedCards.length; i++) {
+            if (this.displayedDeedCards[i].name == deedCardName) {
+                player.deedCards.push(this.displayedDeedCards[i]);
+            } else {
+                newDeedCardDisplay.push(this.displayedDeedCards[i]);
+            }
+        }
+        var nextDeedCard = this.deedCardDeck.pop();
+        newDeedCardDisplay.push(nextDeedCard);
+        this.displayedDeedCards = newDeedCardDisplay;
+    }
+
     setupSecretAgendaCards() {
         this.allSecretAgendaCards = {};
         this.secretAgendaCards = [];

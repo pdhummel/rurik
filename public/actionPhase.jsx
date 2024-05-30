@@ -475,6 +475,10 @@ function getNextAdvisor() {
     }
     show("returnSchemeCardDiv");
   }
+
+  function showDeedCardChoices() {
+    show("takeDeedCardDiv");
+  }
   
   function returnSchemeCard() {
     var gameId = getInnerHtmlValue("gameId");
@@ -491,4 +495,11 @@ function getNextAdvisor() {
     var data = '{ "schemeCard": "' + schemeCard + '"}';
     callApi("/game/" + gameId + "/player/" + color + "/schemeCard", "post", data, refreshGameHandler);
   }
-    
+  
+  function takeDeedCard() {
+    var gameId = getInnerHtmlValue("gameId");
+    var color = getInnerHtmlValue("myColor");
+    var deedCard = getSelectedRadioButton("deedCardChoice");
+    var data = '{ "deedCard": "' + deedCard + '"}';
+    callApi("/game/" + gameId + "/player/" + color + "/takeDeedCard", "put", data, refreshGameHandler);
+  }

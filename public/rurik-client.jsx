@@ -244,6 +244,11 @@ function refreshGameStatusResponseHandler(response) {
       hide("playSchemeCardDiv");
     }
     
+    if (currentState == "takeDeedCardForActionPhase" && currentPlayer == myColor) {
+      show("takeDeedCardDiv");
+    } else {
+      hide("takeDeedCardDiv");
+    }
     
 }
 
@@ -296,6 +301,10 @@ function refreshCardsResponseHandler(response) {
     row.push(deedCard.victoryPoints);
     row.push(deedCard.requirementText);
     rows.push(row);
+    var radioButton = document.getElementById("deedCard" + i);
+    radioButton.value = deedCard.name;
+    var label = document.getElementById("deedCardLabel" + i);
+    label.innerHTML = "(" + deedCard.victoryPoints + ") " + deedCard.name + ": " + deedCard.requirementText;
   }
   var table = createTable(rows, ["Name", "VPs", "Description"]);
   deedCardsDiv.appendChild(table);

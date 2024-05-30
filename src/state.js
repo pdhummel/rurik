@@ -20,6 +20,7 @@ class GameStates {
         this.gameStates["selectSchemeCard"] = new GameState("selectSchemeCard", ["returnSchemeCard"]);
         this.gameStates["schemeFirstPlayer"] = new GameState("schemeFirstPlayer", ["assignFirstPlayer"]);
         this.gameStates["drawSchemeCards"] = new GameState("drawSchemeCards", ["drawSchemeCards"]);
+        this.gameStates["takeDeedCardForActionPhase"] = new GameState("takeDeedCardForActionPhase", ["takeSchemeCard"]);
         this.gameStates["claimPhase"] = new GameState("claimPhase", ["chooseDeedCard"]);
         this.gameStates["endGame"] = new GameState("endGame", []);
 

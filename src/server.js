@@ -147,7 +147,6 @@ app.put('/game/:id/player/:color/boat', (req, res) => {
 });
 
 
-
 app.get('/game/:id/cards', (req, res) => {
   console.log("get " + req.path + " " + req.params);
   var game = games.getGameById(req.params.id);
@@ -161,6 +160,28 @@ app.get('/game/:id/cards', (req, res) => {
   cards["schemeDeck2"] = game.cards.schemeDeck2;
   cards['discardedSchemeCards'] = game.cards.discardedSchemeCards;
   res.send(cards);
+});
+
+app.put('/game/:id/player/:color/takeDeedCard', (req, res) => {
+  console.log("put " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var color = req.params.color;
+  var player = game.getPlayer(color);
+  if (player == undefined) {
+    res.status(404).send('Player not found');
+    return;
+  }
+  var deedCardName = req.body.deedCard;
+  if (deedCardName == undefined || deedCardName == null || deedCardName == "null") {
+    res.status(404).send('Deed Card not selected.');
+    return;
+  }
+  game.takeDeedCard(color, deedCardName);
+  res.send(player);
 });
   
 app.listen(port, () => {

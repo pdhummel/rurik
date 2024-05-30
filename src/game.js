@@ -733,7 +733,8 @@ class Game {
     }
 
     collectSchemeCardReward(currentPlayer, schemeCard) {
-        //var schemeCard = this.cards.getSchemeCardById(schemeCardId);
+        console.log("collectSchemeCardReward(): " + currentPlayer.color + " " + schemeCard.id);
+        var takeDeedCard = false;
         for (var i=0; i<schemeCard.rewards.length; i++) {
             var reward = schemeCard.rewards[i];
             // coin, tax, muster, move, build, attack, deedCard, warTrack, buildOrAttack, taxOrMuster
@@ -755,17 +756,31 @@ class Game {
             } else if (reward == "warTrack") {
                 // TODO
             } else if (reward == "deedCard") {
-                // TODO
+                takeDeedCard = true;
             } else if (reward == "buildOrAttack") {
                 // TODO
             } else if (reward == "taxOrMuster") {
                 // TODO
             }
         }
+        if (takeDeedCard) {
+            this.gameStates.setCurrentState("takeDeedCardForActionPhase");
+        }
         if (this.gameStates.currentState.name == "actionPhasePlaySchemeCard") {
             this.gameStates.setCurrentState("actionPhase");
         }
 
+    }
+
+    takeDeedCard(color, deedCardName) {
+        console.log("takeDeedCard(): " + color + " " + deedCardName);
+        if (deedCardName == null) {
+            this.throwError("Deed card was not selected.", "takeDeedCard");
+        }
+        this.validateGameStatus("takeDeedCardForActionPhase", "takeDeedCard");
+        var currentPlayer = this.validateCurrentPlayer(color, "takeDeedCard");
+        this.cards.takeDeedCard(currentPlayer, deedCardName);
+        this.gameStates.setCurrentState("actionPhase");
     }
 
     endCurrentAction(color) {
