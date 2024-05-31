@@ -3,12 +3,10 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 ## TODO
-* show leader in supply
 * game log
 * messages and error messages in UI
 * show round indicator on map board
 * show upcoming advisors on map board
-* bug: fix docker after code refactoring
 
 
 * action phase
@@ -18,19 +16,18 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
     * warTrack bonus
   * build action - church, stable, tavern
   * leader abilities
-  * display war track bonuses
   * gain war track bonuses on attack
   * accomplish deeds
   
 
 
 * player view
-  * show secret agenda
-  
+  * show leader in supply  
 
 
 * claim phase
   * create claim board
+    * display war track bonuses
 
 * save game state
 * undo action/turn
@@ -40,7 +37,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 * other players view
   * show scheme card count for others
-  * show deed cards for others
+  * show completed deed cards for others
+  * show player boat, dock, supply
 
 * add support for AI players
   * AI strategy phase logic -- based on solo
@@ -95,8 +93,11 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show captured rebel armies
 * show conversion tokens
 * first player bear token
-* take deedCard when playing scheme card
+* scheme card reward - take deedCard
 * show deed cards for self
+* bug: fix docker after code refactoring
+* show secret agenda
+
 
 ## APIs
 

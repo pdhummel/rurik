@@ -74,6 +74,8 @@ function refreshPlayer() {
     } else {
       hide("convertWoodOrStoneAndAnyForBuild");
     }
+
+    // deedCards
     var deedCards = response.data.deedCards;
     var deedCardsDiv = document.getElementById("myDeedCardsDiv");
     deedCardsDiv.innerHTML = "";
@@ -89,6 +91,18 @@ function refreshPlayer() {
     var table = createTable(rows, ["Name", "VPs", "Description"]);
     deedCardsDiv.appendChild(table);  
     show("myDeedCardsDiv");
+
+    // secret agenda
+    var secretAgendaCards = response.data.secretAgenda;
+    var mySecretAgendaCardDiv = document.getElementById("mySecretAgendaCardDiv");
+    if (secretAgendaCards.length > 0) {
+      var secretAgendaCard = secretAgendaCards[0];
+      mySecretAgendaCardDiv.innerHTML = "(" + secretAgendaCard.points + ") " + secretAgendaCard.name + ": " + secretAgendaCard.text;
+      show("mySecretAgendaCardDiv");
+    } else {
+      mySecretAgendaCardDiv.innerHTML = "";
+      hide("mySecretAgendaCardDiv");
+    }
   }
   
   
