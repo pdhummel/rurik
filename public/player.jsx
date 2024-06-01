@@ -97,7 +97,7 @@ function refreshPlayer() {
     var mySecretAgendaCardDiv = document.getElementById("mySecretAgendaCardDiv");
     if (secretAgendaCards.length > 0) {
       var secretAgendaCard = secretAgendaCards[0];
-      mySecretAgendaCardDiv.innerHTML = "(" + secretAgendaCard.points + ") " + secretAgendaCard.name + ": " + secretAgendaCard.text;
+      mySecretAgendaCardDiv.innerHTML = '<span style="color:black;background-color:white">(' + secretAgendaCard.points + ') ' + secretAgendaCard.name + ': ' + secretAgendaCard.text + '</span>';
       show("mySecretAgendaCardDiv");
     } else {
       mySecretAgendaCardDiv.innerHTML = "";

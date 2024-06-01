@@ -98,13 +98,13 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     }
     e.style.display = "none";
   }
-  function show(divId) {
+  function show(divId, display="block") {
     var e = document.getElementById(divId);
     if (e === undefined || e == null) {
       console.log("show(): could not find " + e);
       return;
     }
-    e.style.display = "block";
+    e.style.display = display;
   }
   function getSelectedValue(selectElementId) {
     var selectElement = document.getElementById(selectElementId);
@@ -117,10 +117,12 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     return value;
   }
   function clearOptions(selectElement) {
-    var i, L = selectElement.options.length - 1;
-    for(i = L; i >= 0; i--) {
-      selectElement.remove(i);
-    }      
+    if (selectElement != undefined && selectElement.options != undefined && selectElement.options != null) {
+      var i, L = selectElement.options.length - 1;
+      for(i = L; i >= 0; i--) {
+        selectElement.remove(i);
+      }      
+    }
   }
   function setInnerHtml(elementId, value) {
     var e = document.getElementById(elementId);

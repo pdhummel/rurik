@@ -310,7 +310,14 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       return;
     }
     var schemeCardId = req.body.schemeCard;
-    game.playSchemeCard(color, schemeCardId);
+    var schemeCardActionChoice = req.body.schemeCardActionChoice;
+    try {
+      game.playSchemeCard(color, schemeCardId, schemeCardActionChoice);
+    } catch(error) {
+      console.log(error.message);
+      res.status(400).send(error.message);
+      return;
+    }   
     res.send(player);
   });  
 

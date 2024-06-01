@@ -640,32 +640,42 @@ class Game {
                     break;
                 }
             }
-            var warPoints = this.claimBoard.claimsByPlayer[color]["warfare"];
-            warPoints++;
-            this.claimBoard.claimsByPlayer[color]["warfare"] = warPoints;
-            // TODO: warfare rewards
-            var reward = this.claimBoard.warfareRewards[warPoints];
-            if (reward != undefined && reward != null) {
-                if (reward == "2 wood") {
-                    currentPlayer.boat.addGoodToBoatOrDock("wood");
-                    currentPlayer.boat.addGoodToBoatOrDock("wood");
-                } else if (reward == "2 coins") {
-                    currentPlayer.boat.money++;
-                    currentPlayer.boat.money++;
-                } else if (reward == "fur") {
-                    currentPlayer.boat.addGoodToBoatOrDock("fur");
-                } else if (reward == "schemeCard") {
-                    // TODO: scheme card
-                } else if (reward == "victoryPoint") {
-                    currentPlayer.victoryPoints++;
-                }
-            }
+            this.goUpWarTrack(currentPlayer);
         }
         currentPlayer.attackActions = currentPlayer.attackActions - 1;
         this.gameStates.setCurrentState("actionPhase");
 
         console.log("attack(): troopsLost=" + troopsLost);
         return troopsLost;
+    }
+
+
+    goUpWarTrack(currentPlayer) {
+        var color = currentPlayer.color;
+        var warPoints = this.claimBoard.claimsByPlayer[color]["warfare"];
+        warPoints++;
+        this.claimBoard.claimsByPlayer[color]["warfare"] = warPoints;
+        var reward = this.claimBoard.warfareRewards[warPoints];
+        this.handleWarTrackReward(currentPlayer, reward);
+    }
+
+    // TODO: warfare rewards
+    handleWarTrackReward(currentPlayer, reward) {
+        if (reward != undefined && reward != null) {
+            if (reward == "2 wood") {
+                currentPlayer.boat.addGoodToBoatOrDock("wood");
+                currentPlayer.boat.addGoodToBoatOrDock("wood");
+            } else if (reward == "2 coins") {
+                currentPlayer.boat.money++;
+                currentPlayer.boat.money++;
+            } else if (reward == "fur") {
+                currentPlayer.boat.addGoodToBoatOrDock("fur");
+            } else if (reward == "schemeCard") {
+                // TODO: scheme card
+            } else if (reward == "victoryPoint") {
+                currentPlayer.victoryPoints++;
+            }
+        }
     }
 
     transferGood(color, direction, resource) {
@@ -707,7 +717,8 @@ class Game {
     }
 
 
-    playSchemeCard(color, schemeCardId) {
+    playSchemeCard(color, schemeCardId, schemeCardActionChoice) {
+        console.log("playSchemeCard(): " + color + " " + schemeCardId + " " + schemeCardActionChoice);
         this.validateGameStatus("actionPhasePlaySchemeCard", "playSchemeCard");
         var currentPlayer = this.validateCurrentPlayer(color, "playSchemeCard");
         if (currentPlayer.schemeCardsCanPlay < 1 || currentPlayer.schemeCards.length < 1) {
@@ -718,7 +729,7 @@ class Game {
         if (currentPlayer.hasSchemeCard(schemeCardId) && 
             schemeCard.rewardCoinCost <= currentPlayer.boat.money) {
             currentPlayer.boat.money = currentPlayer.boat.money - schemeCard.rewardCoinCost;
-            this.collectSchemeCardReward(currentPlayer, schemeCard);
+            this.collectSchemeCardReward(currentPlayer, schemeCard, schemeCardActionChoice);
             this.cards.discardedSchemeCards.push(schemeCard);
             var playerSchemeCards = [];
             for (var i=0; i < currentPlayer.schemeCards.length; i++) {
@@ -732,8 +743,8 @@ class Game {
         currentPlayer.schemeCardsCanPlay--;
     }
 
-    collectSchemeCardReward(currentPlayer, schemeCard) {
-        console.log("collectSchemeCardReward(): " + currentPlayer.color + " " + schemeCard.id);
+    collectSchemeCardReward(currentPlayer, schemeCard, schemeCardActionChoice=null) {
+        console.log("collectSchemeCardReward(): " + currentPlayer.color + " " + schemeCard.id + " " + schemeCardActionChoice);
         var takeDeedCard = false;
         for (var i=0; i<schemeCard.rewards.length; i++) {
             var reward = schemeCard.rewards[i];
@@ -754,13 +765,27 @@ class Game {
                     currentPlayer.troopsToDeploy++;
                 }
             } else if (reward == "warTrack") {
-                // TODO
+                this.goUpWarTrack(currentPlayer);
+                // TODO: handle warTrack reward being a scheme card
             } else if (reward == "deedCard") {
                 takeDeedCard = true;
             } else if (reward == "buildOrAttack") {
-                // TODO
+                if (schemeCardActionChoice == "build") {
+                    currentPlayer.buildActions++;
+                }
+                if (schemeCardActionChoice == "attack") {
+                    currentPlayer.attackActions++;
+                }
             } else if (reward == "taxOrMuster") {
-                // TODO
+                if (schemeCardActionChoice == "tax") {
+                    currentPlayer.taxActions++;
+                }
+                if (schemeCardActionChoice == "muster") {
+                    if (currentPlayer.supplyTroops > 0) {
+                        currentPlayer.supplyTroops--;
+                        currentPlayer.troopsToDeploy++;
+                    }
+                }
             }
         }
         if (takeDeedCard) {

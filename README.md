@@ -12,7 +12,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * action phase
   * use conversion token
   * handle scheme card rewards - 
-    * Cards with "Or"
     * warTrack bonus
   * build action - church, stable, tavern
   * leader abilities
@@ -97,6 +96,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show deed cards for self
 * bug: fix docker after code refactoring
 * show secret agenda
+* scheme cards with "Or" rewards
 
 
 ## APIs

@@ -272,7 +272,10 @@ function populateSchemeCards(player) {
     selectSchemeCard.append(option);
     outputSchemeCard("personalSchemeCardDiv" + i, schemeCard.id);
     outputSchemeCard("playSchemeCardDiv" + i, schemeCard.id);
-  }  
+  }
+  if (schemeCards.length > 0) {
+    selectPlaySchemeCardChanged();
+  }
 }
 
 function refreshCards() {

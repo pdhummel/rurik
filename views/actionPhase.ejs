@@ -1,5 +1,5 @@
 <div id="musterTroopsDiv" style="display:none;">
-    Muster:</br>
+    Muster:<br/>
     <select id="selectMusterTroopsLocation"></select>
     <select id="selectMusterTroopCount"></select>
     <input id="musterTroopButton" type="button" value="Muster Troops" onclick="javascript:musterTroops();"/>
@@ -8,9 +8,9 @@
   </div>
 
   <div id="moveTroopsDiv" style="display:none;">
-    Move 1 troop to a neighboring location.</br>
+    Move 1 troop to a neighboring location.<br/>
     From: <select id="selectMoveFromLocation"></select>
-    To: <select id="selectMoveToLocation"></select></br>
+    To: <select id="selectMoveToLocation"></select><br/>
     <input type="checkbox" id="moveLeaderYN" value="Y"/>
     <label for="moveLeaderYN">Move leader instead of troops - "from" location.</label><br/>
     <input id="moveTroopButton" type="button" value="Move Troops" onclick="javascript:moveTroops();"/>
@@ -19,7 +19,7 @@
   </div>
 
   <div id="attackDiv" style="display:none;">
-    Attack:</br>
+    Attack:<br/>
     Location: <select id="selectAttackLocation"></select>
     Target: <select id="selectTargetToAttack">
       <option>rebel</option>
@@ -27,7 +27,7 @@
       <option>red</option>
       <option>yellow</option>
       <option>white</option>
-    </select></br>
+    </select><br/>
     <input type="radio" id="attackSchemeDeck1" name="attackSchemeDeck" value="1" checked>
     <label id="attackSchemeDeckLabel1" for="attackSchemeDeck1">Casualty Scheme Deck 1</label><br>
     <input type="radio" id="attackSchemeDeck2" name="attackSchemeDeck" value="2">
@@ -39,8 +39,8 @@
   </div>
 
   <div id="taxDiv" style="display:none;">
-    Tax:</br>
-    Location: <select id="selectTaxLocation"></select></br>
+    Tax:<br/>
+    Location: <select id="selectTaxLocation"></select><br/>
     <input type="checkbox" id="marketCoinYN" value="Y"/>
     <label for="marketCoinYN">Take coin instead of resource for market bonus.</label><br/>
     <input id="taxButton" type="button" value="Tax" onclick="javascript:tax();"/>
@@ -49,15 +49,15 @@
   </div>
 
   <div id="buildDiv" style="display:none;">
-    Build:</br>
-    Location: <select id="selectBuildLocation"></select></br>
+    Build:<br/>
+    Location: <select id="selectBuildLocation"></select><br/>
     Building: <select id="selectBuilding">
       <option>market</option>
       <option>stronghold</option>
       <option>church</option>
       <option>tavern</option>
       <option>stable</option>            
-    </select></br>
+    </select><br/>
     <input id="buildButton" type="button" value="Build" onclick="javascript:build();"/>
     <input id="cancelBuildButton" type="button" value="Cancel" onclick="javascript:cancelBuild();"/><br/>
     <br/>
@@ -87,7 +87,7 @@
     <option>honey</option>
     <option>fish</option>
   </select>
-  </br>
+  <br/>
   <input type="radio" id="dockToBoat" name="transferGoodsDirection" value="dockToBoat" checked>
   <label id="dockToBoatLabel" for="dockToBoat"></label>Dock to Boat<br/>
   <input type="radio" id="boatToDock" name="transferGoodsDirection" value="boatToDock">
@@ -110,7 +110,7 @@
     </select>
     <br/>
   </div>
-  Select Scheme Deck to Draw Cards:</br>
+  Select Scheme Deck to Draw Cards:<br/>
   <input type="radio" id="schemeDeck1" name="schemeDeck" value="1" checked>
   <label id="schemeDeck1Label" for="schemeDeck1"></label>Scheme Deck 1<br/>
   <input type="radio" id="schemeDeck2" name="schemeDeck" value="2">
@@ -121,7 +121,7 @@
 </div>
 
 <div id="returnSchemeCardDiv" style="display:none">
-  Return Scheme Card to Deck:</br>
+  Return Scheme Card to Deck:<br/>
   <table>
     <tr>
       <td><div id="returnSchemeCardDiv0"></div></td>
@@ -178,11 +178,11 @@
   <br/>
 </div>
 
-</br>
+<br/>
 
 <div id="playSchemeCardDiv" style="display:none" >
   Pick Scheme Card:
-  <select id="selectPlaySchemeCard"></select>
+  <select id="selectPlaySchemeCard" onchange="javascript:selectPlaySchemeCardChanged();"></select><select id="schemeCardOrSelect"></select>
   <input type="button" value="Scheme" onclick="javascript:playSchemeCard();"/>
   <input id="cancelPlaySchemeCardButton" type="button" value="Cancel" onclick="javascript:cancelAction();"/><br/>
  
@@ -200,10 +200,12 @@
       <td><div id="playSchemeCardDiv9"></div></td>
     </tr>
   </table>
+  <!--Choose Scheme Action: <select id="schemeCardOrSelect" style="display:block"></select><br/>-->
+  <br/>
 </div>
 
 <div id="takeDeedCardDiv" style="display:none">
-  Take Deed Cards: </br>
+  Take Deed Cards: <br/>
   <input type="radio" id="deedCard0" name="deedCardChoice" value="" selected>
   <label id="deedCardLabel0" for="deedCard0"></label><br/>
   <input type="radio" id="deedCard1" name="deedCardChoice" value="">

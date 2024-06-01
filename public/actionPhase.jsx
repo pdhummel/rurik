@@ -492,10 +492,36 @@ function getNextAdvisor() {
     var gameId = getInnerHtmlValue("gameId");
     var color = getInnerHtmlValue("myColor");
     var schemeCard = getSelectedValue("selectPlaySchemeCard");
-    var data = '{ "schemeCard": "' + schemeCard + '"}';
+    var schemeCardActionChoice = getSelectedValue("schemeCardOrSelect");
+    var data = '{ "schemeCard": "' + schemeCard + '", "schemeCardActionChoice": "' + schemeCardActionChoice + '"}';
     callApi("/game/" + gameId + "/player/" + color + "/schemeCard", "post", data, refreshGameHandler);
   }
   
+  function selectPlaySchemeCardChanged() {
+    var schemeCardOrSelect = document.getElementById("schemeCardOrSelect");
+    clearOptions(schemeCardOrSelect);
+    var schemeCardId = getSelectedValue("selectPlaySchemeCard");
+    var parts = schemeCardId.split("-");
+    var reward = parts.shift();
+    // buildOrAttack, taxOrMuster
+    if (reward.indexOf("Or") == -1) {
+      hide("schemeCardOrSelect");
+    } else {
+      var orRewards = reward.split("Or");
+      var reward1 = orRewards[0].toLowerCase(); 
+      var reward2 = orRewards[1].toLowerCase(); 
+      var option = document.createElement("option");
+      option.value = reward1;
+      option.innerText = reward1;
+      schemeCardOrSelect.append(option);
+      option = document.createElement("option");
+      option.value = reward2;
+      option.innerText = reward2;
+      schemeCardOrSelect.append(option);
+      show("schemeCardOrSelect", "inline");  
+    }
+  }
+
   function takeDeedCard() {
     var gameId = getInnerHtmlValue("gameId");
     var color = getInnerHtmlValue("myColor");
