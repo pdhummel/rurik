@@ -124,21 +124,25 @@ function refreshGameStatusResponseHandler(response) {
       show("personalCardsDiv");
       show("supplyDiv");
     }
+
     if (currentState == "waitingForFirstPlayerSelection") {
       show("pickFirstPlayerDiv");
     } else {
       hide("pickFirstPlayerDiv");
     }
+
     if (currentState == "waitingForLeaderSelection" && currentPlayer == myColor) {
       callApi("/game/" + gameId + "/leaders", "get", "", leaderResponseHandler);
     } else {
       hide("leaderSelectionDiv");
     }
+
     if (currentState == "waitingForSecretAgendaSelection" && currentPlayer == myColor) {
       callApi("/game/" + gameId + "/player/" + myColor + "/secretAgenda", "get", "", getSecretAgendaHandler);
     } else {
       hide("chooseSecretAgendaDiv");
     }
+
     if (currentState == "waitingForTroopPlacement" && currentPlayer == myColor) {
       show("placeInitialTroopsDiv");
     } else if (currentState == "waitingForLeaderPlacement" && currentPlayer == myColor) {
@@ -147,6 +151,7 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       hide("placeInitialTroopsDiv");
     }
+
     if (currentState == "strategyPhase") {
       if (gameStatus.numberOfPlayers <= 2) {
         show("strategyBoard-1-2");
@@ -155,6 +160,7 @@ function refreshGameStatusResponseHandler(response) {
         show("strategyBoard-3-4");
         hide("strategyBoard-1-2");
       }
+
       show("advisors");
       if (currentPlayer == myColor) {
         show("placeAdvisorDiv");
@@ -163,7 +169,7 @@ function refreshGameStatusResponseHandler(response) {
         hide("placeAdvisorDiv");
       }
     } else if (currentState.startsWith("actionPhase") || currentState == "retrieveAdvisor" || 
-      currentState == "selectSchemeCard" || currentState == "selectSchemeCard" || currentState.startsWith("actionPhase") ||
+      currentState == "selectSchemeCard" || currentState == "selectSchemeCard" ||
       currentState == "schemeFirstPlayer" || currentState == "drawSchemeCards"
     ) {
       if (gameStatus.numberOfPlayers <= 2) {
@@ -180,46 +186,13 @@ function refreshGameStatusResponseHandler(response) {
       hide("advisors");
       hide("placeAdvisorDiv");
     }
+
     if (currentState == "retrieveAdvisor" && currentPlayer == myColor) {
       getNextAdvisor();
     } else {
       hide("retrieveAdvisorDiv");
     }
-    if (currentState == "actionPhase" && currentPlayer == myColor) {
-      showActionPhaseDiv();
-    } else {
-      hide("actionPhaseDiv");
-    }
-    if (currentState == "actionPhaseMuster" && currentPlayer == myColor) {
-      showMusterTroopsDiv();
-    } else {
-      hide("musterTroopsDiv");
-    }
-    if (currentState == "actionPhaseMove" && currentPlayer == myColor) {
-      showMoveTroopsDiv();
-    } else {
-      hide("moveTroopsDiv");
-    }
-    if (currentState == "actionPhaseAttack" && currentPlayer == myColor) {
-      showAttackDiv();
-    } else {
-      hide("attackDiv");
-    }
-    if (currentState == "actionPhaseTax" && currentPlayer == myColor) {
-      showTaxDiv();
-    } else {
-      hide("taxDiv");
-    }
-    if (currentState == "actionPhaseBuild" && currentPlayer == myColor) {
-      showBuildDiv();
-    } else {
-      hide("buildDiv");
-    }
-    if (currentState == "actionPhaseTransfer" && currentPlayer == myColor) {
-      showTransferGoodsDiv();
-    } else {
-      hide("transferGoodsDiv");
-    }
+
     if (currentState == "schemeFirstPlayer" && currentPlayer == myColor) {
       show("schemeFirstPlayerDiv");
       show("pickSchemeDeckDiv");
@@ -238,18 +211,9 @@ function refreshGameStatusResponseHandler(response) {
       populateSchemeCards(response.data.clientPlayer);
     }
 
-    if (currentState == "actionPhasePlaySchemeCard" && currentPlayer == myColor) {
-      show("playSchemeCardDiv");
-    } else {
-      hide("playSchemeCardDiv");
+    if (currentState.toLowerCase().includes("actionphase") && currentPlayer == myColor) {
+      showActionPhases(currentState, myColor);
     }
-    
-    if (currentState == "takeDeedCardForActionPhase" && currentPlayer == myColor) {
-      show("takeDeedCardDiv");
-    } else {
-      hide("takeDeedCardDiv");
-    }
-    
 }
 
 function populateSchemeCards(player) {

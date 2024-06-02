@@ -808,6 +808,45 @@ class Game {
         this.gameStates.setCurrentState("actionPhase");
     }
 
+    playMusterConversionTile(currentPlayer, resource1, resource2) {
+        console.log("playMusterConversionTile(): " + currentPlayer.color + " " + resource1 + " " + resource2);
+        var actions = currentPlayer.boat.useMusterConversionTile(resource1, resource2);
+        if (currentPlayer.supplyTroops >= actions) {
+            currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy + actions;
+            currentPlayer.supplyTroops = currentPlayer.supplyTroops - actions;
+        }
+    }
+
+    playBuildConversionTile(currentPlayer, resource1, resource2) {
+        console.log("playBuildConversionTile(): " + currentPlayer.color + " " + resource1 + " " + resource2);
+        var actions = currentPlayer.boat.useBuildConversionTile(resource1, resource2);
+        currentPlayer.buildActions = currentPlayer.buildActions + actions;
+    }
+
+    playAttackConversionTile(currentPlayer) {
+        console.log("playBuildAttackConversionTile(): " + currentPlayer.color);
+        var actions = currentPlayer.boat.useAttackConversionTile();
+        currentPlayer.attackActions = currentPlayer.attackActions + actions;
+    }
+
+    playConversionTile(color, conversionTileName, resource1, resource2) {
+        console.log("playConversionTile(): " + color + " " + conversionTileName);
+        this.validateGameStatus("actionPhasePlayConversionTile", "playConversionTile");
+        var currentPlayer = this.validateCurrentPlayer(color, "playConversionTile");
+        if (currentPlayer.convertedGoodsForTurn) {
+            this.throwError("Cannot play conversion tiles at this time.", "playConversionTile");
+        }
+        if (conversionTileName == "attack") {
+            this.playAttackConversionTile(currentPlayer);
+        } else if (conversionTileName == "muster") {
+            this.playMusterConversionTile(currentPlayer, resource1, resource2);
+        } else if (conversionTileName == "build") {
+            this.playBuildConversionTile(currentPlayer, resource1, resource2);
+        }
+        currentPlayer.convertedGoodsForTurn = true;
+        this.gameStates.setCurrentState("actionPhase");
+    }
+
     endCurrentAction(color) {
         if (this.gameStates.currentState.name == "oneTimeScheme" || this.gameStates.currentState.name == "scheme") {
             var currentPlayer = this.players.getCurrentPlayer();
@@ -823,9 +862,9 @@ class Game {
         if (currentPlayer.advisorCountForTurn <= currentPlayer.advisors.length) {
             this.throwError("Cannot end turn before playing your advisor.", "endTurn");
         }
-
-        currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
+        currentPlayer.supplyTroops = currentPlayer.supplyTroops + currentPlayer.troopsToDeploy;
         currentPlayer.troopsToDeploy = 0;
+        currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
         currentPlayer.taxActions = 0;
         currentPlayer.buildActions = 0;
         currentPlayer.moveActions = 0;
@@ -856,6 +895,7 @@ class Game {
         actionToStateMap["buildAction"] = "actionPhaseBuild";
         actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
         actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
+        actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {

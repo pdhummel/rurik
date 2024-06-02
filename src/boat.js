@@ -105,40 +105,59 @@ class BoatMat {
     }
 
     useResourceConversionTile(resource1, resource2, resourceToMatch1, resourceToMatch2) {
+        console.log("useResourceConversionTile(): " + resource1 + " " + resource2 + " " + resourceToMatch1 + " " + resourceToMatch2);
         var actions = 0;
+        var canConvert = false;
         if (resource1 == resourceToMatch1 || resource1 == resourceToMatch2 || 
             resource2 == resourceToMatch1 || resource2 == resourceToMatch2) {
-            var canConvert = false;
             if (resource1 == resource2 && this.goodsOnDock[resource1] > 1) {
                 canConvert = true;
             } else if (this.goodsOnDock[resource1] > 0 && this.goodsOnDock[resource2] > 0 ) {
                 canConvert = true;
             }
-            if (canConvert) {
-                this.goodsOnDock[resource1]--;
-                this.goodsOnDock[resource2]--;
-                actions++;
-            }
+        }
+        if (!canConvert) {
+            console.log("useResourceConversionTile(): " + this.goodsOnDock[resource1] + " " + this.goodsOnDock[resource2]);
+            throw new Error("Resources not available to complete conversion.", "useResourceConversionTile");
+        }
+        if (canConvert) {
+            this.goodsOnDock[resource1]--;
+            this.goodsOnDock[resource2]--;
+            actions++;
         }
         return actions;
     }
 
     useMusterConversionTile(resource1, resource2) {
-        var actions = useResourceConversionTile(resource1, resource2, "fish", "honey");
+        if (this.canPlayMusterConversionTile == false) {
+            throw new Error("Cannot use muster conversion tile at this time.", "useMusterConversionTile");
+        }
+        var actions = this.useResourceConversionTile(resource1, resource2, "fish", "honey");
+        this.canPlayMusterConversionTile = false;
         return actions;
     }
 
     useBuildConversionTile(resource1, resource2) {
-        var actions = useResourceConversionTile(resource1, resource2, "wood", "stone");
+        if (this.canPlayBuildConversionTile == false) {
+            throw new Error("Cannot use build conversion tile at this time.", "useBuildConversionTile");
+        }
+        var actions = this.useResourceConversionTile(resource1, resource2, "wood", "stone");
+        this.canPlayBuildConversionTile = false;
         return actions;
     }
 
     useAttackConversionTile() {
+        if (this.useAttackConversionTile == false) {
+            throw new Error("Cannot use attack conversion tile at this time.", "useAttackConversionTile");
+        }
         var actions = 0;
         if (this.capturedRebels > 0 && this.money >1) {
             this.capturedRebels--;
             this.money = this.money - 2;
             actions++;
+            this.canPlayAttackConversionTile = false;
+        } else {
+            throw new Error("Either rebels or money are not available to complete the conversion", "useAttackConversionTile");
         }
         return actions;
     }

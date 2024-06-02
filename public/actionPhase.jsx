@@ -1,3 +1,58 @@
+function showActionPhases(currentState, myColor) {
+  if (currentState == "actionPhase") {
+    showActionPhaseDiv();
+  } else {
+    hide("actionPhaseDiv");
+  }
+  if (currentState == "actionPhaseMuster") {
+    showMusterTroopsDiv();
+  } else {
+    hide("musterTroopsDiv");
+  }
+  if (currentState == "actionPhaseMove") {
+    showMoveTroopsDiv();
+  } else {
+    hide("moveTroopsDiv");
+  }
+  if (currentState == "actionPhaseAttack") {
+    showAttackDiv();
+  } else {
+    hide("attackDiv");
+  }
+  if (currentState == "actionPhaseTax") {
+    showTaxDiv();
+  } else {
+    hide("taxDiv");
+  }
+  if (currentState == "actionPhaseBuild") {
+    showBuildDiv();
+  } else {
+    hide("buildDiv");
+  }
+  if (currentState == "actionPhaseTransfer") {
+    showTransferGoodsDiv();
+  } else {
+    hide("transferGoodsDiv");
+  }
+  if (currentState == "actionPhasePlaySchemeCard") {
+    show("playSchemeCardDiv");
+  } else {
+    hide("playSchemeCardDiv");
+  }
+  
+  if (currentState == "takeDeedCardForActionPhase") {
+    show("takeDeedCardDiv");
+  } else {
+    hide("takeDeedCardDiv");
+  }
+
+  if (currentState == "actionPhasePlayConversionTile") {
+    showPlayConversionTile();
+  } else {
+    hide("playConversionTileDiv");
+  }
+}
+
 function getNextAdvisor() {
     var gameId = getInnerHtmlValue("gameId");
     var color = getInnerHtmlValue("myColor");
@@ -131,6 +186,13 @@ function getNextAdvisor() {
     } else {
       hide("accomplishDeedOption");
     }
+
+    //if (playerData.boat.goodsOnDock[""] > 0 || playerData.boat.goodsOnBoat[""]> 0) {
+    //  show("transferGoodsOption");
+    //} else {
+    //  hide("transferGoodsOption");
+    //}
+
     show("actionPhaseDiv");
   }
   
@@ -147,7 +209,7 @@ function getNextAdvisor() {
     if (actionPhaseActionValue == "musterAction" || actionPhaseActionValue == "moveAction" || 
         actionPhaseActionValue == "attackAction" || actionPhaseActionValue =="taxAction" ||
         actionPhaseActionValue == "buildAction" || actionPhaseActionValue == "transferGoodsAction" ||
-        actionPhaseActionValue == "schemeAction") {
+        actionPhaseActionValue == "schemeAction" || actionPhaseActionValue == "convertGoodsAction") {
       beginAction(gameId, color, actionPhaseActionValue);
     }
     if (actionPhaseActionValue == "endTurnAction") {
@@ -529,3 +591,77 @@ function getNextAdvisor() {
     var data = '{ "deedCard": "' + deedCard + '"}';
     callApi("/game/" + gameId + "/player/" + color + "/takeDeedCard", "put", data, refreshGameHandler);
   }
+
+  function showPlayConversionTile() {
+    var gameId = getInnerHtmlValue("gameId");
+    var color = getInnerHtmlValue("myColor");
+    if (gameId != undefined && gameId != null && color != undefined && color != null) {
+      callApi('/game/' + gameId + '/player/' + color, "get", "", showPlayConversionTileHandler);
+    } 
+  }
+  function showPlayConversionTileHandler(response) {
+    var player = response.data;
+    console.log("showPlayConversionTileHandler():" + JSON.stringify(player));
+    var selectConversionTile = document.getElementById("selectConversionTile");
+    clearOptions(selectConversionTile);
+
+    if (player.boat.canPlayAttackConversionTile) {
+      var option = document.createElement("option");
+      option.innerText = "Attack: Pay a rebel + 2 coins.";
+      option.value = "attack";
+      selectConversionTile.append(option);
+    }
+    if (player.boat.canPlayBuildConversionTile) {
+      var option = document.createElement("option");
+      option.innerText = "Build: Pay wood or stone + another resource.";
+      option.value = "build";
+      selectConversionTile.append(option);
+    }
+    if (player.boat.canPlayMusterConversionTile) {
+      var option = document.createElement("option");
+      option.innerText = "Muster: Pay honey or fish + another resource.";
+      option.value = "muster";
+      selectConversionTile.append(option);
+    }
+    selectConversionTileChanged();
+    show("playConversionTileDiv");
+  }
+
+  function selectConversionTileChanged() {
+    var selectConvertResource1 = document.getElementById("selectConvertResource1");
+    clearOptions(selectConvertResource1);
+    var selectConvertResource2 = document.getElementById("selectConvertResource2");
+    clearOptions(selectConvertResource2);
+
+    var value = getSelectedValue("selectConversionTile");
+    if (value == "attack") {
+      hide("selectConvertResource1");
+      hide("selectConvertResource2");
+    }
+    if (value == "muster") {
+      addSimpleOptions(selectConvertResource1, ["fish", "honey", "tradeBoon"]);
+      show("selectConvertResource1", "inline");
+
+      addSimpleOptions(selectConvertResource2, ["fish", "fur", "honey", "stone", "wood", "tradeBoon" ]);
+      show("selectConvertResource2", "inline");
+    }
+
+    if (value == "build") {
+      addSimpleOptions(selectConvertResource1, ["stone", "wood", "tradeBoon"]);
+      show("selectConvertResource1", "inline");
+
+      addSimpleOptions(selectConvertResource2, ["fish", "fur", "honey", "stone", "wood", "tradeBoon"]);
+      show("selectConvertResource2", "inline");
+    }
+  }
+
+function playConversionTile() {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var conversionTile = getSelectedValue("selectConversionTile");
+  var resource1 = getSelectedValue("selectConvertResource1");
+  var resource2 = getSelectedValue("selectConvertResource2");
+  var data = '{ "conversionTile": "' + conversionTile + '", "resource1": "' + resource1 +  '", "resource2": "' + resource2 + '" }';
+  callApi("/game/" + gameId + "/player/" + color + "/conversionTile", "post", data, refreshGameHandler);
+
+}

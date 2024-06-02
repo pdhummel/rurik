@@ -321,4 +321,33 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     res.send(player);
   });  
 
+
+    // play a conversion tile
+    app.post('/game/:id/player/:color/conversionTile', (req, res) => {
+      console.log("post " + req.path + " " + req.params);
+      var game = games.getGameById(req.params.id);
+      if (game === undefined) {
+        res.status(404).send('Game not found');
+        return;
+      }
+      var color = req.params.color;
+      var player = game.getPlayer(color);
+      if (player == undefined) {
+        res.status(404).send('Player not found');
+        return;
+      }
+      var conversionTileName = req.body.conversionTile;
+      var resource1 = req.body.resource1;
+      var resource2 = req.body.resource2;
+      try {
+        game.playConversionTile(color, conversionTileName, resource1, resource2);
+      } catch(error) {
+        console.log(error.message);
+        res.status(400).send(error.message);
+        return;
+      }   
+      res.send(player);
+    });  
+
+
 module.exports = app;

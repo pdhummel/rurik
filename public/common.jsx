@@ -107,8 +107,11 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     e.style.display = display;
   }
   function getSelectedValue(selectElementId) {
+    var value = null;
     var selectElement = document.getElementById(selectElementId);
-    var value = selectElement.options[selectElement.selectedIndex].value;
+    if (selectElement.options.length > 0) {
+      value = selectElement.options[selectElement.selectedIndex].value;  
+    }
     return value;
   }
   function getValue(elementId) {
@@ -188,3 +191,15 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     var table = createTable(rows, headings);
     document.getElementById("gameListData").appendChild(table);
   }
+
+  function addSimpleOptions(select, options) {
+    for (var i=0; i<options.length; i++) {
+      var optionText = options[i];
+      var option = document.createElement("option");
+      option.innerText = optionText;
+      option.value = optionText;
+      select.append(option);
+    }
+  }
+
+  
