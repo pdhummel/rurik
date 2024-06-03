@@ -155,10 +155,13 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     return value;
   }
 
-  function createTable(rows, headings) {
+  function createTable(rows, headings, backgroundColor=null) {
     var table = document.createElement('table');
     table.style.borderCollapse = "collapse";
     var tr = document.createElement('tr');
+    if (backgroundColor != null) {
+      tr.style.backgroundColor = backgroundColor;
+    }
     for (var cell=0; cell < headings.length; cell++) {
       var th = document.createElement('th');
       th.style.align = "left";
@@ -171,6 +174,9 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     for (var r = 0; r < rows.length; r++) {
       tr = document.createElement('tr');
       tr.style.borderBottom = "1px solid black";
+      if (backgroundColor != null) {
+        tr.style.backgroundColor = backgroundColor;
+      }
       var row = rows[r];
       for (var cell=0; cell < row.length; cell++) {
         var td = document.createElement('td');
@@ -186,9 +192,9 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     return table;
   }
   
-  function populateTable(rows, headings) {
+  function populateTable(rows, headings, backgroundColor=null) {
     document.getElementById("gameListData").innerHTML = "";
-    var table = createTable(rows, headings);
+    var table = createTable(rows, headings, backgroundColor);
     document.getElementById("gameListData").appendChild(table);
   }
 

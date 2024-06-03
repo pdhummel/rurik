@@ -450,7 +450,8 @@ function getNextAdvisor() {
     
     var buildLocation = getSelectedValue("selectBuildLocation");
     var building = getSelectedValue("selectBuilding");
-    var data = '{ "locationName": "' + buildLocation + '", "building": "' + building + '" }';
+    var targetToConvert = getSelectedValue("selectTargetToConvert");
+    var data = '{ "locationName": "' + buildLocation + '", "building": "' + building + '", "targetToConvert": "' + targetToConvert + '" }';
     callApi("/game/" + gameId + "/player/" + color + "/build", "post", data, refreshGameHandler);
   }
   
@@ -459,6 +460,15 @@ function getNextAdvisor() {
     var color = getInnerHtmlValue("myColor");
     var data = '{ "action": "cancel" }';
     callApi('/game/' + gameId + '/player/' + color + '/turn', "put", data, beginActionResponseHandler);
+  }
+
+  function selectBuildingChanged() {
+    var building = getSelectedValue("selectBuilding");
+    if (building == "church") {
+      show("targetToConvertDiv", "inline");
+    } else {
+      hide("targetToConvertDiv");
+    }
   }
   
   

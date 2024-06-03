@@ -273,7 +273,7 @@ function refreshCardsResponseHandler(response) {
     var label = document.getElementById("deedCardLabel" + i);
     label.innerHTML = "(" + deedCard.victoryPoints + ") " + deedCard.name + ": " + deedCard.requirementText;
   }
-  var table = createTable(rows, ["Name", "VPs", "Description"]);
+  var table = createTable(rows, ["Name", "VPs", "Description"], "white");
   deedCardsDiv.appendChild(table);
 }
 

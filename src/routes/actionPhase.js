@@ -134,8 +134,9 @@ app.post('/game/:id/player/:color/move', (req, res) => {
     }
   
     var building = req.body.building;
+    var targetToConvert = req.body.targetToConvert;
     try {
-      game.build(color, locationName, building);
+      game.build(color, locationName, building, targetToConvert);
       res.send(game.gameMap.locations);
       return;
     } catch(error) {

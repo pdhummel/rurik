@@ -51,13 +51,24 @@
   <div id="buildDiv" style="display:none;">
     Build:<br/>
     Location: <select id="selectBuildLocation"></select><br/>
-    Building: <select id="selectBuilding">
+    Building: <select id="selectBuilding" onchange="javascript:selectBuildingChanged();">
       <option>market</option>
       <option>stronghold</option>
       <option>church</option>
       <option>tavern</option>
-      <option>stable</option>            
-    </select><br/>
+      <option>stable</option>
+    </select>
+    <span id="targetToConvertDiv" style="display:none">
+      Target to Convert: <select id="selectTargetToConvert">
+        <option></option>
+        <option>rebel</option>
+        <option>blue</option>
+        <option>red</option>
+        <option>yellow</option>
+        <option>white</option>
+      </select>
+  </span>
+    <br/>
     <input id="buildButton" type="button" value="Build" onclick="javascript:build();"/>
     <input id="cancelBuildButton" type="button" value="Cancel" onclick="javascript:cancelBuild();"/><br/>
     <br/>

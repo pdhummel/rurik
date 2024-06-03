@@ -539,7 +539,7 @@ class Game {
         console.log("tax(): exit");
     }
 
-    build(color, locationName, buildingName) {
+    build(color, locationName, buildingName, targetToConvert=null) {
         console.log("build(): " + color + ": " + locationName + " " + buildingName);
         this.validateGameStatus("actionPhaseBuild", "build");
         var currentPlayer = this.validateCurrentPlayer(color, "build");
@@ -574,7 +574,25 @@ class Game {
         if (buildingName == "stable") {
             currentPlayer.moveActionsFromLocation[locationName] = 2;
         } else if (buildingName == "church") {
-            // TODO: conversion
+            var converted = false;
+            if (targetToConvert == "rebel" && location.rebels.length > 0) {
+                location.rebels.pop();
+                if (currentPlayer.supplyTroops > 0) {
+                    location.troopsByColor[color]++;
+                    currentPlayer.supplyTroops--;
+                }
+                converted = true;
+            } else if (location.troopsByColor[targetToConvert] > 0) {
+                location.troopsByColor[targetToConvert]--;
+                if (currentPlayer.supplyTroops > 0) {
+                    location.troopsByColor[color]++;
+                    currentPlayer.supplyTroops--;
+                }
+                converted = true;
+            }
+            if (converted  == false && targetToConvert != undefined && targetToConvert != null && targetToConvert.length > 0) {
+                this.throwError("Could not convert enemy " + targetToConvert, "build");
+            }
         } else if (buildingName == "tavern") {
             // TODO: test tavern
             currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
@@ -862,7 +880,6 @@ class Game {
         if (currentPlayer.advisorCountForTurn <= currentPlayer.advisors.length) {
             this.throwError("Cannot end turn before playing your advisor.", "endTurn");
         }
-        currentPlayer.supplyTroops = currentPlayer.supplyTroops + currentPlayer.troopsToDeploy;
         currentPlayer.troopsToDeploy = 0;
         currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
         currentPlayer.taxActions = 0;

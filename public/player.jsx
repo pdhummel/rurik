@@ -88,7 +88,7 @@ function refreshPlayer() {
       row.push(deedCard.requirementText);
       rows.push(row);
     }
-    var table = createTable(rows, ["Name", "VPs", "Description"]);
+    var table = createTable(rows, ["Name", "VPs", "Description"], "white");
     deedCardsDiv.appendChild(table);  
     show("myDeedCardsDiv");
 
