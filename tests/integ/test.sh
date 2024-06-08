@@ -31,6 +31,12 @@ rest() {
   set -e
 }
 
+
+r=$(rest "${server}/game/1/test" PUT)
+echo $r
+exit 0
+
+
 echo "Creating game"
 new_game_response=$(rest "${server}/game" POST '{"gameName": "Pauls Game"}')
 game_id=$(echo ${new_game_response} | jq -r '.id')
@@ -93,7 +99,7 @@ r=$(rest "${server}/game/${game_id}/location/Rostov/leader" PUT '{ "color": "blu
 echo "Second player place leader"
 r=$(rest "${server}/game/${game_id}/location/Smolensk/leader" PUT '{ "color": "red" }')
 
-
+#exit 0
 
 echo "First player advisor bid"
 r=$(rest "${server}/game/${game_id}/advisorBid/muster" PUT '{ "color": "blue", "advisor": "1"  }')
@@ -172,6 +178,8 @@ if [ "${move_or_scheme}" = "scheme" ];then
   scheme_card1=$(echo $player | jq -r '.temporarySchemeCards[0].id')
   scheme_card2=$(echo $player | jq -r '.temporarySchemeCards[1].id')
 
+  #exit 0
+
   echo "Second player discard scheme card"
   r=$(rest "${server}/game/${game_id}/player/red/schemeCard" DELETE '{ "schemeCard": "'${scheme_card1}'"  }')
 
@@ -241,6 +249,8 @@ r=$(rest "${server}/game/${game_id}/advisorRetrieve/build" PUT '{ "color": "red"
 echo "Second player select build action"
 r=$(rest "${server}/game/${game_id}/player/red/turn" PUT '{ "action": "buildAction"  }')
 
+#exit 0
+
 echo "Second player build action"
 r=$(rest "${server}/game/${game_id}/player/red/build" POST '{ "locationName": "Polotsk", "building": "market" }')
 
@@ -259,8 +269,12 @@ r=$(rest "${server}/game/${game_id}/player/blue/build" POST '{ "locationName": "
 echo "First player select build action"
 r=$(rest "${server}/game/${game_id}/player/blue/turn" PUT '{ "action": "buildAction"  }')
 
+#exit 0
+
 echo "First player build action"
 r=$(rest "${server}/game/${game_id}/player/blue/build" POST '{ "locationName": "Novgorod", "building": "market" }')
+
+#exit 0
 
 echo "First player end turn"
 r=$(rest "${server}/game/${game_id}/player/blue/turn" DELETE)
@@ -280,5 +294,17 @@ r=$(rest "${server}/game/${game_id}/player/red/turn" PUT '{ "action": "musterAct
 echo "Second player muster troops"
 r=$(rest "${server}/game/${game_id}/location/Polotsk/troops" PUT '{ "color": "red", "numberOfTroops": 1  }')
 
+#exit 0
+
 echo "Second player end turn"
 r=$(rest "${server}/game/${game_id}/player/red/turn" DELETE)
+
+
+
+
+echo "Dump game"
+echo ${game_id}
+r=$(rest "${server}/game/${game_id}/test" GET)
+echo $r
+
+

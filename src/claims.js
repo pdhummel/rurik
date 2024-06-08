@@ -80,10 +80,11 @@ class ClaimBoard {
         return coins;
     }
 
+    // This resets the values which are used in the visualization of the claims track.
     resetClaimsByTrack() {
         console.log("resetClaimsByTrack()");
         var tracks = ["rule", "build", "trade"];
-        var points = [8, 5, 3, 2, 1];
+        var points = [8, 5, 3, 2, 1, 0];
         for (var t=0; t<tracks.length; t++) {
             var track = tracks[t];
             this.claimsByTrack[track] = {};
@@ -98,6 +99,8 @@ class ClaimBoard {
         }
     }
 
+    // This updates the values which are used in the visualization of the claims track
+    // claimsByPlayer -> claimsByTrack
     updateClaimsByTrack() {
         console.log("updateClaimsByTrack()");
         var colors = ["blue", "red", "white", "yellow"];
@@ -114,6 +117,8 @@ class ClaimBoard {
         }
     }
 
+    // This is used to save claimsByPlayer to previousClaimsByPlayer after the claimsByPlayer
+    // have been calculated at the end of the round.
     updatePreviousClaims() {
         console.log("updatePreviousClaims()");
         var colors = ["blue", "red", "white", "yellow"];
@@ -126,6 +131,8 @@ class ClaimBoard {
         }
     }
 
+    // This is useful to calculate in game scoring for a player. It is an ephemeral value,
+    // which could be used by AI to evaluate who is winning and whether one decision is better than another.
     calculateTotalClaims(player, gameMap) {
         console.log("calculateTotalClaims(): " + player.color);
         var totalClaimPoints = 0;
@@ -155,20 +162,31 @@ class ClaimBoard {
         return totalClaimPoints;
     }
 
+    updateClaimsForClaimsPhase(players, gameMap) {
+        for (var p=0; p < players.length; p++) {
+            var player = players[p];
+            this.updateClaims(player, gameMap);
+        }
+        this.resetClaimsByTrack();
+        this.updateClaimsByTrack();
+    }
+
+    // This updates the claimsByPlayer using the player's position on the map.
+    // The claimsByPlayer never decrease so it is never worst than the previousClaimsByPlayer.
     updateClaims(player, gameMap) {
         console.log("updateClaims(): " + player.color);
         var color = player.color;
-        var rulePoints = calculateClaimsForRule(player, gameMap);
+        var rulePoints = this.calculateClaimsForRule(player, gameMap);
         if (rulePoints > this.previousClaimsByPlayer[color]["rule"]) {
             this.claimsByPlayer[color]["rule"] = rulePoints;
         }
 
-        var tradePoints = calculateClaimsForTrade(player);
+        var tradePoints = this.calculateClaimsForTrade(player);
         if (tradePoints > this.previousClaimsByPlayer[color]["trade"]) {
             this.claimsByPlayer[color]["trade"] = tradePoints;
         }
 
-        var buildPoints = calculateClaimsForBuild(player, gameMap);
+        var buildPoints = this.calculateClaimsForBuild(player, gameMap);
         if (buildPoints > this.previousClaimsByPlayer[color]["build"]) {
             this.claimsByPlayer[color]["build"] = buildPoints;
         }
@@ -241,7 +259,7 @@ class ClaimBoard {
                 locationsWithBuildings.push(location);
             }
         }
-        var adjacentBuildRegions = countConnectedLocations(gameMap, locationsWithBuildings);
+        var adjacentBuildRegions = this.countConnectedLocations(gameMap, color, locationsWithBuildings);
 
         var points = [8, 5, 3, 2, 1];
         for (var p=0; p<points.length; p++) {
@@ -255,24 +273,28 @@ class ClaimBoard {
         return playerBuildPoints;
     }
 
-    DFSUtil(gameMap, cluster, locationName, visited) {
+    DFSUtil(gameMap, color, cluster, locationName, visited) {
         console.log("DFSUtil(): " + locationName);
         // Mark the current node as visited and print it
         visited[locationName] = true;
-        cluster.push(locationName);
+        var location = gameMap.getLocation(locationName);
+        if (location.doesPlayerHaveBuilding(color)) {
+            cluster.push(locationName);
+        }
             
         // Recur for all the vertices
         // adjacent to this vertex
-        var location = gameMap.getLocation(locationName);
-        for (let x = 0; x < location.neighbors.length; x++) {
-            if (!visited[location.neighbors[x]]) {
-                DFSUtil(gameMap, cluster, location.neighbors[x], visited);
-            }   
+        if (location.doesPlayerHaveBuilding(color)) {
+            for (let x = 0; x < location.neighbors.length; x++) {
+                if (!visited[location.neighbors[x]]) {
+                    this.DFSUtil(gameMap, color, cluster, location.neighbors[x], visited);
+                }   
+            }
         }
         return cluster;
     }
      
-    countConnectedLocations(gameMap, locationsWithBuildings) {
+    countConnectedLocations(gameMap, color, locationsWithBuildings) {
         console.log("countConnectedLocations(): " + locationsWithBuildings);
         var largestClusterCount = 0;
         // Mark all the vertices as not visited
@@ -284,9 +306,9 @@ class ClaimBoard {
         }
         for (let v = 0; v < V; ++v) {
             var location = locationsWithBuildings[v];
-            if (!visited[location.name]) {
+            if (!visited[location.name] && location.doesPlayerHaveBuilding(color)) {
                 // count all reachable vertices from v
-                var cluster = DFSUtil(gameMap, [], location.name, visited);
+                var cluster = this.DFSUtil(gameMap, color, [], location.name, visited);
                 if (cluster.length > largestClusterCount) {
                     largestClusterCount = cluster.length;
                 }

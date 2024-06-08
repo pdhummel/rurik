@@ -214,6 +214,54 @@ function refreshGameStatusResponseHandler(response) {
     if (currentState.toLowerCase().includes("actionphase") && currentPlayer == myColor) {
       showActionPhases(currentState, myColor);
     }
+
+    if (currentState == "claimPhase" || currentState == "takeDeedCardForClaimPhase") {
+      showClaimBoard();
+    } else {
+      hide("claimBoardTable");
+    }
+    if (currentState == "takeDeedCardForClaimPhase" && currentPlayer == myColor) {
+      show("takeDeedCardDiv");
+    } else {
+      hide("takeDeedCardDiv");
+    }
+}
+
+function showClaimBoard() {
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/claimBoard", "get", "", showClaimBoardResponseHandler);  
+}
+
+function showClaimBoardResponseHandler(response) {
+  console.log("showClaimBoardResponseHandler(): " + JSON.stringify(response.data));
+  /*
+  {"claimsByPlayer":{"blue":{"rule":1,"build":8,"trade":0,"warfare":0},
+  "red":{"rule":1,"build":8,"trade":0,"warfare":0},
+  "white":{"rule":0,"build":0,"trade":0,"warfare":0},
+  "yellow":{"rule":0,"build":0,"trade":0,"warfare":0}},"previousClaimsByPlayer":{"blue":{"rule":0,"build":0,"trade":0},"red":{"rule":0,"build":0,"trade":0},"white":{"rule":0,"build":0,"trade":0},"yellow":{"rule":0,"build":0,"trade":0}},"warfareRewards":{"0":null,"1":null,"2":"2 wood","3":null,"4":"2 coins","5":null,"6":"2 fish","7":null,"8":"schemeCard","9":null,"10":"victoryPoint"},
+  "claimsByTrack":{"rule":{"0":["white","yellow"],"1":["blue","red"],"2":[],"3":[],"5":[],"8":[]},"build":{"0":["white","yellow"],"1":[],"2":[],"3":[],"5":[],"8":["blue","red"]},"trade":{"0":["blue","red","white","yellow"],"1":[],"2":[],"3":[],"5":[],"8":[]},"warfare":{"0":["blue","red","white","yellow"],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[]}},
+  "requirementsByTrack":{"rule":{"1":2,"2":3,"3":4,"5":5,"8":5},"build":{"1":2,"2":3,"3":4,"5":5,"8":7},"trade":{"1":3,"2":5,"3":7,"5":9,"8":11}}}
+  */
+ //var claimsByTrack = response.data['claimsByTrack'];
+ var claimsByTrack = response.data.claimsByTrack
+ var columns = ["rule", "build", "trade"];
+ for (var i=0; i<columns.length; i++) {
+  var column = columns[i];
+  var track = claimsByTrack[column];
+  var keys = Object.keys(track);
+  for (var j=0; j < keys.length; j++) {
+    var pointValue = keys[j];
+    var colors = track[pointValue];
+    for (var k=0; k<colors.length; k++) {
+      var color = colors[k];
+      // red-regions-5, red-build-5, red-boat-9
+      var claim = color  + "-" + column + "-" + pointValue;
+      show(claim, "inline");
+    }
+  }
+ }
+ console.log("claimsByTrack=" + JSON.stringify(claimsByTrack));
+  show("claimBoardTable");
 }
 
 function populateSchemeCards(player) {

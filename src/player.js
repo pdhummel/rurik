@@ -181,6 +181,60 @@ class GamePlayers {
         this.mapAdvisorsToAuctionSpacesByAction(auctionBoard, "tax");
         this.mapAdvisorsToAuctionSpacesByAction(auctionBoard, "scheme");
     }
+
+    restorePlayers() {
+        var keys = Object.keys(this.playersByColor);
+        for (var i=0; i < keys.length; i++) {
+            var key =keys[i];
+            var color = key;
+            var player = this.playersByColor[key];
+            var newPlayer = new Player(player.name, player.color, player.tablePosition, player.isPlayerAi);
+            player = Object.assign(newPlayer, player);
+            this.playersByColor[key] = player;
+            player.restorePlayer();
+        }
+
+        var color = this.currentPlayer.color;
+        this.currentPlayer = this.playersByColor[color];
+        color = this.firstPlayer.color;
+        this.firstPlayer = this.playersByColor[color];
+        this.playersByColor[color].isFirstPlayer = true;
+        color = this.nextFirstPlayer.color;
+        this.nextFirstPlayer = this.playersByColor[color];
+        this.playersByColor[color].isNextFirstPlayer = true;  
+        
+        for (var i=0; i < Object.keys(this.playersByName).length; i++) {
+            var key = Object.keys(this.playersByName)[i];
+            var player = this.playersByName[key];
+            var color = player.color;
+            this.playersByName[key] =  this.playersByColor[color];
+        }        
+
+        for (var i=0; i < Object.keys(this.playersByPosition).length; i++) {
+            var key = Object.keys(this.playersByPosition)[i];
+            var player = this.playersByPosition[key];
+            var color = player.color;
+            this.playersByPosition[key] = this.playersByColor[color];
+        }
+
+        var tempPlayers = [];
+        for (var i=0; i < this.players.length; i++) {
+            var player = this.players[i];
+            var color = player.color;
+            player = this.playersByColor[color];
+            tempPlayers.push(player);
+        }
+
+        this.players = tempPlayers;
+        for (var i=0; i < this.sortedPlayers.length; i++) {
+            var player = this.sortedPlayers[i];
+            var color = player.color;
+            player = this.playersByColor[color];
+            tempPlayers.push(player);
+        }
+        this.sortedPlayers = tempPlayers;
+
+    }
 }
 
 class Player {
@@ -291,8 +345,11 @@ class Player {
         return false;
     }
 
+    restorePlayer() {
+        var newBoat = new BoatMat();
+        this.boat = Object.assign(newBoat, this.boat);
+    }
 }
-
 
 
 module.exports = GamePlayers

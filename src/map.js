@@ -151,7 +151,18 @@ class Location {
         }
         return false;
     }
-    
+
+    restoreLocation() {
+        var tempBuildings = [];
+        for (var b=0; b<this.buildings.length; b++) {
+            var building = this.buildings[b];
+            var newBuilding = new Building(building.color, building.name);
+            //var buildingProto = this.clone(Building.proto);
+            building = Object.assign(newBuilding, building);
+            tempBuildings.push(building);
+        }
+        this.buildings = tempBuildings;
+    }    
 }
 
 class GameMap {
@@ -176,6 +187,37 @@ class GameMap {
         this.addLocation(13, "Murom", "brown", "stone", ["Chernigov", "Pereyaslavl", "Suzdal", "Azov"]);
         this.addLocation(14, "Peresech", "brown", "fur", ["Galich", "Brest", "Azov"]);
         this.addLocation(15, "Azov", "brown", "fish", ["Kiev", "Pereyaslavl", "Galich", "Murom", "Peresech"]);
+    }
+
+
+    restoreGameMap() {
+        var newRebels = new Rebels();
+        this.rebels = Object.assign(newRebels, this.rebels);
+
+        for (var i=0; i < Object.keys(this.locationByName).length; i++) {
+            var key = Object.keys(this.locationByName)[i];
+            var location = this.locationByName[key];
+            var newLocation = new Location(location.id, location.name, location.color, location.defaultResource, location.neighbors);
+            var location = Object.assign(newLocation, location);
+            this.locationByName[key] = location;
+        }
+
+        var tempLocations = [];
+        for (var i=0; i < this.locations.length; i++) {
+            var location = this.locations[i];
+            var locationName = location.name;
+            location = this.locationByName[locationName];
+            tempLocations.push(location);
+        }
+        this.locations = tempLocations;
+        tempLocations = [];
+        for (var i=0; i < this.locationsForGame.length; i++) {
+            var location = this.locationsForGame[i];
+            var locationName = location.name;
+            location = this.locationByName[locationName];
+            tempLocations.push(location);
+        }
+        this.locationsForGame = tempLocations;
     }
 
     addLocation(id, name, color, resource, neighbors) {

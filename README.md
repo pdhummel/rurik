@@ -7,6 +7,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * messages and error messages in UI
 * show round indicator on map board
 * show upcoming advisors on map board
+* window for claim board and war track
 
 
 * action phase
@@ -25,8 +26,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 * claim phase
-  * create claim board
-    * display war track bonuses
+  * display war track with claim board
+  * display war track bonuses
 
 * save game state
 * undo action/turn
@@ -99,6 +100,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * scheme cards with "Or" rewards
 * use conversion token
 * build action - church
+* create claim board
 
 
 ## APIs

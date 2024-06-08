@@ -8,66 +8,6 @@ const ClaimBoard = require('./claims.js');
 const Validator = require('./validations.js');
 
 
-
-class GameStatus {
-    constructor(game, clientColor=null) {
-        this.gameId = game.id;
-        this.id = game.id;
-        this.gameName = game.name;
-        this.name = game.name;
-        this.playerNames = "";
-        this.currentPlayer = null;
-        this.clientPlayer = null;
-        this.numberOfPlayers = game.players.players.length;
-        this.targetNumberOfPlayers = game.targetNumberOfPlayers;
-        var currentGameState = game.gameStates.getCurrentState();
-        this.currentState = null;
-        if (currentGameState != undefined && currentGameState != null) {
-            this.currentState = currentGameState.name;
-        }
-        var firstPlayer = game.players.getFirstPlayer();
-        this.playersByPosition = game.players.playersByPosition;
-        for (var i=0; i<this.numberOfPlayers; i++) {
-            this.playerNames = this.playerNames + " " + game.players.players[i].name;
-        }
-        if (firstPlayer != undefined && firstPlayer != null) {
-            this.firstPlayer = firstPlayer.color;
-        }
-        if (!(clientColor == undefined && clientColor == null || clientColor.length < 1)) {
-            this.clientPlayer = game.getPlayer(clientColor);
-            this.clientLeader = this.clientPlayer.leader;
-            this.clientName = this.clientPlayer.name;
-            this.clientPosition = this.clientPlayer.position;
-        }
-        if (this.currentState != "waitingForPlayers" && currentGameState != undefined) {
-            this.round = game.currentRound;
-            //this.auctionBoard = game.auctionBoard;
-            var currentPlayer = game.players.getCurrentPlayer();
-            if (currentPlayer != undefined && currentPlayer != null) {
-                this.currentPlayer = currentPlayer.color;
-                if (currentPlayer.color == clientColor) {
-                    this.statusMessage = "Waiting on you";
-                    this.availableActions = currentGameState.allowedActions;
-                } else if (clientColor == undefined || clientColor == null || clientColor.length < 1) {
-                    this.statusMessage = "Waiting on " + currentPlayer.color;
-                    this.availableActions = currentGameState.allowedActions;
-                } else {
-                    this.statusMessage = "Waiting on " + currentPlayer.color;
-                    this.availableActions = [];                
-                }
-            }
-            var nextPlayer = game.players.getNextPlayer(this.currentPlayer);
-            if (nextPlayer != undefined && nextPlayer != null) {
-                this.nextPlayer = nextPlayer.color;
-            }
-            var nextFirstPlayer = game.players.nextFirstPlayer;
-            if (nextFirstPlayer != undefined && nextFirstPlayer != null) {
-                this.nextFirstPlayer = nextFirstPlayer.color;
-            }
-        }
-    }
-}
-
 class Games {
     constructor() {
         this.games = {};
@@ -109,6 +49,49 @@ class Games {
         }
         return gameStatusList;
     }
+
+    clone(obj) {
+        function CloneFactory () {}
+        CloneFactory.prototype = obj;
+        return new CloneFactory();
+    }
+
+    restoreGame(gameObject) {
+        //var gameProto = clone(Game.prototype);
+        //var game = Object.assign(gameProto, gameObject);
+        var newGame = new Game(gameObject.gameName, gameObject.targetNumberOfPlayers, gameObject.password);
+        var game = Object.assign(newGame, gameObject);
+
+        var newPlayers = new GamePlayers(game.targetNumberOfPlayers);
+        game.players = Object.assign(newPlayers, game.players);
+        game.players.restorePlayers();
+
+        var newCards = new Cards();
+        game.cards = Object.assign(newCards, game.cards);
+
+        var newGameMap = new GameMap();
+        game.gameMap = Object.assign(newGameMap, game.gameMap);
+        game.gameMap.restoreGameMap();
+
+
+        var newGameStates = new GameStates();
+        newGameStates.setCurrentState(game.gameStates.currentState.name);
+        game.gameStates = newGameStates;
+
+        var newClaimBoard = new ClaimBoard();
+        game.claimBoard = Object.assign(newClaimBoard, game.claimBoard);
+
+        var newAvailableLeaders = new AvailableLeaders()
+        game.availableLeaders = Object.assign(newAvailableLeaders, game.availableLeaders);
+
+        this.games[game.id] = game;
+
+        if (game.gameStates.currentState.name == "claimPhase") {
+            game.updateClaimsForClaimsPhase();
+        }
+
+        return game;
+    }
 }
 
 class Game {
@@ -126,7 +109,7 @@ class Game {
         this.gameStates = new GameStates();
         // TODO: generate id with uuid
         this.id = Date.now();
-        // TODO: creation date
+        // TODO: formatted creation date
         this.creationDate = null;
         this.name = gameName;
         this.password = password;
@@ -866,6 +849,7 @@ class Game {
     }
 
     endCurrentAction(color) {
+        console.log("endCurrentAction(): " + color);
         if (this.gameStates.currentState.name == "oneTimeScheme" || this.gameStates.currentState.name == "scheme") {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
@@ -875,6 +859,7 @@ class Game {
     }
 
     endTurn(color) {
+        console.log("endTurn(): " + color);
         this.validateGameStatus("actionPhase", "endTurn");
         var currentPlayer = this.validateCurrentPlayer(color, "endTurn");
         if (currentPlayer.advisorCountForTurn <= currentPlayer.advisors.length) {
@@ -896,9 +881,19 @@ class Game {
             this.players.setCurrentPlayer(nextPlayer);
             this.gameStates.setCurrentState("retrieveAdvisor");
         } else {
-            this.players.setCurrentPlayer(this.players.firstPlayer);
             this.gameStates.setCurrentState("claimPhase");
+            this.updateClaimsForClaimsPhase();
         }
+    }
+
+    updateClaimsForClaimsPhase() {
+        console.log("updateClaimsForClaimsPhase()");
+        this.validateGameStatus("claimPhase", "updateClaimsForClaimsPhase");
+        this.claimBoard.updateClaimsForClaimsPhase(this.players.players, this.gameMap);
+        this.players.setCurrentPlayer(this.players.firstPlayer);
+        this.gameStates.setCurrentState("takeDeedCardForClaimPhase");
+        console.log(JSON.stringify(this.gameStates));
+        console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);
     }
 
     beginActionPhaseAction(color, action) {
@@ -974,4 +969,68 @@ class Game {
 }
 
 
-module.exports = Games
+class GameStatus {
+    constructor(game, clientColor=null) {
+        this.gameId = game.id;
+        this.id = game.id;
+        this.gameName = game.name;
+        this.name = game.name;
+        this.playerNames = "";
+        this.currentPlayer = null;
+        this.clientPlayer = null;
+        this.numberOfPlayers = game.players.players.length;
+        this.targetNumberOfPlayers = game.targetNumberOfPlayers;
+        var currentGameState = game.gameStates.getCurrentState();
+        this.currentState = null;
+        if (currentGameState != undefined && currentGameState != null) {
+            this.currentState = currentGameState.name;
+        }
+        var firstPlayer = game.players.getFirstPlayer();
+        this.playersByPosition = game.players.playersByPosition;
+        for (var i=0; i<this.numberOfPlayers; i++) {
+            this.playerNames = this.playerNames + " " + game.players.players[i].name;
+        }
+        if (firstPlayer != undefined && firstPlayer != null) {
+            this.firstPlayer = firstPlayer.color;
+        }
+        if (!(clientColor == undefined && clientColor == null || clientColor.length < 1)) {
+            this.clientPlayer = game.getPlayer(clientColor);
+            this.clientLeader = this.clientPlayer.leader;
+            this.clientName = this.clientPlayer.name;
+            this.clientPosition = this.clientPlayer.position;
+        }
+        if (this.currentState != "waitingForPlayers" && currentGameState != undefined) {
+            this.round = game.currentRound;
+            //this.auctionBoard = game.auctionBoard;
+            var currentPlayer = game.players.getCurrentPlayer();
+            if (currentPlayer != undefined && currentPlayer != null) {
+                this.currentPlayer = currentPlayer.color;
+                if (currentPlayer.color == clientColor) {
+                    this.statusMessage = "Waiting on you";
+                    this.availableActions = currentGameState.allowedActions;
+                } else if (clientColor == undefined || clientColor == null || clientColor.length < 1) {
+                    this.statusMessage = "Waiting on " + currentPlayer.color;
+                    this.availableActions = currentGameState.allowedActions;
+                } else {
+                    this.statusMessage = "Waiting on " + currentPlayer.color;
+                    this.availableActions = [];                
+                }
+            }
+            var nextPlayer = game.players.getNextPlayer(this.currentPlayer);
+            if (nextPlayer != undefined && nextPlayer != null) {
+                this.nextPlayer = nextPlayer.color;
+            }
+            var nextFirstPlayer = game.players.nextFirstPlayer;
+            if (nextFirstPlayer != undefined && nextFirstPlayer != null) {
+                this.nextFirstPlayer = nextFirstPlayer.color;
+            }
+        }
+    }
+}
+
+
+//module.exports = Games
+module.exports = {
+    Games: Games,
+    Game: Game
+}

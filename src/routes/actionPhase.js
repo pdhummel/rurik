@@ -1,7 +1,7 @@
 const app = require('express').Router();
 const Games = require('../game.js');
 
-var games = Games.getInstance();
+var games = Games.Games.getInstance();
 
 app.post('/game/:id/player/:color/move', (req, res) => {
     console.log("post " + req.path + " " + req.params);

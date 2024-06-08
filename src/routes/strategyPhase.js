@@ -1,7 +1,7 @@
 const app = require('express').Router();
 const Games = require('../game.js');
 
-var games = Games.getInstance();
+var games = Games.Games.getInstance();
 
 app.get('/game/:id/auction', (req, res) => {
     console.log("get " + req.path + " " + req.params);

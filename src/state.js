@@ -22,6 +22,7 @@ class GameStates {
         this.gameStates["schemeFirstPlayer"] = new GameState("schemeFirstPlayer", ["assignFirstPlayer"]);
         this.gameStates["drawSchemeCards"] = new GameState("drawSchemeCards", ["drawSchemeCards"]);
         this.gameStates["takeDeedCardForActionPhase"] = new GameState("takeDeedCardForActionPhase", ["takeSchemeCard"]);
+        this.gameStates["takeDeedCardForClaimPhase"] = new GameState("takeDeedCardForClaimPhase", ["takeSchemeCard"]);
         this.gameStates["claimPhase"] = new GameState("claimPhase", ["chooseDeedCard"]);
         this.gameStates["endGame"] = new GameState("endGame", []);
 
@@ -34,6 +35,17 @@ class GameStates {
 
     getCurrentState() {
         return this.currentState;
+    }
+
+    restoreGameStates() {
+        var keys = Object.keys(this.gameStates);
+        for (var i=0; i < keys.length; i++) {
+            var key = keys[i];
+            var gameState = this.gameStates[key];
+            var newGameState = new GameState(gameState.name, gameState.allowedActions);
+            gameState = Object.assign(newGameState, gameState);
+            this.gameStates[key] = gameState;
+        }
     }
     
 }

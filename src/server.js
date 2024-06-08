@@ -3,8 +3,9 @@ const Validator = require('./validations.js');
 const preGameAndSetupRoutes = require("./routes/preGameAndSetup");
 const strategyPhaseRoutes = require("./routes/strategyPhase");
 const actionPhaseRoutes = require("./routes/actionPhase");
+const testRoutes = require("./routes/tests");
 
-var games = Games.getInstance();
+var games = Games.Games.getInstance();
 
 const express = require('express');
 var bodyParser = require('body-parser');
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 app.use(preGameAndSetupRoutes);
 app.use(strategyPhaseRoutes);
 app.use(actionPhaseRoutes);
+app.use(testRoutes);
 
 app.get("/", (req, res) => {
   res.render("index"); // index refers to index.ejs
@@ -188,4 +190,14 @@ app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
+app.get('/game/:id/claimBoard', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+
+  res.send(game.claimBoard);
+});
 
