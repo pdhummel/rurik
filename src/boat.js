@@ -87,6 +87,7 @@ class BoatMat {
         if ( this.goodsOnBoatSlots["fur"] == this.goodsOnBoat["fur"]) {
             coinIncome++;
         }
+        return coinIncome;
     }
 
     moveResourceFromBoatToDock(resource) {

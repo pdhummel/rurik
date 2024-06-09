@@ -1,25 +1,23 @@
 
-
-
 function onLoad() {
   listGames();
 
   var myCardsModal = setupPopupWindow("myCardsModal", "myCardsButton", "closeMyCardsModal");
   var gameCardsModal = setupPopupWindow("gameCardsModal", "gameCardsButton", "closeGameCardsModal");
   var boatAndSupplyModal = setupPopupWindow("boatAndSupplyModal", "boatAndSupplyButton", "closeBoatAndSupplyModal");
+  var claimBoardModal = setupPopupWindow("claimBoardModal", "claimBoardButton", "closeClaimBoardModal");
 
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = function(event) {
-    if (event.target == myCardsModal || event.target == gameCardsModal || event.target == boatAndSupplyModal) {
+    if (event.target == myCardsModal || event.target == gameCardsModal || event.target == boatAndSupplyModal || 
+        event.target == claimBoardModal) {
       myCardsModal.style.display = "none";
       gameCardsModal.style.display = "none";
       boatAndSupplyModal.style.display = "none";
+      claimBoardModal.style.display = "none";
     }
   }
 }
-
-
-
 
 function refreshGameStatus() {
   var gameId = getInnerHtmlValue("gameId");
@@ -94,6 +92,11 @@ function refreshGameStatusResponseHandler(response) {
 
     if (gameRound != undefined) {
       setInnerHtml("gameRound", gameRound);
+      hide("crown-round-1");
+      hide("crown-round-2");
+      hide("crown-round-3");
+      hide("crown-round-4");
+      show("crown-round-" + gameRound);
       //show("gameCardsButton");
     }
     if (clientLeader != undefined && clientLeader != null && 
@@ -218,7 +221,9 @@ function refreshGameStatusResponseHandler(response) {
     if (currentState == "claimPhase" || currentState == "takeDeedCardForClaimPhase") {
       showClaimBoard();
     } else {
+      document.getElementById("nopop_claimboard").checked = false;
       hide("claimBoardTable");
+      hide("warfareDiv");
     }
     if (currentState == "takeDeedCardForClaimPhase" && currentPlayer == myColor) {
       show("takeDeedCardDiv");
@@ -234,34 +239,49 @@ function showClaimBoard() {
 
 function showClaimBoardResponseHandler(response) {
   console.log("showClaimBoardResponseHandler(): " + JSON.stringify(response.data));
-  /*
-  {"claimsByPlayer":{"blue":{"rule":1,"build":8,"trade":0,"warfare":0},
-  "red":{"rule":1,"build":8,"trade":0,"warfare":0},
-  "white":{"rule":0,"build":0,"trade":0,"warfare":0},
-  "yellow":{"rule":0,"build":0,"trade":0,"warfare":0}},"previousClaimsByPlayer":{"blue":{"rule":0,"build":0,"trade":0},"red":{"rule":0,"build":0,"trade":0},"white":{"rule":0,"build":0,"trade":0},"yellow":{"rule":0,"build":0,"trade":0}},"warfareRewards":{"0":null,"1":null,"2":"2 wood","3":null,"4":"2 coins","5":null,"6":"2 fish","7":null,"8":"schemeCard","9":null,"10":"victoryPoint"},
-  "claimsByTrack":{"rule":{"0":["white","yellow"],"1":["blue","red"],"2":[],"3":[],"5":[],"8":[]},"build":{"0":["white","yellow"],"1":[],"2":[],"3":[],"5":[],"8":["blue","red"]},"trade":{"0":["blue","red","white","yellow"],"1":[],"2":[],"3":[],"5":[],"8":[]},"warfare":{"0":["blue","red","white","yellow"],"1":[],"2":[],"3":[],"4":[],"5":[],"6":[],"7":[],"8":[],"9":[],"10":[]}},
-  "requirementsByTrack":{"rule":{"1":2,"2":3,"3":4,"5":5,"8":5},"build":{"1":2,"2":3,"3":4,"5":5,"8":7},"trade":{"1":3,"2":5,"3":7,"5":9,"8":11}}}
-  */
- //var claimsByTrack = response.data['claimsByTrack'];
- var claimsByTrack = response.data.claimsByTrack
- var columns = ["rule", "build", "trade"];
- for (var i=0; i<columns.length; i++) {
-  var column = columns[i];
-  var track = claimsByTrack[column];
-  var keys = Object.keys(track);
-  for (var j=0; j < keys.length; j++) {
-    var pointValue = keys[j];
-    var colors = track[pointValue];
-    for (var k=0; k<colors.length; k++) {
-      var color = colors[k];
-      // red-regions-5, red-build-5, red-boat-9
-      var claim = color  + "-" + column + "-" + pointValue;
-      show(claim, "inline");
+  var claimsByTrack = response.data.claimsByTrack
+  var columns = ["rule", "build", "trade"];
+  for (var i=0; i<columns.length; i++) {
+    var column = columns[i];
+    var track = claimsByTrack[column];
+    var keys = Object.keys(track);
+    for (var j=0; j < keys.length; j++) {
+      var pointValue = keys[j];
+      var colors = track[pointValue];
+      for (var k=0; k<colors.length; k++) {
+        var color = colors[k];
+        // red-regions-5, red-build-5, red-boat-9
+        var claim = color  + "-" + column + "-" + pointValue;
+        show(claim, "inline");
+      }
     }
   }
- }
- console.log("claimsByTrack=" + JSON.stringify(claimsByTrack));
+  var claimsByPlayer = response.data.claimsByPlayer;
+  console.log(claimsByPlayer);
+  // red-war-0
+  var colors = ["red", "blue", "yellow", "white"];
+  for (c=0; c<colors.length; c++) {
+    for (var i=0; i<=10; i++) {
+      hide(colors[c] + "-war-" + i);
+    }
+    var warfare = claimsByPlayer[colors[c]]["warfare"];
+    show(colors[c] + "-war-" + warfare);
+  }
+  var warfareRewards = response.data.warfareRewards;
+  for (var i=0; i<=10; i++) {
+    var reward = warfareRewards[i];
+    if (reward != undefined && reward != null) {
+      setInnerHtml("warfare-reward-" + i, reward);
+    }
+  }
   show("claimBoardTable");
+  show("warfareDiv");
+  var keepClosed = document.getElementById("nopop_claimboard");
+  if (! keepClosed.checked) {
+    show("claimBoardModal");
+    keepClosed.checked = true;
+  }
+  
 }
 
 function populateSchemeCards(player) {

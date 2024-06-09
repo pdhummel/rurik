@@ -58,6 +58,17 @@ class GamePlayers {
         }        
     }
 
+    endRoundForPlayers() {
+        for (var i=0; i < this.players.length; i++) {
+            var player = this.players[i];
+            player.boat.canPlayMusterConversionTile = true;
+            player.boat.canPlayAttackConversionTile = true;
+            player.boat.canPlayBuildConversionTile = true;
+            var coinIncome = player.boat.calculateCoinIncome();
+            player.boat.money = player.boat.money + coinIncome;
+        }
+    }
+
     setFirstPlayer(player) {
         if (this.firstPlayer != undefined) {
             this.firstPlayer.isFirstPlayer = false;
@@ -273,6 +284,7 @@ class Player {
         this.moveActions = 0;
         this.attackActions = 0;
         this.moveActionsFromLocation = {};
+        this.finishedRound = false;
 
         this.isFirstPlayer = false;
         this.isNextFirstPlayer = false;

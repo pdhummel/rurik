@@ -803,11 +803,41 @@ class Game {
         if (deedCardName == null) {
             this.throwError("Deed card was not selected.", "takeDeedCard");
         }
-        this.validateGameStatus("takeDeedCardForActionPhase", "takeDeedCard");
+        this.validateGameStatus2(["takeDeedCardForActionPhase", "takeDeedCardForClaimPhase"], "takeDeedCard");
         var currentPlayer = this.validateCurrentPlayer(color, "takeDeedCard");
         this.cards.takeDeedCard(currentPlayer, deedCardName);
-        this.gameStates.setCurrentState("actionPhase");
+        if (this.gameStates.currentState.name == "takeDeedCardForActionPhase") {
+            this.gameStates.setCurrentState("actionPhase");
+        } else {
+            currentPlayer.finishedRound = true;
+            var nextPlayer = this.players.getNextPlayer(currentPlayer);            
+            if (! nextPlayer.finishedRound) {
+                this.players.setCurrentPlayer(nextPlayer);
+            } else {
+                this.endRound();
+            }
+        }
     }
+
+    endRound() {
+        console.log("endRound()");
+        this.currentRound++;
+        if (this.currentRound > 4) {
+            this.endGame();
+        } else {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
+            this.players.setAdvisors(advisors);
+            this.players.endRoundForPlayers();
+            this.gameStates.setCurrentState("strategyPhase");
+        }
+    }
+
+    endGame() {
+        console.log("endGame() ");
+        this.gameStates.setCurrentState("endGame");
+    }
+
 
     playMusterConversionTile(currentPlayer, resource1, resource2) {
         console.log("playMusterConversionTile(): " + currentPlayer.color + " " + resource1 + " " + resource2);
@@ -892,7 +922,6 @@ class Game {
         this.claimBoard.updateClaimsForClaimsPhase(this.players.players, this.gameMap);
         this.players.setCurrentPlayer(this.players.firstPlayer);
         this.gameStates.setCurrentState("takeDeedCardForClaimPhase");
-        console.log(JSON.stringify(this.gameStates));
         console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);
     }
 
@@ -950,6 +979,26 @@ class Game {
             } else {
                 this.throwError("Cannot do that right now, because state is " + this.gameStates.currentState.name + 
                     " and not " + desiredState + ".", method);    
+            }
+        }
+    }
+
+    validateGameStatus2(possibleStates, method, message=null) {
+        console.log("validateGameStatus2(): " + possibleStates + " " + this.gameStates.currentState.name);
+        var found = false;
+        for (var i=0; i<possibleStates.length; i++) {
+            var desiredState = possibleStates[i];
+            if (this.gameStates.currentState.name == desiredState) {
+                found = true;
+                break;
+            }
+        }
+        if (! found) {
+            if (message != null) {
+                this.throwError(message, method);
+            } else {
+                this.throwError("Cannot do that right now, because state is " + this.gameStates.currentState.name + 
+                    " and not one of the desired states.", method);    
             }
         }
     }

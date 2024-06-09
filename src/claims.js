@@ -165,7 +165,11 @@ class ClaimBoard {
     updateClaimsForClaimsPhase(players, gameMap) {
         for (var p=0; p < players.length; p++) {
             var player = players[p];
-            this.updateClaims(player, gameMap);
+            var coinCompensation = this.updateClaims(player, gameMap);
+            if (this.claimsByPlayer[player.color]["warfare"] <= 0) {
+                coinCompensation++;
+            }
+            player.boat.money = player.boat.money + coinCompensation;
         }
         this.resetClaimsByTrack();
         this.updateClaimsByTrack();
@@ -175,21 +179,32 @@ class ClaimBoard {
     // The claimsByPlayer never decrease so it is never worst than the previousClaimsByPlayer.
     updateClaims(player, gameMap) {
         console.log("updateClaims(): " + player.color);
+        var coinCompensation = 0;
         var color = player.color;
         var rulePoints = this.calculateClaimsForRule(player, gameMap);
         if (rulePoints > this.previousClaimsByPlayer[color]["rule"]) {
             this.claimsByPlayer[color]["rule"] = rulePoints;
+        }
+        if (this.claimsByPlayer[color]["rule"] <= 0) {
+            coinCompensation++;
         }
 
         var tradePoints = this.calculateClaimsForTrade(player);
         if (tradePoints > this.previousClaimsByPlayer[color]["trade"]) {
             this.claimsByPlayer[color]["trade"] = tradePoints;
         }
+        if (this.claimsByPlayer[color]["trade"] <= 0) {
+            coinCompensation++;
+        }
 
         var buildPoints = this.calculateClaimsForBuild(player, gameMap);
         if (buildPoints > this.previousClaimsByPlayer[color]["build"]) {
             this.claimsByPlayer[color]["build"] = buildPoints;
         }
+        if (this.claimsByPlayer[color]["build"] <= 0) {
+            coinCompensation++;
+        }
+        return coinCompensation;
     }
 
     calculateClaimsForRule(player, gameMap) {
