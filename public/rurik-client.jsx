@@ -20,6 +20,7 @@ function onLoad() {
 }
 
 function refreshGameStatus() {
+  console.log("refreshGameStatus()");
   var gameId = getInnerHtmlValue("gameId");
   if (gameId != undefined && gameId.length > 0) {
     var clientColorParam = "";
@@ -32,6 +33,7 @@ function refreshGameStatus() {
     refreshPlayer();
     refreshStrategyBoard();
     refreshCards();
+    refreshClaimBoard();
   }
 }
 function refreshGameStatusResponseHandler(response) {
@@ -44,6 +46,7 @@ function refreshGameStatusResponseHandler(response) {
     }
 
     var currentState = gameStatus.currentState;
+    console.log("refreshGameStatusResponseHandler(): currentState=" + currentState);
     var status = currentState;
     var gameId = getInnerHtmlValue("gameId");
     var gameName = gameStatus.gameName;
@@ -232,13 +235,13 @@ function refreshGameStatusResponseHandler(response) {
     }
 }
 
-function showClaimBoard() {
+function refreshClaimBoard() {
   var gameId = getInnerHtmlValue("gameId");
-  callApi("/game/" + gameId + "/claimBoard", "get", "", showClaimBoardResponseHandler);  
+  callApi("/game/" + gameId + "/claimBoard", "get", "", refreshClaimBoardHandler);  
 }
 
-function showClaimBoardResponseHandler(response) {
-  console.log("showClaimBoardResponseHandler(): " + JSON.stringify(response.data));
+function refreshClaimBoardHandler(response) {
+  console.log("refreshClaimBoardHandler(): " + JSON.stringify(response.data));
   var claimsByTrack = response.data.claimsByTrack
   var columns = ["rule", "build", "trade"];
   for (var i=0; i<columns.length; i++) {
@@ -276,13 +279,24 @@ function showClaimBoardResponseHandler(response) {
   }
   show("claimBoardTable");
   show("warfareDiv");
+}
+
+function showClaimBoard() {
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/claimBoard", "get", "", showClaimBoardResponseHandler);  
+}
+
+function showClaimBoardResponseHandler(response) {
+  console.log("showClaimBoardResponseHandler(): " + JSON.stringify(response.data));
+  refreshClaimBoardHandler(response);
   var keepClosed = document.getElementById("nopop_claimboard");
   if (! keepClosed.checked) {
     show("claimBoardModal");
     keepClosed.checked = true;
-  }
-  
+  }  
 }
+
+
 
 function populateSchemeCards(player) {
   var schemeCards = player.schemeCards;
@@ -411,7 +425,7 @@ function outputSchemeCard(cardDivName, schemeCardId) {
       lastRow = '<td><img width="30px" src="/assets/scheme-' + reward1 + '.png" /></td><td></td><td><img width="30px" src="/assets/scheme-' + reward2 + '.png" /></td>';
     } 
   } else {
-    console.log("nothing");
+    console.log("outputSchemeCard(): nothing");
       lastRow = lastRow + '<td height="30px"></td>'
   }
   tr.innerHTML = lastRow;

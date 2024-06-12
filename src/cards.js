@@ -60,7 +60,8 @@ class Cards {
         this.addDeedCard("Market Day", 2, "Have 3 markets with different resources.", ["scheme2Cards"], [], {"differentResources":["market", "market", "market"]});
         this.addDeedCard("Defensive Belt", 1, "Have 3 strongholds in adjacent regions.", ["attackMinusScheme"], [], {"adjacentRegions":["stronghold", "stronghold", "stronghold"]});
         this.addDeedCard("Capital City", 2, "Have a market, stronghold, and church in a single region.", ["tax"], [], {"sameRegion":["market", "stronghold", "church"]});
-        this.addDeedCard("Grand Hunter", 2, "Pay 2 fur and be first player.", ["move"], ["fur", "fur"], ["firstPlayer"]);
+        this.addDeedCard("Grand Hunter", 2, "Pay 2 fur and have the first player token.", ["move"], ["fur", "fur"], ["firstPlayer"]);
+
 
         // shuffle the deed cards
         for (var i=0; i<(this.deedCardDeck.length); i++) {
@@ -304,6 +305,14 @@ class DeedCard {
         this.costs = costs;
         this.achievements = achievements;
         this.canSolo = canSolo;
+        this.accomplished = false;
+        this.verifiedByPlayers = {};
+        this.verifiedByPlayers['red'] = null;
+        this.verifiedByPlayers['blue'] = null;
+        this.verifiedByPlayers['yellow'] = null;
+        this.verifiedByPlayers['white'] = null;
+        this.playerColor = null;
+        this.claimStatements = [];
     }
 }
 

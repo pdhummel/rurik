@@ -6,6 +6,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * game log
 * messages and error messages in UI
 * show upcoming advisors on map board
+* show reward for deed cards
+* indicate accomplished deed cards
 
 
 * action phase
@@ -16,6 +18,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * leader defeated and leader muster
   * gain war track bonuses on attack
   * accomplish deeds
+    * rewards for accomplishing deeds
   
 
 * player view

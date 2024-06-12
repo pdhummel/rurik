@@ -113,6 +113,7 @@ class Game {
         this.creationDate = null;
         this.name = gameName;
         this.password = password;
+        this.deedCardToVerify = null;
     }
 
 
@@ -819,6 +820,69 @@ class Game {
         }
     }
 
+    accomplishedDeed(color, deedCardName, claimStatements) {
+        console.log("claimAccomplishedDeed(): " + color + " " + deedCardName);
+        this.validateGameStatus("actionPhaseAccomplishDeed", "claimAccomplishedDeed");
+        var currentPlayer = this.validateCurrentPlayer(color, "claimAccomplishedDeed");
+        this.deedCardToVerify = this.cards.allDeedCards[deedCardName];
+        this.deedCardToVerify.playerColor = color;
+        this.deedCardToVerify.claimStatements = claimStatements;
+        this.gameStates.setCurrentState("actionPhaseVerifyDeed");
+        var nextPlayer = this.players.getNextPlayer(currentPlayer);
+        // The AI trusts you
+        while (nextPlayer.isPlayerAi && nextPlayer.color != currentPlayer.color) {
+            this.deedCardToVerify.verifiedByPlayers[nextPlayer.color] = true;
+            nextPlayer = this.players.getNextPlayer(nextPlayer);
+        }
+        this.players.setCurrentPlayer(nextPlayer);
+        return this.deedCardToVerify;
+    }
+
+    verifyDeed(color, deedCardName, verified) {
+        console.log("verifyDeed(): " + color + " " + deedCardName);
+        this.validateGameStatus("actionPhaseAccomplishDeed", "claimAccomplishedDeed");
+        var currentPlayer = this.validateCurrentPlayer(color, "verifyDeed");
+        var deedCard = this.cards.allDeedCards[deedCardName];
+        this.deedCardToVerify = deedCard;
+        deedCard.verifiedByPlayers[color] = verified;
+        if (currentPlayer.color == this.deedCardToVerify.playerColor) {
+            var colors = ["red", "blue", "yellow", "white"];
+            var isGood = true;
+            for (var c=0; c<colors.length; c++) {
+                if (deedCard.verifiedByPlayers[colors[c]] == false) {
+                    isGood = false;
+                }
+            }
+            if (isGood) {
+                this.redeemDeed(this.deedCardToVerify);
+            } else {
+                for (var c=0; c<colors.length; c++) {
+                    deedCard.verifiedByPlayers[colors[c]] = null;
+                }    
+            }
+            this.deedCardToVerify = null;
+            this.gameStates.setCurrentState("actionPhase");
+        } else {
+            var nextPlayer = this.players.getNextPlayer(currentPlayer);
+            // The AI trusts you
+            while (nextPlayer.isPlayerAi && nextPlayer.color) {
+                deedCard.verifiedByPlayers[nextPlayer.color] = true;
+                nextPlayer = this.players.getNextPlayer(nextPlayer);
+            }
+            this.players.setCurrentPlayer(nextPlayer);   
+        }
+        return deedCard;
+    }
+
+    redeemDeed(deedCard) {
+        console.log("reedeemDeed(): " + deedCard.name);
+        deedCard.accomplished = true;
+        for (var i=0; i<deedCard.rewards.length; i++) {
+            // scheme2cards, attackMinusScheme, warTrack
+            // muster, move, build, coin, tax
+        }
+    }
+
     endRound() {
         console.log("endRound()");
         this.currentRound++;
@@ -937,6 +1001,8 @@ class Game {
         actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
         actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
         actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
+        actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
+        //actionToStateMap["convertGoodsAction"] = "actionPhaseVerifyDeed";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {

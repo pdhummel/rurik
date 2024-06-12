@@ -1,4 +1,5 @@
 function showActionPhases(currentState, myColor) {
+  console.log("showActionPhases(): currentState=" + currentState);
   if (currentState == "actionPhase") {
     showActionPhaseDiv();
   } else {
@@ -50,6 +51,12 @@ function showActionPhases(currentState, myColor) {
     showPlayConversionTile();
   } else {
     hide("playConversionTileDiv");
+  }
+
+  if (currentState == "actionPhaseAccomplishDeed") {
+    showAccomplishDeed();
+  } else {
+    hide("accomplishDeedDiv");
   }
 }
 
@@ -122,10 +129,6 @@ function getNextAdvisor() {
   }
   function showActionPhaseHandler(response) {
     console.log("showActionPhaseHandler(): " + JSON.stringify(response.data));
-    /*
-          this.accomplishedDeedForTurn = false;
-    
-    */
     var playerData = response.data;
     if (playerData.convertedGoodsForTurn == false && 
       (playerData.boat.canPlayAttackConversionTile || playerData.boat.canPlayBuildConversionTile || playerData.boat.canPlayMusterConversionTile)) {
@@ -209,7 +212,8 @@ function getNextAdvisor() {
     if (actionPhaseActionValue == "musterAction" || actionPhaseActionValue == "moveAction" || 
         actionPhaseActionValue == "attackAction" || actionPhaseActionValue =="taxAction" ||
         actionPhaseActionValue == "buildAction" || actionPhaseActionValue == "transferGoodsAction" ||
-        actionPhaseActionValue == "schemeAction" || actionPhaseActionValue == "convertGoodsAction") {
+        actionPhaseActionValue == "schemeAction" || actionPhaseActionValue == "convertGoodsAction" || 
+        actionPhaseActionValue == "accomplishDeedAction") {
       beginAction(gameId, color, actionPhaseActionValue);
     }
     if (actionPhaseActionValue == "endTurnAction") {
@@ -673,5 +677,74 @@ function playConversionTile() {
   var resource2 = getSelectedValue("selectConvertResource2");
   var data = '{ "conversionTile": "' + conversionTile + '", "resource1": "' + resource1 +  '", "resource2": "' + resource2 + '" }';
   callApi("/game/" + gameId + "/player/" + color + "/conversionTile", "post", data, refreshGameHandler);
+}
+
+function showAccomplishDeed() {
+  console.log("showAccomplishDeed()");
+  selectClaimStatementChanged(0);
+  show("accomplishDeedDiv");
+
+}
+
+function selectClaimStatementChanged(i) {
+  var selectId = "claimStatement" + i;
+  var value = getSelectedValue(selectId);
+  if (value == "assert") {
+    show("claimAssertionSpan" + i);
+    hide("claimPayChoice" + i);
+    hide("claimRemoveChoice" + i);
+    hide("claimPaySchemeCardChoice" + i);
+    hide("claimRemoveSpan0");
+    hide("claimRemoveBuildingChoice" + i);
+    hide("claimPayResourceChoice" + i);
+  } else if (value == "pay") {
+    hide("claimAssertionSpan" + i);
+    show("claimPayChoice" + i, "inline");
+    hide("claimRemoveChoice" + i);
+    hide("claimPaySchemeCardChoice" + i);
+    hide("claimRemoveSpan" + i);
+    hide("claimRemoveBuildingChoice" + i);
+    hide("claimPayResourceChoice" + i);
+    var childSelectId = "claimPayChoice" + i;
+    document.getElementById(childSelectId).value = "coin";
+  } else if (value == "remove") {
+    hide("claimAssertionSpan" + i);
+    hide("claimPayChoice" + i);
+    show("claimRemoveChoice" + i, "inline");
+    hide("claimPaySchemeCardChoice" + i);
+    show("claimRemoveSpan" + i, "inline");
+    hide("claimRemoveBuildingChoice" + i);
+    hide("claimPayResourceChoice" + i);
+    var childSelectId = "claimRemoveChoice" + i;
+    document.getElementById(childSelectId).value = "troop";
+  }
+}
+
+function selectClaimPayChoiceChanged(i) {
+  var selectId = "claimPayChoice" + i;
+  var value = getSelectedValue(selectId);
+  if (value == "coin") {
+    hide("claimPayResourceChoice" + i);
+    hide("claimPaySchemeCardChoice" + i);
+  } else if (value == "resource") {
+    show("claimPayResourceChoice" + i, "inline");
+    hide("claimPaySchemeCardChoice" + i);
+  } else if (value == "scheme card") {
+    hide("claimPayResourceChoice" + i);
+    show("claimPaySchemeCardChoice" + i, "inline");
+  }
+}
+
+function selectClaimRemoveChoiceChanged(i) {
+  var selectId = "claimRemoveChoice" + i;
+  var value = getSelectedValue(selectId);
+  if (value == "troop") {
+    hide("claimRemoveBuildingChoice" + i);
+  } else if (value == "building") {
+    show("claimRemoveBuildingChoice" + i, "inline");
+  }
+}
+
+function accomplishDeed() {
 
 }

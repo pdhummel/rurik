@@ -32,9 +32,9 @@ rest() {
 }
 
 
-r=$(rest "${server}/game/1/test" PUT)
-echo $r
-exit 0
+#r=$(rest "${server}/game/1/test" PUT)
+#echo $r
+#exit 0
 
 
 echo "Creating game"
@@ -279,6 +279,8 @@ r=$(rest "${server}/game/${game_id}/player/blue/build" POST '{ "locationName": "
 echo "First player end turn"
 r=$(rest "${server}/game/${game_id}/player/blue/turn" DELETE)
 
+#exit 0
+
 echo "Second player retrieve advisor"
 r=$(rest "${server}/game/${game_id}/advisorRetrieve/muster" PUT '{ "color": "red", "advisor": "5", "forfeitAction": "N", "row": 1  }')
 
@@ -298,6 +300,51 @@ r=$(rest "${server}/game/${game_id}/location/Polotsk/troops" PUT '{ "color": "re
 
 echo "Second player end turn"
 r=$(rest "${server}/game/${game_id}/player/red/turn" DELETE)
+
+echo "Get available deed cards"
+r=$(rest "${server}/game/${game_id}/cards" GET)
+deedCard0=$(echo $r | jq -r '.deedCards[0].name')
+deedCard1=$(echo $r | jq -r '.deedCards[1].name')
+deedCard2=$(echo $r | jq -r '.deedCards[2].name')
+
+
+echo "First player choose deed card"
+data='{ "deedCard": "'${deedCard0}'"  }'
+echo $data
+r=$(rest "${server}/game/${game_id}/player/blue/takeDeedCard" PUT "${data}")
+
+echo "Second player choose deed card"
+data='{ "deedCard": "'${deedCard1}'"  }'
+echo $data
+r=$(rest "${server}/game/${game_id}/player/red/takeDeedCard" PUT "${data}")
+
+echo "First player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/muster" PUT '{ "color": "blue", "advisor": "1"  }')
+
+echo "Second player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/${move_or_scheme}" PUT '{ "color": "red", "advisor": "1"  }')
+
+echo "First player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/attack" PUT '{ "color": "blue", "advisor": "2"  }')
+
+echo "Second player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/tax" PUT '{ "color": "red", "advisor": "2"  }')
+
+echo "First player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/tax" PUT '{ "color": "blue", "advisor": "4"  }')
+
+echo "Second player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/build" PUT '{ "color": "red", "advisor": "4"  }')
+
+echo "First player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/build" PUT '{ "color": "blue", "advisor": "5"  }')
+
+echo "Second player advisor bid"
+r=$(rest "${server}/game/${game_id}/advisorBid/muster" PUT '{ "color": "red", "advisor": "5"  }')
+
+
+
+
 
 
 
