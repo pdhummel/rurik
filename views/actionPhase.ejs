@@ -237,108 +237,18 @@
 </div>
 
 <div id="accomplishDeedDiv" style="display:none">
-
-<!--
-        Radio button/Select for Deed Cards
-
-        pay       resource <resource>
-        pay       coin
-        pay       scheme card <scheme card>
-
-        remove    from <region>, troop
-        remove    from <region>, building <bldg> 
-
-        have      defeated rebels x times
-        have      building <bldg> in <region>
-        have      troops in <region> - x
-        have      first player token
-
-        rule      <region>
-
-        <freeform text>
--->  
   Select Deed Card:
   <div id="playDeedCardChoices"></div><br/>
 
   <table>
-    <tr><td style="vertical-align: baseline">
-      <select id="claimStatement0" onchange="javascript:selectClaimStatementChanged(0);">
-        <option>assert</option>
-        <option>pay</option>
-        <option>remove</option>
-      </select>
-      <select id="claimPayChoice0" style="display:none"  onchange="javascript:selectClaimPayChoiceChanged(0);">
-        <option>coin</option>
-        <option>resource</option>
-        <option>scheme card</option>
-      </select>
-      <select id="claimRemoveChoice0" style="display:none" style="display:none"  onchange="javascript:selectClaimRemoveChoiceChanged(0);">
-        <option>troop</option>
-        <option>building</option>
-      </select>
-      <select id="claimPayResourceChoice0" style="display:none">
-        <option>wood</option>
-        <option>stone</option>
-        <option>fur</option>
-        <option>honey</option>
-        <option>fish</option>
-        <option>tradeboon</option>
-      </select>
-      <select id="claimPaySchemeCardChoice0"  style="display:none"></select>
-      <select id="claimRemoveBuildingChoice0"  style="display:none">
-        <option>market</option>
-        <option>church</option>
-        <option>stronghold</option>
-        <option>tavern</option>
-        <option>stable</option>
-      </select>
-      <span id="claimRemoveSpan0"  style="display:none"> from <select id="claimRemoveLocationChoice0"  style="display:inline"></select></span>
-      <span id="claimAssertionSpan0" style="display:inline"><textarea id="claimAssertion0" style="height:12px; width: 400px; display:inline"></textarea></span>
-      <br/> 
-      <input type="button" value="Accomplish Deed" onclick="javascript:accomplishDeed();"/>
-      <input type="button" value="Cancel" onclick="javascript:cancelAction();"/><br/>    
-    </td></tr>
-
-
+    <%- include('accomplishDeed.ejs', {row: 0}) %>
+    <%- include('accomplishDeed.ejs', {row: 1}) %>
+    <%- include('accomplishDeed.ejs', {row: 2}) %>
+    <%- include('accomplishDeed.ejs', {row: 3}) %>
+    <%- include('accomplishDeed.ejs', {row: 4}) %>
   </table>
-
-
-
-  <!--
-  <select id="claimStatement">
-    <option>pay</option>
-    <option>remove</option>
-    <option>have</option>
-    <option>rule</option>
-  </select>
-  <select id="claimPayChoice">
-    <option>resource or coin</option>
-    <option>scheme card</option>
-  </select>
-  <select id="claimPayResourceChoice">
-    <option>wood</option>
-    <option>stone</option>
-    <option>fish</option>
-    <option>honey</option>
-    <option>fur</option>
-    <option>coin</option>
-  </select>
-  <select id="claimPaySchemeCardChoice"></select>
-  <span id="claimRemoveSpan"> from </span>
-  <select id="claimRemoveLocationChoice"></select>
-  <select id="claimRemoveChoice">
-    <option>troop</option>
-    <option>building</option>
-  </select>
-  <select id="claimRemoveBuildingChoice">
-    <option>market</option>
-    <option>church</option>
-    <option>stronghold</option>
-    <option>tavern</option>
-    <option>stable</option>
-  </select>
-  -->
+  <input type="button" value="Accomplish Deed" onclick="javascript:accomplishDeed();"/>
+  <input type="button" value="Cancel" onclick="javascript:cancelAction();"/><br/>    
   <br/>
   
-
 </div>

@@ -1,0 +1,54 @@
+<tr>
+  <td style="border-bottom: 1pt solid black; vertical-align: baseline">
+    <select id="claimStatement<%= row %>" style="display:inline" onchange="javascript:selectClaimStatementChanged(<%= row %>);">
+      <option>assert</option>
+      <option>pay</option>
+      <option>remove</option>
+    </select>
+    <select id="claimPayChoice<%= row %>" style="display:none"  onchange="javascript:selectClaimPayChoiceChanged(<%= row %>);">
+      <option>coin</option>
+      <option>resource</option>
+      <option>scheme card</option>
+    </select>
+    <select id="claimRemoveChoice<%= row %>" style="display:none" style="display:none"  onchange="javascript:selectClaimRemoveChoiceChanged(<%= row %>);">
+      <option>troop</option>
+      <option>building</option>
+    </select>
+    <select id="claimPayResourceChoice<%= row %>" style="display:none">
+      <option>wood</option>
+      <option>stone</option>
+      <option>fur</option>
+      <option>honey</option>
+      <option>fish</option>
+      <option>tradeboon</option>
+    </select>
+    <select id="claimPaySchemeCardChoice<%= row %>"  style="display:inline"></select>
+    <select id="claimRemoveBuildingChoice<%= row %>"  style="display:none">
+      <option>market</option>
+      <option>church</option>
+      <option>stronghold</option>
+      <option>tavern</option>
+      <option>stable</option>
+    </select>
+    <span id="claimRemoveSpan<%= row %>"  style="display:none"> from <select id="claimRemoveLocationChoice<%= row %>"  style="display:inline">
+        <option>Novgorod</option>
+        <option>Rostov</option>
+        <option>Polotsk</option>
+        <option>Smolensk</option>
+        <option>Volyn</option>
+        <option>Kiev</option>
+        <option>Chernigov</option>
+        <option>Pereyaslavl</option>
+        <option>Pskov</option>
+        <option>Suzdal</option>
+        <option>Galich</option>
+        <option>Brest</option>
+        <option>Murom</option>
+        <option>Peresech</option>
+        <option>Azov</option>
+    </select><br/></span>
+    <!--<span id="claimAssertionSpan<%=row %>" style="display:inline"><textarea id="claimAssertion<%= row %>" style="height:12px; width: 400px; display:inline"></textarea></span>-->
+    <span id="claimAssertionSpan<%=row %>" style="display:inline"><input id="claimAssertion<%= row %>" type="text" style="width: 300px; display:inline"></textarea></span>
+  </td>
+</tr>
+

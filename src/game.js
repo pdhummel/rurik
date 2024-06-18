@@ -878,7 +878,7 @@ class Game {
         console.log("reedeemDeed(): " + deedCard.name);
         deedCard.accomplished = true;
         for (var i=0; i<deedCard.rewards.length; i++) {
-            // scheme2cards, attackMinusScheme, warTrack
+            // scheme2cards, attackMinusScheme, moveAnywhere, warTrack
             // muster, move, build, coin, tax
         }
     }

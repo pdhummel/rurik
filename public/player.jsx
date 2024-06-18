@@ -79,17 +79,28 @@ function refreshPlayer() {
     var deedCards = response.data.deedCards;
     var deedCardsDiv = document.getElementById("myDeedCardsDiv");
     deedCardsDiv.innerHTML = "";
+    var playDeedCardChoices = document.getElementById("playDeedCardChoices");
+    playDeedCardChoices.innerHTML = "";
     var rows = [];
+    var accomplishRows = [];
     for (var i=0; i < deedCards.length; i++) {
       var deedCard = deedCards[i];
       var row = [];
+      var accomplishRow = [];
       row.push(deedCard.name);
       row.push(deedCard.victoryPoints);
       row.push(deedCard.requirementText);
       rows.push(row);
+      accomplishRow.push('<input type="radio" id="deedCard"+i name="accomplishDeedCard">');
+      accomplishRow.push(deedCard.name);
+      accomplishRow.push(deedCard.victoryPoints);
+      accomplishRow.push(deedCard.requirementText);
+      accomplishRows.push(accomplishRow);
     }
     var table = createTable(rows, ["Name", "VPs", "Description"], "white");
+    var accomplishTable = createTable(accomplishRows, ["", "Name", "VPs", "Description"], "white");
     deedCardsDiv.appendChild(table);  
+    playDeedCardChoices.appendChild(accomplishTable);
     show("myDeedCardsDiv");
 
     // secret agenda

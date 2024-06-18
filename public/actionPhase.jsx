@@ -682,6 +682,10 @@ function playConversionTile() {
 function showAccomplishDeed() {
   console.log("showAccomplishDeed()");
   selectClaimStatementChanged(0);
+  selectClaimStatementChanged(1);
+  selectClaimStatementChanged(2);
+  selectClaimStatementChanged(3);
+  selectClaimStatementChanged(4);
   show("accomplishDeedDiv");
 
 }
@@ -690,7 +694,7 @@ function selectClaimStatementChanged(i) {
   var selectId = "claimStatement" + i;
   var value = getSelectedValue(selectId);
   if (value == "assert") {
-    show("claimAssertionSpan" + i);
+    show("claimAssertionSpan" + i, "inline");
     hide("claimPayChoice" + i);
     hide("claimRemoveChoice" + i);
     hide("claimPaySchemeCardChoice" + i);

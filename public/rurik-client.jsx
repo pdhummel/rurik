@@ -299,13 +299,25 @@ function showClaimBoardResponseHandler(response) {
 
 
 function populateSchemeCards(player) {
+  console.log("populateSchemeCards(): " + JSON.stringify(player));
   var schemeCards = player.schemeCards;
   var selectSchemeCard = document.getElementById("selectPlaySchemeCard");
   clearOptions(selectSchemeCard);
+  var claimPaySchemeCardChoice0 = document.getElementById("claimPaySchemeCardChoice0");
+  var claimPaySchemeCardChoice1 = document.getElementById("claimPaySchemeCardChoice1");
+  var claimPaySchemeCardChoice2 = document.getElementById("claimPaySchemeCardChoice2");
+  var claimPaySchemeCardChoice3 = document.getElementById("claimPaySchemeCardChoice3");
+  var claimPaySchemeCardChoice4 = document.getElementById("claimPaySchemeCardChoice4");
+  clearOptions(claimPaySchemeCardChoice0);
+  clearOptions(claimPaySchemeCardChoice1);
+  clearOptions(claimPaySchemeCardChoice2);
+  clearOptions(claimPaySchemeCardChoice3);
+  clearOptions(claimPaySchemeCardChoice4);
   for (var i=0; i<10; i++) {
     setInnerHtml("personalSchemeCardDiv"+i, "");
     setInnerHtml("playSchemeCardDiv"+i, "");
   }
+  console.log("populateSchemeCards(): schemeCards=" + schemeCards.length);
   for (var i=0; i<schemeCards.length; i++) {
     var schemeCard = schemeCards[i];
     var option = document.createElement("option");
@@ -318,9 +330,21 @@ function populateSchemeCards(player) {
     selectSchemeCard.append(option);
     outputSchemeCard("personalSchemeCardDiv" + i, schemeCard.id);
     outputSchemeCard("playSchemeCardDiv" + i, schemeCard.id);
+    assignOptionToClaimPaySchemeCardChoice(schemeCard);
   }
   if (schemeCards.length > 0) {
     selectPlaySchemeCardChanged();
+  }
+}
+
+function assignOptionToClaimPaySchemeCardChoice(schemeCard) {
+  console.log("assignOptionToClaimPaySchemeCardChoice(): schemeCardId=" + schemeCard.id);
+  for (var i=0; i<5; i++) {
+    var option = document.createElement("option");
+    option.value = schemeCard.id;
+    option.innerText = schemeCard.id;
+    var claimPaySchemeCardChoice = document.getElementById("claimPaySchemeCardChoice" + i);
+    claimPaySchemeCardChoice.append(option);
   }
 }
 
@@ -369,6 +393,7 @@ function refreshGameHandler(response) {
 
 
 function outputSchemeCard(cardDivName, schemeCardId) {
+  console.log("outputSchemeCard():" + schemeCardId);
   var parts = schemeCardId.split("-");
   var deaths = parts.pop();
   var cost = parts.pop();
@@ -405,28 +430,28 @@ function outputSchemeCard(cardDivName, schemeCardId) {
   var rewards = parts;
   var lastRow = '';
   if (rewards.length > 0) {
-    console.log(" rewards.length=" + rewards.length);
+    //console.log("outputSchemeCard(): rewards.length=" + rewards.length);
     if (rewards.length == 1) {
       reward = rewards.shift();
       if (reward.indexOf("Or") == -1) {
-        console.log("No Or");
+        //console.log("outputSchemeCard(): No Or");
         lastRow = '<td></td><td><img width="30px" src="/assets/scheme-' + reward + '.png" /></td><td></td>'
       } else {
-        console.log("OR");
+        //console.log("outputSchemeCard(): OR");
         var orRewards = reward.split("Or");
         var reward1 = orRewards[0].toLowerCase(); 
         var reward2 = orRewards[1].toLowerCase(); 
         lastRow = '<td><img width="30px" src="/assets/scheme-' + reward1 + '.png" /></td><td>OR</td><td><img width="30px" src="/assets/scheme-' + reward2 + '.png" /></td>';
       }
     } else if (rewards.length == 2) {
-      console.log("2");
+      //console.log("outputSchemeCard(): 2");
       var reward1 = rewards.shift();
       var reward2 = rewards.shift();
       lastRow = '<td><img width="30px" src="/assets/scheme-' + reward1 + '.png" /></td><td></td><td><img width="30px" src="/assets/scheme-' + reward2 + '.png" /></td>';
     } 
   } else {
-    console.log("outputSchemeCard(): nothing");
-      lastRow = lastRow + '<td height="30px"></td>'
+    //console.log("outputSchemeCard(): nothing");
+    lastRow = lastRow + '<td height="30px"></td>'
   }
   tr.innerHTML = lastRow;
   table.appendChild(tr);

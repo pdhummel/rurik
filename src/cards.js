@@ -22,9 +22,7 @@ class Cards {
         this.addDeedCard("Splendid Feast", 1, "Pay fish, honey, 2 coins.", ["scheme2cards"], ["fish", "honey", "coin", "coin"], []);
         this.addDeedCard("Send Gifts", 1, "Pay fish, fur, 2 coins.", ["move", "move"], ["fish", "fur", "coin", "coin"], []);
         this.addDeedCard("Wilderness Forts", 1, "Pay stone, fur, wood.", ["build"], ["stone", "fur", "wood"], []);
-        // TODO: Handle the special attack reward 
         this.addDeedCard("Hire Mercenaries", 1, "Pay fish, stone, 2 coins.", ["attackMinusScheme"], ["fish", "stone", "coin", "coin"], []);
-        //this.addDeedCard("Hire Mercenaries", 1, "Pay fish, stone, 2 coins.", ["attack"], ["fish", "stone", "coin", "coin"], []);
 
         // These are cost based, but requires decision for which resource to pay.
         this.addDeedCard("Trade Route", 1, "Pay 3 different resources.", ["coin", "coin"], {"differentResource":["resource", "resource", "resource"]}, []);
@@ -37,12 +35,9 @@ class Cards {
         this.addDeedCard("Honorable Prince", 1, "Pay a scheme card and 3 coin.", ["muster", "muster"], ["schemeCard", "coin", "coin", "coin"], []);
         this.addDeedCard("New Beginning", 1, "Sacrifice market, stronghold, and church.", ["tax", "tax"], ["market", "stronghold", "church"], []);
         this.addDeedCard("Retire Veterans", 1, "Remove 2 troops and pay 2 coins.", ["scheme2Cards"], ["troop", "troop", "coin", "coin"], []);
-        // TODO: Handle the special move reward 
         this.addDeedCard("Victory March", 1, "Remove 2 troops and pay a scheme card.", ["moveAnywhere", "moveAnywhere"], ["schemeCard", "troop", "troop"], []);
-        //this.addDeedCard("Victory March", 1, "Remove 2 troops and pay a scheme card.", ["move", "move"], ["schemeCard", "troop", "troop"], []);
         this.addDeedCard("Peace Maker", 1, "Remove 2 troops from a ruled region.", ["scheme2Cards"], ["troop", "troop"], []);
         this.addDeedCard("Border Patrols", 1, "Remove 3 troops from different regions.", ["moveAnywhere", "moveAnywhere"], {"differentRegions":["troop", "troop", "troop"]}, []);
-        //this.addDeedCard("Border Patrols", 1, "Remove 3 troops from different regions.", ["move", "move"], ["troop", "troop", "troop"], []);
 
         // These include some achievements which must be fulfilled and may also have costs.
         this.addDeedCard("Enforce Peace", 1, "Pay wood and honey and defeat 2 rebels.", ["attackMinusScheme"], ["wood", "honey"], ["defeatRebel", "defeatRebel"]);
