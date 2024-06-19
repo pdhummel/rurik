@@ -750,5 +750,27 @@ function selectClaimRemoveChoiceChanged(i) {
 }
 
 function accomplishDeed() {
-
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = {};
+  var deedCardName = getSelectedRadioButton("accomplishDeedCard");
+  data['deedCardName'] = deedCardName;  
+  var claimStatements = [];
+  for (var i=0; i<5; i++) {
+    var claimStatement = {};
+    claimStatement.claimPayChoice = getSelectedValue("claimPayChoice" + i);
+    claimStatement.claimStatementChoice = getSelectedValue("claimStatement" + i);
+    claimStatement.claimRemoveChoice = getSelectedValue("claimRemoveChoice" + i);
+    claimStatement.claimPayResourceChoice = getSelectedValue("claimPayResourceChoice" + i);
+    claimStatement.claimPaySchemeCardChoice = getSelectedValue("claimPaySchemeCardChoice" + i);
+    claimStatement.claimRemoveBuildingChoice = getSelectedValue("claimRemoveBuildingChoice" + i);
+    claimStatement.claimRemoveLocationChoice = getSelectedValue("claimRemoveLocationChoice" + i);
+    claimStatement.claimAssertion = getValue("claimAssertion" + i);
+    claimStatements.push(claimStatement);
+  }
+  data.claimStatements = claimStatements;
+  var postData = JSON.stringify(data);
+  console.log("accomplishDeed(): data=" + postData);
+  callApi("/game/" + gameId + "/player/" + color + "/deed", "post", postData, refreshGameHandler);
 }
+

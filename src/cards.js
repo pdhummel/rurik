@@ -308,6 +308,7 @@ class DeedCard {
         this.verifiedByPlayers['white'] = null;
         this.playerColor = null;
         this.claimStatements = [];
+        this.summarizedClaimStatements = [];
     }
 }
 

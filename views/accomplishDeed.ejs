@@ -1,6 +1,7 @@
 <tr>
   <td style="border-bottom: 1pt solid black; vertical-align: baseline">
     <select id="claimStatement<%= row %>" style="display:inline" onchange="javascript:selectClaimStatementChanged(<%= row %>);">
+      <option>none</option>
       <option>assert</option>
       <option>pay</option>
       <option>remove</option>
@@ -47,8 +48,7 @@
         <option>Peresech</option>
         <option>Azov</option>
     </select><br/></span>
-    <!--<span id="claimAssertionSpan<%=row %>" style="display:inline"><textarea id="claimAssertion<%= row %>" style="height:12px; width: 400px; display:inline"></textarea></span>-->
-    <span id="claimAssertionSpan<%=row %>" style="display:inline"><input id="claimAssertion<%= row %>" type="text" style="width: 300px; display:inline"></textarea></span>
+    <span id="claimAssertionSpan<%=row %>" style="display:inline"><input id="claimAssertion<%= row %>" type="text" style="width: 300px; display:inline"></span>
   </td>
 </tr>
 

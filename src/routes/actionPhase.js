@@ -351,4 +351,24 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     });  
 
 
+    app.post('/game/:id/player/:color/deed', (req, res) => {
+      console.log("post " + req.path + " " + JSON.stringify(req.params) + " " + JSON.stringify(req.body));
+      var game = games.getGameById(req.params.id);
+      if (game === undefined) {
+        res.status(404).send('Game not found');
+        return;
+      }
+      var color = req.params.color;
+      var player = game.getPlayer(color);
+      if (player == undefined) {
+        res.status(404).send('Player not found');
+        return;
+      }
+      var deedCardName = req.body.deedCardName;
+      var claimStatements = req.body.claimStatements;
+      var deedCardToVerify = game.accomplishedDeed(color, deedCardName, claimStatements);
+      res.send(deedCardToVerify);
+    });
+
+
 module.exports = app;

@@ -822,11 +822,52 @@ class Game {
 
     accomplishedDeed(color, deedCardName, claimStatements) {
         console.log("claimAccomplishedDeed(): " + color + " " + deedCardName);
+      // claimStatementChoice
+      // claimPayChoice
+      // claimRemoveChoice
+      // claimPayResourceChoice
+      // claimPaySchemeCardChoice
+      // claimRemoveBuildingChoice
+      // claimRemoveLocationChoice
+      // claimAssertion
+
         this.validateGameStatus("actionPhaseAccomplishDeed", "claimAccomplishedDeed");
         var currentPlayer = this.validateCurrentPlayer(color, "claimAccomplishedDeed");
         this.deedCardToVerify = this.cards.allDeedCards[deedCardName];
         this.deedCardToVerify.playerColor = color;
         this.deedCardToVerify.claimStatements = claimStatements;
+        for (var i=0; i<claimStatements.length; i++) {
+            var claimText = null;
+            var claimStatement = claimStatements[i];
+            if (claimStatement.claimStatementChoice == undefined || claimStatement.claimStatementChoice == null ||
+                claimStatement.claimStatementChoice == "none" || claimStatement.claimStatementChoice == "") {
+                continue;
+            } else if (claimStatement.claimStatementChoice == "pay") {
+                claimText = "Pay ";
+                if (claimStatement.claimPayChoice == "coin") {
+                    claimText = claimText + "coin";
+                } else if (claimStatement.claimPayChoice == "resource") {
+                    claimText = claimText + claimStatement.claimPayResourceChoice;
+                } else if (claimStatement.claimPayChoice == "scheme card") {
+                    claimText = claimText + "scheme card";
+                } else {
+                    claimText = claimText + "???"
+                }
+            } else if (claimStatement.claimStatementChoice == "remove") {
+                claimText = "Remove ";
+                if (claimStatement.claimRemoveChoice == "troop") {
+                    claimText = claimText + "troop"
+                } else if (claimStatement.claimRemoveChoice == "building") {
+                    claimText = claimText + claimStatement.claimRemoveBuildingChoice;
+                } else {
+                    claimText = claimText + "???";
+                }
+                claimText = claimText + " from " + claimStatement.claimRemoveLocationChoice;
+            } else if (claimStatement.claimStatementChoice == "assert") {
+                claimText = "Assert: " + claimStatement.claimAssertion;
+            }
+            this.deedCardToVerify.summarizedClaimStatements.push(claimText);
+        }
         this.gameStates.setCurrentState("actionPhaseVerifyDeed");
         var nextPlayer = this.players.getNextPlayer(currentPlayer);
         // The AI trusts you
@@ -834,7 +875,7 @@ class Game {
             this.deedCardToVerify.verifiedByPlayers[nextPlayer.color] = true;
             nextPlayer = this.players.getNextPlayer(nextPlayer);
         }
-        this.players.setCurrentPlayer(nextPlayer);
+        this.players.setCurrentPlayer(nextPlayer);        
         return this.deedCardToVerify;
     }
 
