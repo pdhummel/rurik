@@ -821,18 +821,9 @@ class Game {
     }
 
     accomplishedDeed(color, deedCardName, claimStatements) {
-        console.log("claimAccomplishedDeed(): " + color + " " + deedCardName);
-      // claimStatementChoice
-      // claimPayChoice
-      // claimRemoveChoice
-      // claimPayResourceChoice
-      // claimPaySchemeCardChoice
-      // claimRemoveBuildingChoice
-      // claimRemoveLocationChoice
-      // claimAssertion
-
-        this.validateGameStatus("actionPhaseAccomplishDeed", "claimAccomplishedDeed");
-        var currentPlayer = this.validateCurrentPlayer(color, "claimAccomplishedDeed");
+        console.log("accomplishedDeed(): " + color + " " + deedCardName);
+        this.validateGameStatus("actionPhaseAccomplishDeed", "accomplishedDeed");
+        var currentPlayer = this.validateCurrentPlayer(color, "accomplishedDeed");
         this.deedCardToVerify = this.cards.allDeedCards[deedCardName];
         this.deedCardToVerify.playerColor = color;
         this.deedCardToVerify.claimStatements = claimStatements;
@@ -846,21 +837,39 @@ class Game {
                 claimText = "Pay ";
                 if (claimStatement.claimPayChoice == "coin") {
                     claimText = claimText + "coin";
+                    if (currentPlayer.boat.money < 1) {
+                        this.throwError("You do not have enough money", "accomplishedDeed");
+                    }
                 } else if (claimStatement.claimPayChoice == "resource") {
                     claimText = claimText + claimStatement.claimPayResourceChoice;
+                    if (! currentPlayer.boat.goodsOnDock[claimStatement.claimPayResourceChoice] > 0) {
+                        this.throwError("You do not have " + claimStatement.claimPayResourceChoice + " on your dock.", "accomplishedDeed");
+                    }
                 } else if (claimStatement.claimPayChoice == "scheme card") {
                     claimText = claimText + "scheme card";
+                    if (currentPlayer.schemeCards.length < 1) {
+                        this.throwError("You do not have a scheme card");
+                    }
                 } else {
                     claimText = claimText + "???"
+                    this.throwError("Payment not specified.", "accomplishedDeed");
                 }
             } else if (claimStatement.claimStatementChoice == "remove") {
                 claimText = "Remove ";
+                var location = this.gameMap.locationByName(claimStatement.claimRemoveLocationChoice);
                 if (claimStatement.claimRemoveChoice == "troop") {
                     claimText = claimText + "troop"
+                    if (! location.doesOccupy(color)) {
+                        this.throwError("You do not have troops in " + claimStatement.claimRemoveLocationChoice, "accomplishDeed");
+                    }
                 } else if (claimStatement.claimRemoveChoice == "building") {
                     claimText = claimText + claimStatement.claimRemoveBuildingChoice;
+                    if (! location.doesPlayerHaveThisBuilding(color, claimStatement.claimRemoveBuildingChoice)) {
+                        this.throwError("You do not have a " + claimStatement.claimRemoveBuildingChoice + " in " + claimStatement.claimRemoveLocationChoice, "accomplishDeed");
+                    }
                 } else {
                     claimText = claimText + "???";
+                    this.throwError("What to remove not specified.", "accomplishedDeed");
                 }
                 claimText = claimText + " from " + claimStatement.claimRemoveLocationChoice;
             } else if (claimStatement.claimStatementChoice == "assert") {
@@ -879,9 +888,10 @@ class Game {
         return this.deedCardToVerify;
     }
 
-    verifyDeed(color, deedCardName, verified) {
+    verifyDeed(color, verified) {
+        var deedCardName = this.deedCardToVerify.name;
         console.log("verifyDeed(): " + color + " " + deedCardName);
-        this.validateGameStatus("actionPhaseAccomplishDeed", "claimAccomplishedDeed");
+        this.validateGameStatus("actionPhaseVerifyDeed", "verifyDeed");
         var currentPlayer = this.validateCurrentPlayer(color, "verifyDeed");
         var deedCard = this.cards.allDeedCards[deedCardName];
         this.deedCardToVerify = deedCard;
@@ -895,7 +905,7 @@ class Game {
                 }
             }
             if (isGood) {
-                this.redeemDeed(this.deedCardToVerify);
+                this.redeemDeed(currentPlayer, this.deedCardToVerify);
             } else {
                 for (var c=0; c<colors.length; c++) {
                     deedCard.verifiedByPlayers[colors[c]] = null;
@@ -915,10 +925,67 @@ class Game {
         return deedCard;
     }
 
-    redeemDeed(deedCard) {
+    redeemDeed(player, deedCard) {
         console.log("reedeemDeed(): " + deedCard.name);
+        var claimStatements = deedCard.claimStatements;
+        for (var i=0; i<claimStatements.length; i++) {
+            var claimStatement = claimStatements[i];
+            if (claimStatement.claimStatementChoice == "pay") {
+                if (claimStatement.claimPayChoice == "coin") {
+                    if (player.boat.money < 1) {
+                        this.throwError("You do not have enough money", "reedeemDeed");
+                    }
+                    player.boat.money--;
+                } else if (claimStatement.claimPayChoice == "resource") {
+                    if (! player.boat.goodsOnDock[claimStatement.claimPayResourceChoice] > 0) {
+                        this.throwError("You do not have " + claimStatement.claimPayResourceChoice + " on your dock.", "reedeemDeed");
+                    }
+                    player.boat.goodsOnDock[claimStatement.claimPayResourceChoice]--;
+                } else if (claimStatement.claimPayChoice == "scheme card") {
+                    if (player.schemeCards.length < 1) {
+                        this.throwError("You do not have a scheme card");
+                    }
+                    var schemeCard = this.cards.getSchemeCardById(claimStatement.claimPaySchemeCardChoice);
+                    this.cards.discardedSchemeCards.push(schemeCard);
+                    // remove the scheme card
+                    var playerSchemeCards = [];
+                    for (var i=0; i < currentPlayer.schemeCards.length; i++) {
+                        var playerSchemeCard = currentPlayer.schemeCards[i];
+                        if (playerSchemeCard.id != schemeCard.id) {
+                            playerSchemeCards.push(playerSchemeCard);
+                        }
+                    }
+                    currentPlayer.schemeCards = playerSchemeCards;
+                }
+            } else if (claimStatement.claimStatementChoice == "remove") {
+                var location = this.gameMap.locationByName(claimStatement.claimRemoveLocationChoice);
+                if (claimStatement.claimRemoveChoice == "troop") {
+                    claimText = claimText + "troop"
+                    if (! location.doesOccupy(color) && location.troopsByColor[player.color] > 0) {
+                        this.throwError("You do not have troops in " + claimStatement.claimRemoveLocationChoice, "accomplishDeed");
+                    }
+                    location.troopsByColor[player.color]--;
+                    player.supplyTroops++;
+                } else if (claimStatement.claimRemoveChoice == "building") {
+                    if (! location.doesPlayerHaveThisBuilding(color, claimStatement.claimRemoveBuildingChoice)) {
+                        this.throwError("You do not have a " + claimStatement.claimRemoveBuildingChoice + " in " + claimStatement.claimRemoveLocationChoice, "accomplishDeed");
+                    }
+                    // remove the building
+                    var locationBuildings = [];
+                    for (var j=0; j<location.buildings; j++) {
+                        var building = location.buildings[j];
+                        if (building.name != claimStatement.claimRemoveBuildingChoice) {
+                            locationBuildings.push(building);
+                        }
+                    }
+                    location.buildings = locationBuildings;
+                    player.buildings[claimStatement.claimRemoveBuildingChoice]++;
+                }
+            }
+        }
         deedCard.accomplished = true;
         for (var i=0; i<deedCard.rewards.length; i++) {
+            // TODO: collect deed card rewards
             // scheme2cards, attackMinusScheme, moveAnywhere, warTrack
             // muster, move, build, coin, tax
         }

@@ -90,14 +90,17 @@ function refreshPlayer() {
       row.push(deedCard.name);
       row.push(deedCard.victoryPoints);
       row.push(deedCard.requirementText);
+      row.push(deedCard.accomplished);
       rows.push(row);
-      accomplishRow.push('<input type="radio" id="deedCard"+i name="accomplishDeedCard" value="' + deedCard.name + '">');
-      accomplishRow.push(deedCard.name);
-      accomplishRow.push(deedCard.victoryPoints);
-      accomplishRow.push(deedCard.requirementText);
-      accomplishRows.push(accomplishRow);
+      if (deedCard.accomplished == false) {
+        accomplishRow.push('<input type="radio" id="deedCard"+i name="accomplishDeedCard" value="' + deedCard.name + '">');
+        accomplishRow.push(deedCard.name);
+        accomplishRow.push(deedCard.victoryPoints);
+        accomplishRow.push(deedCard.requirementText);
+        accomplishRows.push(accomplishRow);  
+      }
     }
-    var table = createTable(rows, ["Name", "VPs", "Description"], "white");
+    var table = createTable(rows, ["Name", "VPs", "Description", "Accomplished?"], "white");
     var accomplishTable = createTable(accomplishRows, ["", "Name", "VPs", "Description"], "white");
     deedCardsDiv.appendChild(table);  
     playDeedCardChoices.appendChild(accomplishTable);

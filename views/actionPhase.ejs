@@ -250,5 +250,15 @@
   <input type="button" value="Accomplish Deed" onclick="javascript:accomplishDeed();"/>
   <input type="button" value="Cancel" onclick="javascript:cancelAction();"/><br/>    
   <br/>
-  
+</div>
+
+<div id="verifyDeedDiv" style="display:none">
+  Please verify the following assertions/actions for the Deed:
+  <div id="deedCardToVerifyDiv"></div>
+  <div id="verifyDeedTableDiv"></div>
+  <span id="verifyDeedButtonSpan" style="display:inline">
+    <input type="button" value="Verify Deed" onclick="javascript:verifyDeed(true);"/>
+    <input type="button" value="Reject Deed" onclick="javascript:verifyDeed(false);"/><br/>
+  </span>
+  <br/>
 </div>

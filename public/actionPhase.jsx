@@ -58,6 +58,12 @@ function showActionPhases(currentState, myColor) {
   } else {
     hide("accomplishDeedDiv");
   }
+
+  if (currentState == "actionPhaseVerifyDeed") {
+    showVerifyDeed();
+  } else {
+    hide("verifyDeedDiv");
+  }
 }
 
 function getNextAdvisor() {
@@ -774,3 +780,40 @@ function accomplishDeed() {
   callApi("/game/" + gameId + "/player/" + color + "/deed", "post", postData, refreshGameHandler);
 }
 
+function showVerifyDeed() {
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/deedToVerify", "get", "", showVerifyDeedHandler);
+}
+
+function showVerifyDeedHandler(response) {
+  console.log("showVerifyDeedHandler():" + JSON.stringify(response.data));
+  var deedCard = response.data;
+  var deedCardToVerifyDiv = document.getElementById("deedCardToVerifyDiv");
+  deedCardToVerifyDiv.innerHTML = "";
+  var accomplishRows = [];
+  var accomplishRow = [];
+  accomplishRow.push(deedCard.name);
+  accomplishRow.push(deedCard.victoryPoints);
+  accomplishRow.push(deedCard.requirementText);
+  accomplishRows.push(accomplishRow);  
+  var table = createTable(accomplishRows, ["Name", "VPs", "Description"], "white");
+  deedCardToVerifyDiv.appendChild(table);
+  var verifyDeedTableDiv = document.getElementById("verifyDeedTableDiv");
+  var claimStatements = deedCard.summarizedClaimStatements;
+  var claimStatementRows = [];
+  for (var i=0; i < claimStatements.length; i++) {
+    var claimStatementRow = [];
+    claimStatementRow.push(claimStatements[i]);
+    claimStatementRows.push(claimStatementRow);
+  }
+  var claimsTable = createTable(claimStatementRows, ["Assertions / Actions"], "white");
+  verifyDeedTableDiv.appendChild(claimsTable);
+  show("verifyDeedDiv");
+}
+
+function verifyDeed(isVerified) {
+  var gameId = getInnerHtmlValue("gameId");
+  var color = getInnerHtmlValue("myColor");
+  var data = '{ "verified": ' + isVerified + ' }'
+  callApi("/game/" + gameId + "/player/" + color + "/deed", "put", data, refreshGameHandler);
+}

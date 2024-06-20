@@ -370,5 +370,32 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       res.send(deedCardToVerify);
     });
 
+    app.get('/game/:id/deedToVerify', (req, res) => {
+      console.log("post " + req.path);
+      var game = games.getGameById(req.params.id);
+      if (game === undefined) {
+        res.status(404).send('Game not found');
+        return;
+      }
+      res.send(game.deedCardToVerify);
+    });
+
+    app.put('/game/:id/player/:color/deed', (req, res) => {
+      console.log("post " + req.path + " " + JSON.stringify(req.params) + " " + JSON.stringify(req.body));
+      var game = games.getGameById(req.params.id);
+      if (game === undefined) {
+        res.status(404).send('Game not found');
+        return;
+      }
+      var color = req.params.color;
+      var player = game.getPlayer(color);
+      if (player == undefined) {
+        res.status(404).send('Player not found');
+        return;
+      }
+      var verified = req.body.verified;
+      game.verifyDeed(color, verified);
+      res.send(game.deedCardToVerify);
+    });
 
 module.exports = app;

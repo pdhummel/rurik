@@ -91,6 +91,19 @@ class Location {
         return hasBuilding;
     }
 
+    doesPlayerHaveThisBuilding(color, buildingName) {
+        var hasBuilding = false;
+        for (var i=0; i<this.buildings.length; i++) {
+            if (this.buildings[i].color == color) {
+                if (this.buildings[i].name == buildingName) {
+                    hasBuilding = true;
+                }
+            }
+        }
+        return hasBuilding;
+
+    }
+
     doesOccupy(color) {
         if (this.troopsByColor[color] > 0 || this.leaderByColor[color] > 0) {
             return true;
