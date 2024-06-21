@@ -90,7 +90,6 @@ function refreshGameStatusResponseHandler(response) {
       currentPlayerColorElement.className = currentPlayer + " numberCircle";
     } else {
       currentPlayerColorElement.innerHTML = "";
-      //currentPlayerColorElement.style.display = "none";
     }    
 
     if (gameRound != undefined) {
@@ -217,10 +216,6 @@ function refreshGameStatusResponseHandler(response) {
       populateSchemeCards(response.data.clientPlayer);
     }
 
-    if (currentState.toLowerCase().includes("actionphase") && currentPlayer == myColor) {
-      showActionPhases(currentState, myColor);
-    }
-
     if (currentState == "claimPhase" || currentState == "takeDeedCardForClaimPhase") {
       showClaimBoard();
     } else {
@@ -233,6 +228,8 @@ function refreshGameStatusResponseHandler(response) {
     } else {
       hide("takeDeedCardDiv");
     }
+
+    showOrHideActionPhases(currentState, currentPlayer);
 }
 
 function refreshClaimBoard() {

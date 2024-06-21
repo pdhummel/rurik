@@ -1,65 +1,66 @@
-function showActionPhases(currentState, myColor) {
+function showOrHideActionPhases(currentState, currentPlayerColor) {
   console.log("showActionPhases(): currentState=" + currentState);
-  if (currentState == "actionPhase") {
+  var myColor = getInnerHtmlValue("myColor");
+  if (currentState == "actionPhase" && currentPlayerColor == myColor) {
     showActionPhaseDiv();
   } else {
     hide("actionPhaseDiv");
   }
-  if (currentState == "actionPhaseMuster") {
+  if (currentState == "actionPhaseMuster" && currentPlayerColor == myColor) {
     showMusterTroopsDiv();
   } else {
     hide("musterTroopsDiv");
   }
-  if (currentState == "actionPhaseMove") {
+  if (currentState == "actionPhaseMove" && currentPlayerColor == myColor) {
     showMoveTroopsDiv();
   } else {
     hide("moveTroopsDiv");
   }
-  if (currentState == "actionPhaseAttack") {
+  if (currentState == "actionPhaseAttack" && currentPlayerColor == myColor) {
     showAttackDiv();
   } else {
     hide("attackDiv");
   }
-  if (currentState == "actionPhaseTax") {
+  if (currentState == "actionPhaseTax" && currentPlayerColor == myColor) {
     showTaxDiv();
   } else {
     hide("taxDiv");
   }
-  if (currentState == "actionPhaseBuild") {
+  if (currentState == "actionPhaseBuild" && currentPlayerColor == myColor) {
     showBuildDiv();
   } else {
     hide("buildDiv");
   }
-  if (currentState == "actionPhaseTransfer") {
+  if (currentState == "actionPhaseTransfer" && currentPlayerColor == myColor) {
     showTransferGoodsDiv();
   } else {
     hide("transferGoodsDiv");
   }
-  if (currentState == "actionPhasePlaySchemeCard") {
+  if (currentState == "actionPhasePlaySchemeCard" && currentPlayerColor == myColor) {
     show("playSchemeCardDiv");
   } else {
     hide("playSchemeCardDiv");
   }
   
-  if (currentState == "takeDeedCardForActionPhase") {
+  if (currentState == "takeDeedCardForActionPhase" && currentPlayerColor == myColor) {
     show("takeDeedCardDiv");
   } else {
     hide("takeDeedCardDiv");
   }
 
-  if (currentState == "actionPhasePlayConversionTile") {
+  if (currentState == "actionPhasePlayConversionTile" && currentPlayerColor == myColor) {
     showPlayConversionTile();
   } else {
     hide("playConversionTileDiv");
   }
 
-  if (currentState == "actionPhaseAccomplishDeed") {
+  if (currentState == "actionPhaseAccomplishDeed" && currentPlayerColor == myColor) {
     showAccomplishDeed();
   } else {
     hide("accomplishDeedDiv");
   }
 
-  if (currentState == "actionPhaseVerifyDeed") {
+  if (currentState == "actionPhaseVerifyDeed" && currentPlayerColor == myColor) {
     showVerifyDeed();
   } else {
     hide("verifyDeedDiv");
@@ -807,6 +808,7 @@ function showVerifyDeedHandler(response) {
     claimStatementRows.push(claimStatementRow);
   }
   var claimsTable = createTable(claimStatementRows, ["Assertions / Actions"], "white");
+  verifyDeedTableDiv.innerHTML = ""
   verifyDeedTableDiv.appendChild(claimsTable);
   show("verifyDeedDiv");
 }
