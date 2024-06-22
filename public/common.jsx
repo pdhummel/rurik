@@ -166,8 +166,9 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
       var th = document.createElement('th');
       th.style.align = "left";
       th.style.border = "1px solid black";
-      var textNode = document.createTextNode(headings[cell]);
-      th.appendChild(textNode);
+      th.innerHTML = headings[cell];
+      //var textNode = document.createTextNode(headings[cell]);
+      //th.appendChild(textNode);
       tr.appendChild(th);
     }
     table.appendChild(tr);   

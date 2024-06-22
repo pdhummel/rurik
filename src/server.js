@@ -201,3 +201,14 @@ app.get('/game/:id/claimBoard', (req, res) => {
   res.send(game.claimBoard);
 });
 
+app.get('/game/:id/endGame', (req, res) => {
+  console.log("get " + req.path + " " + req.params);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send('Game not found');
+    return;
+  }
+  var endGameStats = game.calculateEndGameStats();
+  res.send(endGameStats);
+});
+

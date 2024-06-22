@@ -1011,6 +1011,81 @@ class Game {
         this.gameStates.setCurrentState("endGame");
     }
 
+    calculateEndGameStats() {
+        var endGameStats = {};
+        endGameStats["player"] = {};
+        endGameStats["rule"] = {};
+        endGameStats["build"] = {};
+        endGameStats["trade"] = {};
+        endGameStats["warfare"] = {};
+        endGameStats["vp"] = {};
+        endGameStats["deeds"] = {};
+        endGameStats["secretAgenda"] = {};
+        endGameStats["total"] = {};
+
+        var topWarfare = 0;
+        var secondWarfare = 0;
+        var playersWithTopWarfare = 0;
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var warfare = this.claimBoard.claimsByPlayer[color]["warfare"];
+            if (warfare > topWarfare) {
+                topWarfare = warfare;
+                playersWithTopWarfare = 1;
+            } else if (warfare == topWarfare) {
+                playersWithTopWarfare++;
+            } else if (warfare > secondWarfare) {
+                secondWarfare = warfare;
+            }
+        }
+
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            endGameStats["player"][color] = player;
+            endGameStats["rule"][color] = this.claimBoard.claimsByPlayer[color]["rule"];
+            endGameStats["build"][color] = this.claimBoard.claimsByPlayer[color]["build"];
+            endGameStats["trade"][color] = this.claimBoard.claimsByPlayer[color]["trade"];
+            endGameStats["vp"][color] = player.victoryPoints;
+
+            // 3 points for first place. 
+            // If there is a tie for first, each gets 3 points and no second place is awarded.
+            // 1 point for second place.
+            // If there is a tie for second, each gets 1 point.
+            var warfarePoints = 0;
+            var warfare = this.claimBoard.claimsByPlayer[color]["warfare"];
+            if (warfare == topWarfare) {
+                warfarePoints = 3;
+            } else if (warfare == secondWarfare && playersWithTopWarfare == 1) {
+                warfarePoints = 1;
+            }
+            endGameStats["warfare"][color] = warfarePoints;
+
+            var deedCardPoints = 0;
+            for (var j=0; j<player.deedCards.length; j++) {
+                var deedCard = player.deedCards[j];
+                if (deedCard.accomplished) {
+                    deedCardPoints = deedCardPoints + deedCard.victoryPoints;
+                }
+            }
+            endGameStats["deeds"][color] = deedCardPoints;
+
+            var secretAgendaPoints = 0;
+            for (j=0; j<player.secretAgenda.length; j++) {
+                var secretAgendaCard = player.secretAgenda[j];
+                if (secretAgendaCard.accomplished) {
+                    secretAgendaPoints = secretAgendaPoints + secretAgendaCard.points;
+                }
+            }
+            endGameStats["secretAgenda"][color] = secretAgendaPoints;
+
+
+            endGameStats["total"][color] = endGameStats["rule"][color] + endGameStats["build"][color] + endGameStats["trade"][color] +
+              endGameStats["warfare"][color] + endGameStats["vp"][color] + endGameStats["deeds"][color] + endGameStats["secretAgenda"][color];
+        }
+        return endGameStats;
+    }
 
     playMusterConversionTile(currentPlayer, resource1, resource2) {
         console.log("playMusterConversionTile(): " + currentPlayer.color + " " + resource1 + " " + resource2);

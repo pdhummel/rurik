@@ -224,6 +224,12 @@ function refreshGameStatusResponseHandler(response) {
       hide("warfareDiv");
     }
 
+    if (currentState == "endGame") {
+      showEndGameStats();
+    } else {
+      hide("endGameDiv");
+    }
+
     showOrHideActionPhases(currentState, currentPlayer);
 }
 
@@ -457,4 +463,64 @@ function outputSchemeCard(cardDivName, schemeCardId) {
     tr.innerHTML = '<td height="30px"></td><td></td><td></td>';
   }
   table.appendChild(tr);
+}
+
+function showEndGameStats() {
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/endGame", "get", "", showEndGameHandler);  
+}
+
+function showEndGameHandler(response) {
+  console.log("showEndGamehandler(): " + JSON.stringify(response.data));
+  var endGameStats = response.data;
+  var endGameTableDiv = document.getElementById("endGameTableDiv");
+  var rows = [];
+  var ruleRow = [];
+  var buildRow = [];
+  var tradeRow = [];
+  var warfareRow = [];
+  var vpRow = [];
+  var deedRow = [];
+  var secretAgendaRow = [];
+  var totalRow = [];
+  var colors = Object.keys(endGameStats["rule"]);
+  ruleRow.push("Rule");
+  buildRow.push("Build");
+  tradeRow.push("Trade");
+  warfareRow.push("War");
+  vpRow.push("Victory Points");
+  deedRow.push("Deeds");
+  secretAgendaRow.push("Secret Agenda");
+  totalRow.push("<b>Total</b>");
+  for (var i=0; i<colors.length; i++) {
+    var color = colors[i];
+    ruleRow.push(endGameStats["rule"][color]);
+    buildRow.push(endGameStats["build"][color]);
+    tradeRow.push(endGameStats["trade"][color]);
+    warfareRow.push(endGameStats["warfare"][color]);
+    vpRow.push(endGameStats["vp"][color]);
+    deedRow.push(endGameStats["deeds"][color]);
+    secretAgendaRow.push(endGameStats["secretAgenda"][color]);
+    totalRow.push(endGameStats["total"][color]);
+  }
+  rows.push(ruleRow);
+  rows.push(buildRow);
+  rows.push(tradeRow);
+  rows.push(warfareRow);
+  rows.push(vpRow);
+  rows.push(deedRow);
+  rows.push(secretAgendaRow);
+  rows.push(totalRow);
+  var headings = [];
+  headings.push("Point Category");
+  for (var i=0; i<colors.length; i++) {
+    var color = colors[i];
+    var player = endGameStats["player"][color];
+    var playerSpan = '<span><span class="' + color + ' numberBox">&nbsp;&nbsp;&nbsp;</span> ' + player.name + '&nbsp;&nbsp;</span>';
+    headings.push(playerSpan);
+  }
+  var table = createTable(rows, headings, "white");
+  endGameTableDiv.innerHTML = "";
+  endGameTableDiv.appendChild(table);
+  show("endGameDiv");
 }

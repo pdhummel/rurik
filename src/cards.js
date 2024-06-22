@@ -288,6 +288,7 @@ class SecretAgendaCard {
         this.name = name;
         this.text = text;
         this.points = points;
+        this.accomplished = false;
     }
 }
 

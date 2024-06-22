@@ -7,7 +7,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * messages and error messages in UI
 * show upcoming advisors on map board
 * show reward for deed cards
-* end game logic and scoring
+
 
 
 
@@ -126,7 +126,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * make assertions for accomplishing a deed
 * verify assertions for accomplishing a deed
 * indicate accomplished deed cards
-
+* end game logic and scoring
 
 
 
@@ -151,4 +151,28 @@ nodejs ./src/server.js
 https://cloud.oracle.com
 pdhummel
 
+```
+#rurik_server=
+# remote onetime setup
+ssh  opc@${rurik_server}
+sudo su -
+# setup ~/.ssh/id_rsa and ~/.ssh/id_rsa.pub
+dnf install podman
+dnf install git
+exit # sudo
+git clone git@github.com:pdhummel/rurik.git
 
+# remotely
+ssh  opc@${rurik_server}
+cd rurik
+podman build -f ./docker/Dockerfile -t nodejs-rurik .
+podman run -d --name rurik -p 0.0.0.0:8080:3000 -d localhost/nodejs-rurik:latest
+podman ps
+curl http://localhost:8080
+exit
+
+# locally
+ssh -L 127.0.0.1:8080:127.0.0.1:8080 opc@${rurik_server} -N
+curl http://localhost:8080
+# In a browser: http://localhost:8080
+```
