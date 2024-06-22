@@ -7,7 +7,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * messages and error messages in UI
 * show upcoming advisors on map board
 * show reward for deed cards
-* indicate accomplished deed cards
+* end game logic and scoring
+
 
 
 * action phase
@@ -17,9 +18,25 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * leader abilities
   * leader defeated and leader muster
   * gain war track bonuses on attack
-  * accomplish deeds
-    * rewards for accomplishing deeds
+  * get rewards for accomplishing deeds
   
+* hack mode
+  * add/subtract money
+  * muster troop to anywhere
+  * remove troop from anywhere
+  * remove resource from anywhere
+  * refresh resource anywhere
+  * add resource to dock
+  * remove leader from anywhere
+  * place leader in supply to anywhere
+  * remove building from anywhere
+  * place building in supply to anywhere
+  * take scheme card from deck
+  * set round
+  * set phase
+  * set current player
+  * add actions for move, tax, build, attack
+
 
 * player view
   * show leader in supply  
@@ -106,27 +123,11 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * display war track with claim board
 * window for claim board and war track
 * display war track bonuses
+* make assertions for accomplishing a deed
+* verify assertions for accomplishing a deed
+* indicate accomplished deed cards
 
 
-
-## APIs
-
-| Path | Method | Return | Purpose |
-| :--- | :--- | :--- | :--- |
-| /game | get | game list | list games |
-| /game | post | Game | create game |
-| /game/:id | get | Game | get game |
-| /gameStatus/:id | get | GameStatus | X - get game status |
-| /game/:id/player | post | Player | player join game |
-| /game/:id/player | put | Player | player rejoin game |
-| /game/:id/player | get | Player | get player |
-| | | |
-| | | get advisor board |
-| | | player place advisor |
-| | | player retrieve advisor |
-| | | get map |
-| | | get cards - scheme decks, deed cards |
-| | | get claim board |
 
 
 ## Notes
@@ -149,14 +150,5 @@ nodejs ./src/server.js
 
 https://cloud.oracle.com
 pdhummel
-
-### Deeds
-* payments and sacrifices
-  * pay resource costs
-  * pay a scheme card
-  * sacrifice troops
-  * sacrifice buildings
-* verify achievements
-* collect rewards
 
 

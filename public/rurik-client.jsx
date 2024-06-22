@@ -223,11 +223,6 @@ function refreshGameStatusResponseHandler(response) {
       hide("claimBoardTable");
       hide("warfareDiv");
     }
-    if (currentState == "takeDeedCardForClaimPhase" && currentPlayer == myColor) {
-      show("takeDeedCardDiv");
-    } else {
-      hide("takeDeedCardDiv");
-    }
 
     showOrHideActionPhases(currentState, currentPlayer);
 }
@@ -371,7 +366,7 @@ function refreshCardsResponseHandler(response) {
     row.push(deedCard.victoryPoints);
     row.push(deedCard.requirementText);
     rows.push(row);
-    var radioButton = document.getElementById("deedCard" + i);
+    var radioButton = document.getElementById("deedCardChoice" + i);
     radioButton.value = deedCard.name;
     var label = document.getElementById("deedCardLabel" + i);
     label.innerHTML = "(" + deedCard.victoryPoints + ") " + deedCard.name + ": " + deedCard.requirementText;

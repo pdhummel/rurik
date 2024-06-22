@@ -306,6 +306,13 @@ class GameMap {
         return locationMap;
     }
 
+    resetResources() {
+        for (var i=0; i<this.locationsForGame.length; i++) {
+            var location = this.locationsForGame[i];
+            location.resourceCount = 1;
+        }
+    }
+
 }
 
 module.exports = GameMap, Location

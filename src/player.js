@@ -66,6 +66,7 @@ class GamePlayers {
             player.boat.canPlayBuildConversionTile = true;
             var coinIncome = player.boat.calculateCoinIncome();
             player.boat.money = player.boat.money + coinIncome;
+            player.finishedRound = false;
         }
     }
 

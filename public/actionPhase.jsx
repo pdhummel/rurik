@@ -42,7 +42,7 @@ function showOrHideActionPhases(currentState, currentPlayerColor) {
     hide("playSchemeCardDiv");
   }
   
-  if (currentState == "takeDeedCardForActionPhase" && currentPlayerColor == myColor) {
+  if ((currentState == "takeDeedCardForActionPhase" || currentState == "takeDeedCardForClaimPhase") && currentPlayerColor == myColor) {
     show("takeDeedCardDiv");
   } else {
     hide("takeDeedCardDiv");

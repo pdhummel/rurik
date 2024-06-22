@@ -93,7 +93,7 @@ function refreshPlayer() {
       row.push(deedCard.accomplished);
       rows.push(row);
       if (deedCard.accomplished == false) {
-        accomplishRow.push('<input type="radio" id="deedCard"+i name="accomplishDeedCard" value="' + deedCard.name + '">');
+        accomplishRow.push('<input type="radio" id="accomplishDeedCard' + i + '" name="accomplishDeedCard" value="' + deedCard.name + '">');
         accomplishRow.push(deedCard.name);
         accomplishRow.push(deedCard.victoryPoints);
         accomplishRow.push(deedCard.requirementText);

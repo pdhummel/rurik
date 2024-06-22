@@ -1001,6 +1001,7 @@ class Game {
             var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
             this.players.setAdvisors(advisors);
             this.players.endRoundForPlayers();
+            this.gameMap.resetResources();
             this.gameStates.setCurrentState("strategyPhase");
         }
     }
@@ -1092,8 +1093,12 @@ class Game {
         console.log("updateClaimsForClaimsPhase()");
         this.validateGameStatus("claimPhase", "updateClaimsForClaimsPhase");
         this.claimBoard.updateClaimsForClaimsPhase(this.players.players, this.gameMap);
-        this.players.setCurrentPlayer(this.players.firstPlayer);
-        this.gameStates.setCurrentState("takeDeedCardForClaimPhase");
+        if (this.currentRound != 4) {
+            this.players.setCurrentPlayer(this.players.firstPlayer);
+            this.gameStates.setCurrentState("takeDeedCardForClaimPhase")    
+        } else {
+            this.gameStates.setCurrentState("endGame");
+        }
         console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);
     }
 
@@ -1129,13 +1134,13 @@ class Game {
         var advisorsByRound = [];
         advisorsByRound[0] = [1, 2, 4, 5];
         advisorsByRound[1] = [1, 2, 4, 5];
-        advisorsByRound[2] = [1, 2, 4, 5, 2];
+        advisorsByRound[2] = [1, 2, 2, 4, 5];
         if (numberOfPlayers == 2) {
-            advisorsByRound[3] = [1, 2, 4, 5, 2, 3];
+            advisorsByRound[3] = [1, 2, 2, 3, 4, 5];
         } else if (numberOfPlayers == 3) {
-            advisorsByRound[3] = [1, 2, 4, 5, 2, 3];
+            advisorsByRound[3] = [1, 2, 2, 3, 4, 5];
         } else {
-            advisorsByRound[3] = [1, 2, 4, 5, 2];
+            advisorsByRound[3] = [1, 2, 2, 4, 5];
         }
         return advisorsByRound[round];
     }
