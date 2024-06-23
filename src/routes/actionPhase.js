@@ -8,23 +8,23 @@ app.post('/game/:id/player/:color/move', (req, res) => {
     var game = games.getGameById(req.params.id);
     var color = req.params.color;
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var player = game.getPlayer(color);
     if (player === undefined) {
-      res.status(404).send('Player not found for color ' + color);
+      res.status(404).send({"error": 'Player not found for color ' + color});
       return;
     }
     var fromLocationName = req.body.fromLocationName;
     var toLocationName = req.body.toLocationName;
     var fromLocation = game.gameMap.getLocation(fromLocationName);
     if (fromLocation === undefined) {
-      res.status(404).send('Location not found, ' + fromLocation);
+      res.status(404).send({"error": 'Location not found, ' + fromLocation});
     }
     var toLocation = game.gameMap.getLocation(toLocationName);
     if (toLocation === undefined) {
-      res.status(404).send('Location not found, ' + toLocation);
+      res.status(404).send({"error": 'Location not found, ' + toLocation});
     }
     var moveLeader = false;
     var moveLeaderYN = req.body.moveLeaderYN;
@@ -38,7 +38,7 @@ app.post('/game/:id/player/:color/move', (req, res) => {
       return;
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({"error": error.message} );
       return;
     }     
   });
@@ -48,18 +48,18 @@ app.post('/game/:id/player/:color/move', (req, res) => {
     var game = games.getGameById(req.params.id);
     var color = req.params.color;
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var player = game.getPlayer(color);
     if (player === undefined) {
-      res.status(404).send('Player not found for color ' + color);
+      res.status(404).send({ "error": 'Player not found for color ' + color });
       return;
     }
     var attackLocationName = req.body.attackLocationName;
     var attackLocation = game.gameMap.getLocation(attackLocationName);
     if (attackLocation === undefined) {
-      res.status(404).send('Location not found, ' + attackLocation);
+      res.status(404).send({ "error": 'Location not found, ' + attackLocation });
     }
     var schemeDeckNumber = req.body.schemeDeckNumber;
     var target = req.body.target;
@@ -73,7 +73,7 @@ app.post('/game/:id/player/:color/move', (req, res) => {
       return;
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({ "error": error.message});
       return;
     }     
   });
@@ -83,18 +83,18 @@ app.post('/game/:id/player/:color/move', (req, res) => {
     var game = games.getGameById(req.params.id);
     var color = req.params.color;
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var player = game.getPlayer(color);
     if (player === undefined) {
-      res.status(404).send('Player not found for color ' + color);
+      res.status(404).send({ "error": 'Player not found for color ' + color});
       return;
     }
     var locationName = req.body.locationName;
     var location = game.gameMap.getLocation(locationName);
     if (location === undefined) {
-      res.status(404).send('Location not found, ' + locationName);
+      res.status(404).send({ "error": 'Location not found, ' + locationName});
     }
     var marketCoin = false;
     var marketCoinYN = req.body.marketCoinYN;
@@ -108,7 +108,7 @@ app.post('/game/:id/player/:color/move', (req, res) => {
       return;
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({ "error": error.message});
       return;
     }     
   });
@@ -119,18 +119,18 @@ app.post('/game/:id/player/:color/move', (req, res) => {
     var game = games.getGameById(req.params.id);
     var color = req.params.color;
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var player = game.getPlayer(color);
     if (player === undefined) {
-      res.status(404).send('Player not found for color ' + color);
+      res.status(404).send({ "error": 'Player not found for color ' + color});
       return;
     }
     var locationName = req.body.locationName;
     var location = game.gameMap.getLocation(locationName);
     if (location === undefined) {
-      res.status(404).send('Location not found, ' + locationName);
+      res.status(404).send({ "error": 'Location not found, ' + locationName});
     }
   
     var building = req.body.building;
@@ -141,7 +141,7 @@ app.post('/game/:id/player/:color/move', (req, res) => {
       return;
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({ "error": error.message});
       return;
     }     
   });
@@ -152,12 +152,12 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     var game = games.getGameById(req.params.id);
     var color = req.params.color;
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var player = game.getPlayer(color);
     if (player === undefined) {
-      res.status(404).send('Player not found for color ' + color);
+      res.status(404).send({ "error": 'Player not found for color ' + color});
       return;
     }
     try {
@@ -166,7 +166,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       return;
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({ "error": error.message} );
       return;
     }     
   });
@@ -177,7 +177,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("put " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var action = req.params.action;
@@ -195,7 +195,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       game.takeMainAction(color, advisor, action, row, forfeitAction)
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({ "error": error.message});
       return;
     }   
     res.send(game.auctionBoard);
@@ -205,14 +205,14 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("delete " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var color = req.params.color;
     game.endTurn(color);
     var gameStatus = games.getGameStatus(req.params.id, color);
     if (gameStatus === undefined || gameStatus == null) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }    
     res.send(gameStatus);
@@ -224,7 +224,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("put " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var color = req.params.color;
@@ -238,19 +238,19 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("put " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var color = req.params.color;
     var player = game.getPlayer(color);
     if (player == undefined) {
-      res.status(404).send('Player not found');
+      res.status(404).send({ "error": 'Player not found'} );
       return;
     }
     var firstPlayerColor = req.body.firstPlayerColor;
     var otherPlayer = game.getPlayer(firstPlayerColor);
     if (otherPlayer == undefined) {
-      res.status(404).send('Player not found for ' + firstPlayerColor);
+      res.status(404).send({ "error": 'Player not found for ' + firstPlayerColor });
       return;
     }
   
@@ -262,13 +262,13 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("put " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var color = req.params.color;
     var player = game.getPlayer(color);
     if (player == undefined) {
-      res.status(404).send('Player not found');
+      res.status(404).send({ "error": 'Player not found'});
       return;
     }
     var schemeDeck = req.body.schemeDeck;
@@ -281,13 +281,13 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("delete " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var color = req.params.color;
     var player = game.getPlayer(color);
     if (player == undefined) {
-      res.status(404).send('Player not found');
+      res.status(404).send({ "error": 'Player not found'});
       return;
     }
     var schemeCard = req.body.schemeCard;
@@ -301,13 +301,13 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     console.log("post " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var color = req.params.color;
     var player = game.getPlayer(color);
     if (player == undefined) {
-      res.status(404).send('Player not found');
+      res.status(404).send({ "error": 'Player not found'});
       return;
     }
     var schemeCardId = req.body.schemeCard;
@@ -328,13 +328,13 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       console.log("post " + req.path + " " + req.params);
       var game = games.getGameById(req.params.id);
       if (game === undefined) {
-        res.status(404).send('Game not found');
+        res.status(404).send({"error": "Game not found"});
         return;
       }
       var color = req.params.color;
       var player = game.getPlayer(color);
       if (player == undefined) {
-        res.status(404).send('Player not found');
+        res.status(404).send({ "error": 'Player not found'});
         return;
       }
       var conversionTileName = req.body.conversionTile;
@@ -344,7 +344,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
         game.playConversionTile(color, conversionTileName, resource1, resource2);
       } catch(error) {
         console.log(error.message);
-        res.status(400).send(error.message);
+        res.status(400).send({ "error": error.message});
         return;
       }   
       res.send(player);
@@ -355,13 +355,13 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       console.log("post " + req.path + " " + JSON.stringify(req.params) + " " + JSON.stringify(req.body));
       var game = games.getGameById(req.params.id);
       if (game === undefined) {
-        res.status(404).send('Game not found');
+        res.status(404).send({"error": "Game not found"});
         return;
       }
       var color = req.params.color;
       var player = game.getPlayer(color);
       if (player == undefined) {
-        res.status(404).send('Player not found');
+        res.status(404).send({ "error": 'Player not found'});
         return;
       }
       var deedCardName = req.body.deedCardName;
@@ -374,7 +374,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       console.log("post " + req.path);
       var game = games.getGameById(req.params.id);
       if (game === undefined) {
-        res.status(404).send('Game not found');
+        res.status(404).send({"error": "Game not found"});
         return;
       }
       res.send(game.deedCardToVerify);
@@ -384,13 +384,13 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
       console.log("post " + req.path + " " + JSON.stringify(req.params) + " " + JSON.stringify(req.body));
       var game = games.getGameById(req.params.id);
       if (game === undefined) {
-        res.status(404).send('Game not found');
+        res.status(404).send({"error": "Game not found"});
         return;
       }
       var color = req.params.color;
       var player = game.getPlayer(color);
       if (player == undefined) {
-        res.status(404).send('Player not found');
+        res.status(404).send({ "error": 'Player not found'});
         return;
       }
       var verified = req.body.verified;

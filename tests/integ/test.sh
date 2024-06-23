@@ -10,14 +10,17 @@ rest() {
   method=$2
   data=$3
   if [ "${data}" != "" ];then
-    response=$(curl -s -X ${method} -H "Content-Type: application/json" \
+    r=$(curl -s -X ${method} -w ";%{http_code}" -H "Content-Type: application/json" \
       --data "${data}" "${url}")
   else
-    response=$(curl -s -X ${method} -H "Content-Type: application/json" "${url}")    
+    r=$(curl -s -X ${method} -w ";%{http_code}" -H "Content-Type: application/json" "${url}")    
   fi
   set +e
+  response=$(echo ${r} |  cut -d ";" -f 1)
+  http_code=$(echo ${r} |  cut -d ";" -f 2 | cut -c1)
   echo ${response} | jq
-  if [ $? -ne 0 ];then
+  rc=$?
+  if [ ${rc} -ne 0 ] || [ "${http_code}" != "2" ];then
     set -x
     if [ "${data}" != "" ];then
       echo curl -s -X ${method} -H \""Content-Type: application/json"\" --data \'"${data}"\' \""${url}"\"
@@ -32,7 +35,7 @@ rest() {
 }
 
 
-#r=$(rest "${server}/game/1/test" PUT)
+#r=$(rest "${server}/game/1/testLoad" PUT)
 #echo $r
 #exit 0
 
@@ -40,6 +43,7 @@ rest() {
 echo "Creating game"
 new_game_response=$(rest "${server}/game" POST '{"gameName": "Pauls Game"}')
 game_id=$(echo ${new_game_response} | jq -r '.id')
+
 
 echo "First player joining"
 r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "blue", "name": "Paul", "position": "N" }')
@@ -598,7 +602,7 @@ r=$(rest "${server}/game/${game_id}/player/red/turn" DELETE)
 
 echo "Dump game"
 echo ${game_id}
-r=$(rest "${server}/game/${game_id}/test" GET)
+r=$(rest "${server}/game/${game_id}/testDump" GET)
 echo $r
 
 

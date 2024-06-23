@@ -21,10 +21,12 @@ class Games {
     }
 
     createGame(name, targetNumberOfPlayers) {
+        var gameStatus = null;
         var game = new Game(name, targetNumberOfPlayers);
         console.log("createGame(): gameId=" + game.id);
         this.games[game.id] = game;
-        return new GameStatus(game, null);
+        gameStatus = new GameStatus(game, null);
+        return gameStatus;
     }
 
     getGameById(id) {

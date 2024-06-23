@@ -1,3 +1,5 @@
+//const { response } = require("express");
+
 function callApi(path, httpMethod, jsonData="", responseHandler) {
     console.log("callApi: " + httpMethod + " " + path);  
     if (jsonData.length > 0) {
@@ -18,10 +20,22 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
         responseHandler(response);
       }
     })
-    .then(function(error) { 
+    .catch(function(error) { 
       if (error != undefined) {
-        console.log(error)
+        
+        if (error.response != undefined && error.response.data != undefined) {
+          if (error.response.data.error != undefined) {
+            console.log(error.response.data.error);
+            window.alert(error.response.data.error);
+          } else {
+            console.log(error.response.data);
+            window.alert(error.response.data);
+          }
+        } else {
+          console.log(error);
+        }
       }
+      
     });
   }
 

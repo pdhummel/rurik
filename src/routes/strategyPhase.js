@@ -7,7 +7,7 @@ app.get('/game/:id/auction', (req, res) => {
     console.log("get " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     res.send(game.auctionBoard);
@@ -17,7 +17,7 @@ app.get('/game/:id/auction', (req, res) => {
     console.log("put " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
-      res.status(404).send('Game not found');
+      res.status(404).send({"error": "Game not found"});
       return;
     }
     var action = req.params.action;
@@ -32,7 +32,7 @@ app.get('/game/:id/auction', (req, res) => {
       game.playAdvisor(color, action, advisor, coins);
     } catch(error) {
       console.log(error.message);
-      res.status(400).send(error.message);
+      res.status(400).send({ "error": error.message});
       return;
     }   
     res.send(game.auctionBoard);
