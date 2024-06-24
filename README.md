@@ -6,16 +6,15 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * game log
 * show upcoming advisors on map board
 * show reward for deed cards
-
-
-
+* playAdvisor - check for 2 advisors from the same player in the same column
+* retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
+* handle moveFromLocation and moveToAnywhere
 
 * action phase
   * build action - stable, tavern
   * handle scheme card rewards
     * warTrack bonus
   * leader abilities
-  * leader defeated and leader muster
   * gain war track bonuses on attack
   * get rewards for accomplishing deeds
   
@@ -35,15 +34,14 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * set phase
   * set current player
   * add actions for move, tax, build, attack
+  * remove advisor
+  * place advisor
 
 
 * player view
   * show leader in supply  
   * show total victory points
 
-* claim phase
-  * coins from boat
-  * coin compensation from claim board and war tracks
 
 * save game state
 * undo action/turn
@@ -127,6 +125,10 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * indicate accomplished deed cards
 * end game logic and scoring
 * show error messages in UI
+* end round - coins from boat
+* end round - coin compensation from claim board and war tracks
+* handle leader defeated and leader muster
+
 
 
 ## Notes

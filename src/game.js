@@ -277,7 +277,6 @@ class Game {
 
         // TODO: figure out how to differentiate if there are 2 with the same advisor number 
         // in the same column - for now, process top to bottom.
-        
         if (currentPlayer.advisors.length > 0 && advisor == currentPlayer.advisors[0]) {
             currentPlayer.advisors.shift();
             var auctionSpaces = currentPlayer.advisorsToAuctionSpace[advisor];
@@ -290,6 +289,17 @@ class Game {
                 console.log("takeMainAction(): pop " + auctionSpace.actionName);
             } else {
                 throw new Error("Could not retrieve advisor.", "takeMainAction()");        
+            }
+
+            // If a player has no troops on the map, they may muster their leader + 1 other troop
+            // to any one region.
+            var occupiesSomewhere = false;
+            var locationsForPlayer = this.gameMap.getLocationsForPlayer(color);
+            if (locationsForPlayer["occupies"].length > 0) {
+                occupiesSomewhere = true;
+            }
+            if (! occupiesSomewhere) {
+                currentPlayer.troopsToDeploy = 2;
             }
 
             // remove advisor from auctionSpace
@@ -430,13 +440,25 @@ class Game {
         this.validateGameStatus("actionPhaseMuster", "muster");
         var currentPlayer = this.validateCurrentPlayer(color, "muster");
         var location = this.gameMap.getLocation(locationName);
-        if (location.troopsByColor[color] < 1 && location.leaderByColor[color] < 1) {
+        var occupiesSomewhere = false;
+        var locationsForPlayer = this.gameMap.getLocationsForPlayer(color);
+        if (locationsForPlayer["occupies"].length > 0) {
+            occupiesSomewhere = true;
+        }
+        // If a player has no troops on the board, they can muster to any location.
+        if (location.troopsByColor[color] < 1 && location.leaderByColor[color] < 1 && occupiesSomewhere) {
             this.throwError("Cannot muster troops in a location you do not occupy.", "muster");
         }
-        if (numberOfTroops > currentPlayer.troopsToDeploy || numberOfTroops > currentPlayer.supplyTroops) {
+        if (numberOfTroops > currentPlayer.troopsToDeploy || numberOfTroops > (currentPlayer.supplyTroops + currentPlayer.supplyLeader)) {
             throw new Error("Not enough troops available.", "muster");
         }
-        
+        // muster leader first
+        if (currentPlayer.supplyLeader > 0) {
+            location.leaderByColor[color] = 1;
+            currentPlayer.supplyLeader = 0;
+            currentPlayer.troopsToDeploy--;
+            numberOfTroops--;
+        }
         location.troopsByColor[color] = location.troopsByColor[color] + numberOfTroops;
         currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy - numberOfTroops;
         currentPlayer.supplyTroops = currentPlayer.supplyTroops - numberOfTroops;
@@ -561,6 +583,8 @@ class Game {
             currentPlayer.moveActionsFromLocation[locationName] = 2;
         } else if (buildingName == "church") {
             var converted = false;
+            // Per rules, you can convert an enemy even if you don't have any troops in supply.
+            // Also you can't convert leaders.
             if (targetToConvert == "rebel" && location.rebels.length > 0) {
                 location.rebels.pop();
                 if (currentPlayer.supplyTroops > 0) {
@@ -580,9 +604,10 @@ class Game {
                 this.throwError("Could not convert enemy " + targetToConvert, "build");
             }
         } else if (buildingName == "tavern") {
-            // TODO: test tavern
             currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
-            this.gameStates.setCurrentState("oneTimeScheme");
+            // Per rules, if you have not played a scheme card yet this turn, you may play the top card
+            // from the scheme discard pile and then remove it from the game.
+            //this.gameStates.setCurrentState("oneTimeScheme");
         }
 
     }
@@ -616,6 +641,7 @@ class Game {
             if ((location.troopsByColor[targetColor] < 1 && location.leaderByColor[targetColor] < 1)) {
                 throw new Error(target + " does not have troops to attack in " + locationName + ".", "attack()");
             }
+            var targetPlayer = this.players.getPlayerByColor(targetColor);
 
             var schemeCardsToDraw = 1;
             if (location.doesRule(targetColor)) {
@@ -624,8 +650,10 @@ class Game {
 
             if (location.troopsByColor[targetColor] > 0) {
                 location.troopsByColor[targetColor]--;
+                targetPlayer.supplyTroops++;
             } else {
                 location.leaderByColor[targetColor]--;
+                targetPlayer.supplyLeader = 1;
             }
 
             if (location.countStrongholds(targetColor) > 0) {
@@ -635,10 +663,20 @@ class Game {
             for (var i=0; i<schemeCardsToDraw; i++) {
                 var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
                 var deaths = card.deaths;
+                var removeLeader = false;
                 if (deaths > location.troopsByColor[color]) {
+                    if (location.leaderByColor[color] > 0) {
+                        removeLeader = true;
+                    }
                     deaths = location.troopsByColor[color];
                 }
                 location.troopsByColor[color] = location.troopsByColor[color] - deaths;
+                currentPlayer.supplyTroops = currentPlayer.supplyTroops + deaths;
+                if (removeLeader) {
+                    location.leaderByColor[color] = 0;
+                    currentPlayer.supplyLeader = 1;
+                    deaths++;
+                }
                 if (deaths > 0) {
                     troopsLost = deaths;
                     break;
@@ -988,7 +1026,7 @@ class Game {
         deedCard.accomplished = true;
         for (var i=0; i<deedCard.rewards.length; i++) {
             // TODO: collect deed card rewards
-            // scheme2cards, attackMinusScheme, moveAnywhere, warTrack
+            // scheme2cards, attackMinusScheme, moveAnywhere, warTrack,
             // muster, move, build, coin, tax
         }
     }
@@ -1002,7 +1040,7 @@ class Game {
             this.players.setCurrentPlayer(this.players.firstPlayer);
             var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
             this.players.setAdvisors(advisors);
-            this.players.endRoundForPlayers();
+            this.players.endRoundForPlayers(this.claimBoard);
             this.gameMap.resetResources();
             this.gameStates.setCurrentState("strategyPhase");
         }
@@ -1150,6 +1188,8 @@ class Game {
         currentPlayer.taxActions = 0;
         currentPlayer.buildActions = 0;
         currentPlayer.moveActions = 0;
+        currentPlayer.moveAnywhereActions = 0;
+        currentPlayer.moveActionsFromLocation = {};
         currentPlayer.attackActions = 0;
         currentPlayer.tookMainActionForTurn = false;
         currentPlayer.schemeCardsCanPlay = 1;

@@ -194,7 +194,6 @@ fi
 echo "Second player end turn"
 r=$(rest "${server}/game/${game_id}/player/red/turn" DELETE)
 
-
 echo "First player retrieve advisor"
 r=$(rest "${server}/game/${game_id}/advisorRetrieve/attack" PUT '{ "color": "blue", "advisor": "2", "forfeitAction": "N", "row": 1  }')
 

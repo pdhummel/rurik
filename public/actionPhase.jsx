@@ -144,7 +144,7 @@ function getNextAdvisor() {
       hide("convertGoodsOption");
     }
     var moveActions = playerData.moveActions;
-    if (moveActions > 0) {
+    if (moveActions > 0 || playerData.moveAnywhereActions > 0) {
       setInnerHtml("moveActions", moveActions);
       show("moveOption");
     } else {

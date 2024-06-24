@@ -58,7 +58,7 @@ class GamePlayers {
         }        
     }
 
-    endRoundForPlayers() {
+    endRoundForPlayers(claimBoard) {
         for (var i=0; i < this.players.length; i++) {
             var player = this.players[i];
             player.boat.canPlayMusterConversionTile = true;
@@ -66,6 +66,8 @@ class GamePlayers {
             player.boat.canPlayBuildConversionTile = true;
             var coinIncome = player.boat.calculateCoinIncome();
             player.boat.money = player.boat.money + coinIncome;
+            var coinCompensation = claimBoard.calculateCoins(player.color);
+            player.boat.money = player.boat.money + coinCompensation;
             player.finishedRound = false;
         }
     }
@@ -285,6 +287,7 @@ class Player {
         this.moveActions = 0;
         this.attackActions = 0;
         this.moveActionsFromLocation = {};
+        this.moveAnywhereActions = 0;
         this.finishedRound = false;
 
         this.isFirstPlayer = false;
@@ -292,6 +295,7 @@ class Player {
 
         // 12 - 3 to deploy.
         this.supplyTroops = 9;
+        this.supplyLeader = 0;
         this.buildings = {};
         this.buildings["church"] = 3;
         this.buildings["stronghold"] = 3;
