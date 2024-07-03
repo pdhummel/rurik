@@ -245,7 +245,13 @@ class Game {
         if (currentPlayer.boat.money < bidCoins) {
             throw new Error("Bid exceeded money available.", "playAdvisor");
         }
-        // TODO: check for 2 advisors from the same player
+        // You may only place an advisor in a column that already contains any of your own
+        // advisors after you have placed advisors in three or more different columns.
+        if (this.auctionBoard.isPlayerAlreadyInColumn(columnName, color)) {
+            if (! this.auctionBoard.isPlayerIn3Columns(color)) {
+                throw new Error("You cannot place an advisor in the same column, " + columnName + ", until you are present in 3 or more different columns.", "playAdvisor");
+            }
+        }
         this.auctionBoard.auctionBid(columnName, color, advisor, bidCoins);
         currentPlayer.boat.money = currentPlayer.boat.money - bidCoins;
         currentPlayer.useAdvisor(advisor);
@@ -262,9 +268,9 @@ class Game {
 
     }
 
-    // retrieve advisor
+    // retrieve advisor, rows=1-4
     takeMainAction(color, advisor, actionColumnName, row, forfeitAction=false) {
-        console.log("takeMainAction(): ", color, advisor, actionColumnName, row, forfeitAction);
+        console.log("takeMainAction(): ", color, "advisor=" + advisor, actionColumnName, "row(1-4)=" + row, forfeitAction);
         this.validateGameStatus("retrieveAdvisor", "takeMainAction");
         var currentPlayer = this.validateCurrentPlayer(color, "takeMainAction");
         if (currentPlayer.tookMainActionForTurn == true) {
@@ -281,6 +287,10 @@ class Game {
             currentPlayer.advisors.shift();
             var auctionSpaces = currentPlayer.advisorsToAuctionSpace[advisor];
             var auctionSpace = null;
+            var boardAuctionSpaces = this.auctionBoard.board[actionColumnName];
+            //if (row != undefined && row != null && row > 0) {
+            //    auctionSpace =  boardAuctionSpaces[row-1];
+            //    console.log("takeMainAction(): row=" + row + " " + auctionSpace.actionName + " quantity=" + auctionSpace.quantity);
             if (auctionSpaces.length > 0 && auctionSpaces[0].actionName == actionColumnName) {
                 auctionSpace = auctionSpaces.shift();
                 console.log("takeMainAction(): shift " + auctionSpace.actionName);
@@ -318,8 +328,10 @@ class Game {
                 }
                 if (actionColumnName == "build") {
                     currentPlayer.buildActions = currentPlayer.buildActions + auctionSpace.quantity;
+                    console.log("takeMainAction(): build actions=" + currentPlayer.buildActions);
                 } else if (actionColumnName == "tax") {
                     currentPlayer.taxActions = currentPlayer.taxActions + auctionSpace.quantity;
+                    console.log("takeMainAction(): tax actions=" + currentPlayer.taxActions);
                 } else if (actionColumnName == "move") {
                     currentPlayer.moveActions = currentPlayer.moveActions + auctionSpace.quantity;
                 } else if (actionColumnName == "attack") {

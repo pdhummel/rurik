@@ -174,7 +174,7 @@ app.put('/game/:id/player/:color/takeDeedCard', (req, res) => {
   var color = req.params.color;
   var player = game.getPlayer(color);
   if (player == undefined) {
-    res.status(404).send({"error": "Game not found"});
+    res.status(404).send({"error": "Player not found for color " + color});
     return;
   }
   var deedCardName = req.body.deedCard;

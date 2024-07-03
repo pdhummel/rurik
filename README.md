@@ -6,7 +6,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * game log
 * show upcoming advisors on map board
 * show reward for deed cards
-* playAdvisor - check for 2 advisors from the same player in the same column
 * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
 * handle moveFromLocation and moveToAnywhere
 
@@ -19,12 +18,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * get rewards for accomplishing deeds
   
 * hack mode
-  * add/subtract money
-  * muster troop to anywhere
-  * remove troop from anywhere
   * remove resource from anywhere
   * refresh resource anywhere
-  * add resource to dock
   * remove leader from anywhere
   * place leader in supply to anywhere
   * remove building from anywhere
@@ -33,7 +28,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * set round
   * set phase
   * set current player
-  * add actions for move, tax, build, attack
+  * scheme
   * remove advisor
   * place advisor
 
@@ -128,6 +123,12 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * end round - coins from boat
 * end round - coin compensation from claim board and war tracks
 * handle leader defeated and leader muster
+* hack api -- add/subtract money
+* hack api -- add/remove troop from anywhere
+* hack api -- add actions for muster, move, tax, build, attack
+* hack api -- add resource to dock
+* playAdvisor - check for 2 advisors from the same player in the same column
+
 
 
 

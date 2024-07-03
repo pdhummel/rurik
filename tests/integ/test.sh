@@ -30,6 +30,8 @@ rest() {
     echo ${response}
     set -e
     echo ${response} | jq
+    exit 1
+
   fi
   set -e
 }
@@ -128,8 +130,6 @@ r=$(rest "${server}/game/${game_id}/advisorBid/build" PUT '{ "color": "blue", "a
 
 echo "Second player advisor bid"
 r=$(rest "${server}/game/${game_id}/advisorBid/muster" PUT '{ "color": "red", "advisor": "5"  }')
-
-
 
 echo "First player retrieve advisor"
 r=$(rest "${server}/game/${game_id}/advisorRetrieve/muster" PUT '{ "color": "blue", "advisor": "1", "forfeitAction": "N", "row": 2  }')
@@ -299,10 +299,10 @@ r=$(rest "${server}/game/${game_id}/player/red/turn" PUT '{ "action": "musterAct
 echo "Second player muster troops"
 r=$(rest "${server}/game/${game_id}/location/Polotsk/troops" PUT '{ "color": "red", "numberOfTroops": 1  }')
 
-#exit 0
-
 echo "Second player end turn"
 r=$(rest "${server}/game/${game_id}/player/red/turn" DELETE)
+
+
 
 echo "Get available deed cards"
 r=$(rest "${server}/game/${game_id}/cards" GET)
@@ -593,6 +593,8 @@ r=$(rest "${server}/game/${game_id}/advisorRetrieve/move" PUT '{ "color": "blue"
 echo "First player end turn"
 r=$(rest "${server}/game/${game_id}/player/blue/turn" DELETE)
 
+#exit 0
+
 echo "Second player retrieve advisor and forfeit action"
 r=$(rest "${server}/game/${game_id}/advisorRetrieve/move" PUT '{ "color": "red", "advisor": "5", "forfeitAction": "Y", "row": 2  }')
 echo "Second player end turn"
@@ -601,7 +603,7 @@ r=$(rest "${server}/game/${game_id}/player/red/turn" DELETE)
 
 echo "Dump game"
 echo ${game_id}
-r=$(rest "${server}/game/${game_id}/testDump" GET)
+r=$(rest "${server}/test/game/${game_id}/dump" GET)
 echo $r
 
 

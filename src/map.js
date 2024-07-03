@@ -30,7 +30,9 @@ class Location {
     }
 
     addTroop(color, count=1) {
-        this.troopsByColor[color] = this.troopsByColor[color] + count;
+        if (count + this.troopsByColor[color] >= 0) {
+            this.troopsByColor[color] = this.troopsByColor[color] + count;
+        }
     }
 
     addLeader(color, count=1) {
@@ -151,6 +153,7 @@ class Location {
         } else if (white == highValue) {
             ruler = null;
         }
+        console.log(this.name + " is ruled by " + ruler);
         return ruler;
     }
 
