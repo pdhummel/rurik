@@ -1,12 +1,15 @@
-<div id="gameListDiv">
+  <div id="gameListDiv">
     <div id="gameListData"></div>
     <br/>
   </div>
+
   <div id="createGameDiv">
     Game Name: <input id="gameName" type="text" />
     <input type="button" value="Create Game" onclick="javascript:createGame();"/><br/>
     <br/>
   </div>
+
+
   <div id="joinGameDiv" style="display:none;">
     Player Name: <input id="playerName" type="text">          
     <select id="selectGameId"></select>
@@ -22,6 +25,7 @@
       <option value="S">South</option>
       <option value="W">West</option>
     </select>
+    <input type="checkbox" value="true" id="isAi" />Is AI?<br/>
     <input type="button" value="Join Game" onclick="javascript:joinGame();"/><br/>
     <br/>
   </div>

@@ -6,6 +6,7 @@ const GameStates = require('./state.js');
 const Cards = require('./cards.js');
 const ClaimBoard = require('./claims.js');
 const Validator = require('./validations.js');
+const Ai = require('./ai.js');
 
 
 class Games {
@@ -20,9 +21,9 @@ class Games {
         return Games.self;
     }
 
-    createGame(name, targetNumberOfPlayers) {
+    createGame(name, targetNumberOfPlayers, password=null) {
         var gameStatus = null;
-        var game = new Game(name, targetNumberOfPlayers);
+        var game = new Game(name, targetNumberOfPlayers, password);
         console.log("createGame(): gameId=" + game.id);
         this.games[game.id] = game;
         gameStatus = new GameStatus(game, null);
@@ -103,6 +104,7 @@ class Game {
         this.currentRound = 1;
         this.auctionBoard = null;
         this.gameMap = new GameMap();
+        this.ai = new Ai();
         this.cards = new Cards();
         this.claimBoard = new ClaimBoard();
         this.targetNumberOfPlayers = targetNumberOfPlayers;
@@ -118,16 +120,27 @@ class Game {
         this.deedCardToVerify = null;
     }
 
+    changePlayerAndOrState(player, gameStateName) {
+        if (player != undefined && player != null) {
+            this.players.setCurrentPlayer(player);
+        }
+        if (gameStateName != undefined && gameStateName != null && gameStateName.length > 0) {
+            this.gameStates.setCurrentState("waitingForFirstPlayerSelection");
+        }
+        this.ai.evaluateGame(this);
+    }
 
 
-    joinGame(name, color, position, isPlayerAi=false) {
+    joinGame(name, color, position, isPlayerAi=false, password=null) {
         Validator.validateColor(color);
         Validator.validateTablePosition(position);
         this.validateGameStatus("waitingForPlayers", "joinGame", "Game is no longer accepting players.");
         if (this.players.players.length > this.players.targetNumberOfPlayers) {
             throw new Error("Game is full and already has " + this.players.targetNumberOfPlayers + " players.", "joinGame");
         }
-
+        if (this.password != undefined && this.password != null && this.password.length > 0 && this.password != password) {
+            throw new Error("Incorrect password specified for the game.", "joinGame")
+        }
         var player = this.players.addPlayer(name, color, position, isPlayerAi, this.cards);
         console.log("joinGame(): before resetMoveActionsFromLocation");
         player.resetMoveActionsFromLocation(this.gameMap.locations);
@@ -155,6 +168,7 @@ class Game {
         this.players.setFirstPlayer(player);
         this.players.setCurrentPlayer(player);
         this.gameStates.setCurrentState("waitingForLeaderSelection");
+        this.ai.evaluateGame(this);
     }
 
     selectRandomFirstPlayer() {
@@ -163,6 +177,7 @@ class Game {
         this.players.setFirstPlayer(randomPlayer);
         this.players.setCurrentPlayer(randomPlayer);
         this.gameStates.setCurrentState("waitingForLeaderSelection");
+        this.ai.evaluateGame(this);
     }    
 
     chooseLeader(color, leaderName) {
@@ -181,6 +196,7 @@ class Game {
             this.players.setCurrentPlayer(firstPlayer);
             this.gameStates.setCurrentState("waitingForSecretAgendaSelection");
         }
+        this.ai.evaluateGame(this);
     }
 
 
@@ -201,6 +217,7 @@ class Game {
             this.players.setCurrentPlayer(this.players.firstPlayer);
             this.gameStates.setCurrentState("waitingForTroopPlacement");
         }
+        this.ai.evaluateGame(this);
     }
 
     placeInitialTroop(color, locationName) {
@@ -217,6 +234,7 @@ class Game {
             this.gameStates.setCurrentState("waitingForLeaderPlacement");
             this.players.setTroopsToDeploy(1);
         }
+        this.ai.evaluateGame(this);
     }
 
     placeLeader(color, locationName) {
@@ -233,6 +251,7 @@ class Game {
             this.players.setAdvisors(advisors);
             this.gameStates.setCurrentState("strategyPhase");
         }
+        this.ai.evaluateGame(this);
     }
 
     playAdvisor(color, columnName, advisor, bidCoins=0) {
@@ -265,7 +284,7 @@ class Game {
             this.players.mapAdvisorsToAuctionSpaces(this.auctionBoard);
             this.gameStates.setCurrentState("retrieveAdvisor");
         }
-
+        this.ai.evaluateGame(this);
     }
 
     // retrieve advisor, rows=1-4

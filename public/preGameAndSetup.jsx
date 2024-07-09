@@ -146,8 +146,12 @@ function listGames() {
     var color = getSelectedValue("selectColor");
     var position = getSelectedValue("selectPosition");
     var name = getValue("playerName");
+    var isAi = false;
+    if (document.getElementById("isAi").checked) {
+      isAi = true;
+    }
     if (gameId != undefined && gameId != null && gameId.length > 0) {
-      var data = '{ "color": "' + color + '", "position": "' + position + '", "name":"' + name + '" }'
+      var data = '{ "color": "' + color + '", "position": "' + position + '", "name":"' + name + '", "isAi": "' + isAi + '" }'
       callApi("/game/" + gameId + "/player", "post", data, joinGameResponseHandler);
       setInnerHtml("gameId", gameId);
       setInnerHtml("myName", name);

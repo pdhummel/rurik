@@ -153,7 +153,7 @@ class Location {
         } else if (white == highValue) {
             ruler = null;
         }
-        console.log(this.name + " is ruled by " + ruler);
+        //console.log(this.name + " is ruled by " + ruler);
         return ruler;
     }
 

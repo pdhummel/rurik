@@ -303,6 +303,8 @@ class Player {
         this.buildings["tavern"] = 2;
         this.buildings["stable"] = 2;
 
+        this.aiCard = null;
+        this.aiStrategy = null;
     }
 
     resetMoveActionsFromLocation(locations) {

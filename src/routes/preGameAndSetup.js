@@ -55,21 +55,21 @@ app.get('/game', (req, res) => {
         res.status(400).send({"error": "Color is required."});
         return;
       }
+      if (game.getPlayer(color) != undefined) {
+        res.status(400).send({ "error": "Color already exists in game."});
+        return;
+      }
       if (position == undefined || position.length < 1) {
         res.status(400).send({ "error": "Position is required."});
         return;
       }
-      if (game.getPlayer(color) === undefined) {
-        if (name == undefined || name.length < 1) {
-          res.status(400).send({ "error": "Player name is required."});
-          return;
-        }      
-        game.joinGame(name, color, position);
-      } else {
-        console.log("color already exists in game -- rejoin");
-        res.status(400).send({ "error": "Color already exists in game -- rejoin."});
+      if (name == undefined || name.length < 1) {
+        res.status(400).send({ "error": "Player name is required."});
         return;
       }
+      var isAi = req.body.isAi;
+      game.joinGame(name, color, position, isAi);
+
     } catch(error) {
       console.log(error.message);
       res.status(400).send({ "error": error.message});
