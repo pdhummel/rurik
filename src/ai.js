@@ -1,3 +1,4 @@
+const lodash = require('lodash');
 
 class AiAuction {
     constructor(advisor, action, coins) {
@@ -25,7 +26,6 @@ class AiStrategyCard {
 
 class Ai {
     
-
     constructor() {
         this.mapStateToFunction = {
             "waitingForLeaderSelection": "selectLeader",
@@ -33,11 +33,13 @@ class Ai {
             "waitingForTroopPlacement": "placeInitialTroop",
             "waitingForLeaderPlacement": "placeLeader",
             "strategyPhase": "placeAdvisor",
-            "retrieveAdvisor": "",
-            "schemeFirstPlayer": "",
-            "drawSchemeCards": "",
-            "actionPhase": "",
-            "selectSchemeCard": ""
+            "retrieveAdvisor": "retrieveAdvisor",
+            "actionPhase": "takeAction",
+            "takeDeedCardForClaimPhase": "takeDeedCard",
+            "schemeFirstPlayer": "schemeFirstPlayer",
+            "drawSchemeCards": "drawSchemeCards",
+            "selectSchemeCard": "selectSchemeCard",
+            "endGame": ""
         }
         this.aiCards = [];
         this.createAiCards();
@@ -96,7 +98,6 @@ class Ai {
             player.aiCard = aiCard;
             var strategies = ["attack-move", "build", "tax"];
             r = Math.floor(Math.random() * strategies.length);
-            r = 1;
             player.aiStrategy = strategies[r];
         }
         var advisorsForRound = game.getAdvisorsForRound(game.players.getNumberOfPlayers(), game.currentRound-1);
@@ -113,7 +114,7 @@ class Ai {
         // If that is not possible, move to the next turn recommendation on the AiStrategyCard.
         // The AiStrategyCards has some illegal moves which must be skipped.
 
-        while (! success && index < auctions.length) {
+        while (! success && index < auctions.length && player.advisors.length > 0) {
             //console.log("placeAdvisor(): " + player.color + " " + auction.action + " " + advisorNumber);
             try {
                 auction = auctions[index];
@@ -121,7 +122,7 @@ class Ai {
                 game.playAdvisor(player.color, auction.action, advisorNumber, auction.coins);
                 success = true;
             } catch(error) {
-                console.log("Could not place candidate advisor: ", auction.action, advisorNumber, ": " + error.message);
+                console.log("Could not place candidate advisor using strategy card: ", auction.action, advisorNumber, ": " + error.message);
                 index++;
             }
         }
@@ -129,9 +130,11 @@ class Ai {
             console.log("placeAdvisor(): advisor could not be placed using strategy card");
         }
         var actions = ["muster", "move", "attack", "tax", "build", "scheme"];
-        while (! success) {
-            var r = Math.floor(Math.random() * this.actions.length);
+        var actionsTried = new Set();
+        while (! success && player.advisors.length > 0 && actionsTried.size < actions.length) {
+            var r = Math.floor(Math.random() * actions.length);
             var action = actions[r];
+            actionsTried.add(action);
             var advisor = player.advisors[0];
             try {
                 game.playAdvisor(player.color, action, advisor, 0);
@@ -151,6 +154,136 @@ class Ai {
             }
         }
         return isInList;
+    }
+    
+
+    retrieveAdvisor(game, player) {
+        console.log("retrieveAdvisor()");
+        var color = player.color;
+        var advisor = player.advisors[0];
+        var auctionSpaces = player.advisorsToAuctionSpace[advisor];
+        var auctionSpace = auctionSpaces[0];
+        var actionColumnName = auctionSpace.actionName;
+        var row = auctionSpace.row;
+        try {
+            game.takeMainAction(color, advisor, actionColumnName, row);  
+        } catch(error) {
+            game.takeMainAction(color, advisor, actionColumnName, row, true);  
+        }
+    }
+
+    takeAction(game, player) {
+        // Clone the game and calculate current points for all players.
+        var clonedGame = lodash.cloneDeep(game);
+        var clonedPlayer = lodash.cloneDeep(player);
+        var endGameStats = clonedGame.calculateEndGameStats();
+        var decisionValue = calculateDecisionValue();
+        
+        // Determine candidate actions.
+        //this.troopsToDeploy = 3;
+        //this.taxActions = 0;
+        //this.buildActions = 0;
+        //this.moveActions = 0;
+        //this.attackActions = 0;
+
+        // For each candidate action
+            // Clone the game
+            // Take the candidate action
+            // Recalculate the decision value
+            // if the decision value > current decision value, save candidate action as preferred action
+        // Take preferred action
+        // Re-evaluate if there are other actions available and repeat above.
+        // End turn if there are no more actions.
+        game.endTurn(player.color);
+    }
+
+    calculateDecisionValue(game, player) {
+        // Clone the game and calculate current points for all players.
+        var clonedGame = lodash.cloneDeep(game);
+        var endGameStats = clonedGame.calculateEndGameStats();
+        console.log("takeAction(): endGameStats=" + JSON.stringify(endGameStats));
+        // Descision value calculation:
+        // + If winning, [ai points minus (second place points)] * 100.
+        // - If losing, [ai points minus first place points] * 100.
+        // + Money on-hand.
+        // + Resources on dock.
+        var playerPoints = 0;
+        var decisionValue = 0;
+        var firstPlacePlayerPoints = 0;
+        var secondPlacePlayerPoints = 0;
+        var firstPlacePlayerColors = [];
+        for (var i=0; i < clonedGame.players.sortedPlayers.length; i++) {
+            var playerI = clonedGame.players.sortedPlayers[i];
+            var colorI = playerI.color;
+            var pointsI = gameEndStats["rule"]["color"] + gameEndStats["build"]["color"] + gameEndStats["trade"]["color"] + 
+              + gameEndStats["warfare"]["color"]  + gameEndStats["vp"]["color"];
+            if (pointsI > firstPlacePlayerPoints) {
+                firstPlacePlayerColors = [];
+                firstPlacePlayerPoints = pointsI;
+                firstPlacePlayerColors.push(colorI);
+            } else if (pointsI == firstPlacePlayerPoints) {
+                firstPlacePlayerColors.push(colorI);
+            }
+            if (pointsI > secondPlacePlayerPoints && pointsI < firstPlacePlayerPoints) {
+                secondPlacePlayerPoints = pointsI;
+            }
+            if (colorI == player.color) {
+                playerPoints = pointsI;
+            }
+        }
+        if (firstPlacePlayerPoints == playerPoints) {
+            if (firstPlacePlayerColors.length > 1) {
+                decisionValue = 0;
+            } else {
+                decisionValue = (firstPlacePlayerPoints - secondPlacePlayerPoints) * 100;
+            }
+        } else {
+            decisionValue = (playerPoints - firstPlacePlayerPoints) * 100;
+        }
+        return decisionValue;
+    }
+
+    takeDeedCard(game, player) {
+        var color = player.color;
+        var deedCardName = game.cards.displayedDeedCards[0].name;
+        game.takeDeedCard(color, deedCardName)
+    }
+
+    schemeFirstPlayer(game, player) {
+        var sortedPlayers = game.players.sortedPlayers;
+        var firstPlayerColor = player.color;
+        for (var i=0; i < sortedPlayers.length; i++) {
+            if (sortedPlayers[i].color == player.color) {
+                var firstPlayer = player;
+                var index = i;
+                if (i == 0) {
+                    index = sortedPlayers.length - 1;
+                } else if (i > 0) {
+                    index = i - 1;
+                }
+                firstPlayer = sortedPlayers[index];
+                firstPlayerColor = firstPlayer.color;
+                break;
+            }
+        }
+        game.schemeFirstPlayer(player.color, firstPlayerColor)
+    }
+
+    drawSchemeCards(game, player) {
+        var r = Math.floor(Math.random() * 2);
+        var schemeDeck = r + 1;
+        game.drawSchemeCards(player.color, schemeDeck);
+    }
+
+    selectSchemeCard(game, player) {
+        while (player.temporarySchemeCards.length > 0) {
+            var schemeCard = player.temporarySchemeCards[0];
+            if (player.temporarySchemeCards.length == 1) {
+                game.selectSchemeCardToKeep(player.color, schemeCard);
+            } else {
+                game.selectSchemeCardToReturn(player.color, player.returnSchemeDeck, schemeCard.id)
+            }            
+        }
     }
 
     createAiCards() {
@@ -660,10 +793,6 @@ class Ai {
         this.aiCards.push(new AiStrategyCard(18, aiStrategies, locationOrder));
 
     }
-
 }
-
-
-
 
 module.exports = Ai

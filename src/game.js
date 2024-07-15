@@ -120,6 +120,11 @@ class Game {
         this.deedCardToVerify = null;
     }
 
+    aiEvaluateGame() {
+        var thisGame = this;
+        setTimeout(function() { thisGame.ai.evaluateGame(thisGame); });
+    }
+
     changePlayerAndOrState(player, gameStateName) {
         if (player != undefined && player != null) {
             this.players.setCurrentPlayer(player);
@@ -127,7 +132,7 @@ class Game {
         if (gameStateName != undefined && gameStateName != null && gameStateName.length > 0) {
             this.gameStates.setCurrentState("waitingForFirstPlayerSelection");
         }
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
 
@@ -168,7 +173,7 @@ class Game {
         this.players.setFirstPlayer(player);
         this.players.setCurrentPlayer(player);
         this.gameStates.setCurrentState("waitingForLeaderSelection");
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
     selectRandomFirstPlayer() {
@@ -177,7 +182,7 @@ class Game {
         this.players.setFirstPlayer(randomPlayer);
         this.players.setCurrentPlayer(randomPlayer);
         this.gameStates.setCurrentState("waitingForLeaderSelection");
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }    
 
     chooseLeader(color, leaderName) {
@@ -196,7 +201,7 @@ class Game {
             this.players.setCurrentPlayer(firstPlayer);
             this.gameStates.setCurrentState("waitingForSecretAgendaSelection");
         }
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
 
@@ -217,7 +222,7 @@ class Game {
             this.players.setCurrentPlayer(this.players.firstPlayer);
             this.gameStates.setCurrentState("waitingForTroopPlacement");
         }
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
     placeInitialTroop(color, locationName) {
@@ -234,7 +239,7 @@ class Game {
             this.gameStates.setCurrentState("waitingForLeaderPlacement");
             this.players.setTroopsToDeploy(1);
         }
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
     placeLeader(color, locationName) {
@@ -251,15 +256,16 @@ class Game {
             this.players.setAdvisors(advisors);
             this.gameStates.setCurrentState("strategyPhase");
         }
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
     playAdvisor(color, columnName, advisor, bidCoins=0) {
         console.log("playAdvisor():", color, columnName, advisor, bidCoins);
         this.validateGameStatus("strategyPhase", "playAdvisor");
         var currentPlayer = this.validateCurrentPlayer(color, "playAdvisor");
+        //console.log("playAdvisor(): currentPlayer=" + currentPlayer);
         if (! currentPlayer.isAdvisorAvailable(advisor)) {
-            throw new Error("No advisor is available.", "playAdvisor");
+            throw new Error("No advisor=" + advisor + " is available.", "playAdvisor");
         }
         if (currentPlayer.boat.money < bidCoins) {
             throw new Error("Bid exceeded money available.", "playAdvisor");
@@ -284,7 +290,7 @@ class Game {
             this.players.mapAdvisorsToAuctionSpaces(this.auctionBoard);
             this.gameStates.setCurrentState("retrieveAdvisor");
         }
-        this.ai.evaluateGame(this);
+        this.aiEvaluateGame();
     }
 
     // retrieve advisor, rows=1-4
@@ -293,7 +299,7 @@ class Game {
         this.validateGameStatus("retrieveAdvisor", "takeMainAction");
         var currentPlayer = this.validateCurrentPlayer(color, "takeMainAction");
         if (currentPlayer.tookMainActionForTurn == true) {
-            this.throwError("Player already too main action for this turn.", "takeMainAction");
+            this.throwError("Player already took main action for this turn.", "takeMainAction");
         }
 
         if (currentPlayer.advisors.length < 1 || advisor != currentPlayer.advisors[0]) {
@@ -377,6 +383,7 @@ class Game {
                 this.gameStates.setCurrentState("actionPhase");
             }
         }
+        this.aiEvaluateGame();
     }
 
     schemeFirstPlayer(currentPlayerColor, firstPlayerColor) {
@@ -384,6 +391,7 @@ class Game {
         this.validateCurrentPlayer(currentPlayerColor, "schemeFirstPlayer");
         this.players.setNextFirstPlayerByColor(firstPlayerColor);
         this.gameStates.setCurrentState("drawSchemeCards");
+        this.aiEvaluateGame();
     }
 
     drawSchemeCards(color, schemeDeck) {
@@ -408,6 +416,7 @@ class Game {
             this.gameStates.setCurrentState("selectSchemeCard");
         }
         currentPlayer.schemeCardsToDraw == 0;
+        this.aiEvaluateGame();
     }
 
     selectSchemeCardToKeep(color, schemeCard) {
@@ -417,6 +426,7 @@ class Game {
         }
             
         var currentPlayer = this.validateCurrentPlayer(color, "selectSchemeCardToKeep");
+        console.log("selectSchemeCardToKeep():", color, schemeCard, currentPlayer.temporarySchemeCards.length, currentPlayer.canKeepSchemeCard);
         if (currentPlayer.temporarySchemeCards.length < 1 || ! currentPlayer.canKeepSchemeCard) {
             this.throwError("You have no scheme cards to keep.", "selectSchemeCardToKeep");
         }
@@ -433,7 +443,7 @@ class Game {
         if (currentPlayer.temporarySchemeCards.length < 1) {
             this.gameStates.setCurrentState("actionPhase");
         }
-
+        this.aiEvaluateGame();
     }
 
     selectSchemeCardToReturn(color, schemeDeckNumber, schemeCardId) {
@@ -464,6 +474,7 @@ class Game {
         if (currentPlayer.temporarySchemeCards.length < 1) {
             this.gameStates.setCurrentState("actionPhase");
         }
+        this.aiEvaluateGame();
     }
 
     muster(color, locationName, numberOfTroops) {
@@ -889,6 +900,7 @@ class Game {
                 this.endRound();
             }
         }
+        this.aiEvaluateGame();
     }
 
     accomplishedDeed(color, deedCardName, claimStatements) {
@@ -1231,6 +1243,7 @@ class Game {
         if (nextPlayer.advisors.length > 0) {
             this.players.setCurrentPlayer(nextPlayer);
             this.gameStates.setCurrentState("retrieveAdvisor");
+            this.aiEvaluateGame();
         } else {
             this.gameStates.setCurrentState("claimPhase");
             this.updateClaimsForClaimsPhase();
@@ -1247,6 +1260,7 @@ class Game {
         } else {
             this.gameStates.setCurrentState("endGame");
         }
+        this.aiEvaluateGame();
         console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);
     }
 

@@ -1,11 +1,12 @@
 class AuctionSpace {
-    constructor(actionName, quantity, extraCoin=0) {
+    constructor(actionName, quantity, row, extraCoin=0) {
         this.actionName = actionName;
         this.quantity = quantity;
         this.extraCoin = extraCoin;
         this.color = null;
         this.advisor = 0;
         this.bidCoins = 0;
+        this.row = row;
     }
 
     auctionBid(color, advisor, bidCoins) {
@@ -135,50 +136,55 @@ class AuctionBoard {
         this.board["build"] = [];
         this.board["scheme"] = [];
         if (this.numberOfPlayers <= 2) {
-            this.board["muster"].push(new AuctionSpace("muster", 3, 0));
-            this.board["muster"].push(new AuctionSpace("muster", 2, 0));
-            this.board["muster"].push(new AuctionSpace("muster", 1, 1));
-            this.board["move"].push(new AuctionSpace("move", 3, 0));
-            this.board["move"].push(new AuctionSpace("move", 2, 0));
-            this.board["move"].push(new AuctionSpace("move", 1, 0));
-            this.board["attack"].push(new AuctionSpace("attack", 2, 0));
-            this.board["attack"].push(new AuctionSpace("attack", 1, 0));
-            this.board["attack"].push(new AuctionSpace("attack", 1, 1));
-            this.board["tax"].push(new AuctionSpace("tax", 2, 0));
-            this.board["tax"].push(new AuctionSpace("tax", 1, 0));
-            this.board["tax"].push(new AuctionSpace("tax", 1, 1));
-            this.board["build"].push(new AuctionSpace("build", 2, 0));
-            this.board["build"].push(new AuctionSpace("build", 1, 0));
-            this.board["build"].push(new AuctionSpace("build", 1, 1));
-            this.board["scheme"].push(new AuctionSpace("scheme", 3, 0));
-            this.board["scheme"].push(new AuctionSpace("scheme", 2, 0));
-            this.board["scheme"].push(new AuctionSpace("scheme", 1, 0));
+            this.addAuctionSpace("muster", 3, 0);
+            this.addAuctionSpace("muster", 2, 0);
+            this.addAuctionSpace("muster", 1, 1);
+            this.addAuctionSpace("move", 3, 0);
+            this.addAuctionSpace("move", 2, 0);
+            this.addAuctionSpace("move", 1, 0);
+            this.addAuctionSpace("attack", 2, 0);
+            this.addAuctionSpace("attack", 1, 0);
+            this.addAuctionSpace("attack", 1, 1);
+            this.addAuctionSpace("tax", 2, 0);
+            this.addAuctionSpace("tax", 1, 0);
+            this.addAuctionSpace("tax", 1, 1);
+            this.addAuctionSpace("build", 2, 0);
+            this.addAuctionSpace("build", 1, 0);
+            this.addAuctionSpace("build", 1, 1);
+            this.addAuctionSpace("scheme", 3, 0);
+            this.addAuctionSpace("scheme", 2, 0);
+            this.addAuctionSpace("scheme", 1, 0);
         } else {
-            this.board["muster"].push(new AuctionSpace("muster", 3, 0));
-            this.board["muster"].push(new AuctionSpace("muster", 2, 0));
-            this.board["muster"].push(new AuctionSpace("muster", 1, 0));
-            this.board["muster"].push(new AuctionSpace("muster", 1, 1));
-            this.board["move"].push(new AuctionSpace("move", 4, 0));
-            this.board["move"].push(new AuctionSpace("move", 3, 0));
-            this.board["move"].push(new AuctionSpace("move", 2, 0));
-            this.board["move"].push(new AuctionSpace("move", 1, 0));
-            this.board["attack"].push(new AuctionSpace("attack", 2, 0));
-            this.board["attack"].push(new AuctionSpace("attack", 1, 0));
-            this.board["attack"].push(new AuctionSpace("attack", 1, 1));
-            this.board["attack"].push(new AuctionSpace("attack", 1, 2));
-            this.board["tax"].push(new AuctionSpace("tax", 3, 0));
-            this.board["tax"].push(new AuctionSpace("tax", 2, 0));
-            this.board["tax"].push(new AuctionSpace("tax", 1, 0));
-            this.board["tax"].push(new AuctionSpace("tax", 1, 1));
-            this.board["build"].push(new AuctionSpace("build", 2, 0));
-            this.board["build"].push(new AuctionSpace("build", 1, 0));
-            this.board["build"].push(new AuctionSpace("build", 1, 1));
-            this.board["build"].push(new AuctionSpace("build", 1, 2));
-            this.board["scheme"].push(new AuctionSpace("scheme", 3, 0));
-            this.board["scheme"].push(new AuctionSpace("scheme", 2, 0));
-            this.board["scheme"].push(new AuctionSpace("scheme", 1, 0));
-            this.board["scheme"].push(new AuctionSpace("scheme", 1, 1));
+            this.addAuctionSpace("muster", 3, 0);
+            this.addAuctionSpace("muster", 2, 0);
+            this.addAuctionSpace("muster", 1, 0);
+            this.addAuctionSpace("muster", 1, 1);
+            this.addAuctionSpace("move", 4, 0);
+            this.addAuctionSpace("move", 3, 0);
+            this.addAuctionSpace("move", 2, 0);
+            this.addAuctionSpace("move", 1, 0);
+            this.addAuctionSpace("attack", 2, 0);
+            this.addAuctionSpace("attack", 1, 0);
+            this.addAuctionSpace("attack", 1, 1);
+            this.addAuctionSpace("attack", 1, 2);
+            this.addAuctionSpace("tax", 3, 0);
+            this.addAuctionSpace("tax", 2, 0);
+            this.addAuctionSpace("tax", 1, 0);
+            this.addAuctionSpace("tax", 1, 1);
+            this.addAuctionSpace("build", 2, 0);
+            this.addAuctionSpace("build", 1, 0);
+            this.addAuctionSpace("build", 1, 1);
+            this.addAuctionSpace("build", 1, 2);
+            this.addAuctionSpace("scheme", 3, 0);
+            this.addAuctionSpace("scheme", 2, 0);
+            this.addAuctionSpace("scheme", 1, 0);
+            this.addAuctionSpace("scheme", 1, 1);
         }
+    }
+
+    addAuctionSpace(action, quantity, extraCoin) {
+        var row = this.board[action].length;
+        this.board[action].push(new AuctionSpace(action, quantity, row, extraCoin));
     }
 }
 
