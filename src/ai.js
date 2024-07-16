@@ -39,7 +39,7 @@ class Ai {
             "schemeFirstPlayer": "schemeFirstPlayer",
             "drawSchemeCards": "drawSchemeCards",
             "selectSchemeCard": "selectSchemeCard",
-            "endGame": ""
+            "endGame": "endGame"
         }
         this.aiCards = [];
         this.createAiCards();
@@ -158,7 +158,7 @@ class Ai {
     
 
     retrieveAdvisor(game, player) {
-        console.log("retrieveAdvisor()");
+        console.log("retrieveAdvisor(): advisors=" + JSON.stringify(player.advisors));
         var color = player.color;
         var advisor = player.advisors[0];
         var auctionSpaces = player.advisorsToAuctionSpace[advisor];
@@ -184,10 +184,7 @@ class Ai {
         console.log("beginActionPhaseAction(): " + color + " " + action);
         var actionToStateMap = {};
         actionToStateMap["cancel"] = "actionPhase";
-        actionToStateMap["musterAction"] = "actionPhaseMuster";
         actionToStateMap["moveAction"] = "actionPhaseMove";
-        actionToStateMap["attackAction"] = "actionPhaseAttack";
-        actionToStateMap["taxAction"] = "actionPhaseTax";
         actionToStateMap["buildAction"] = "actionPhaseBuild";
         actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
         actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
@@ -196,15 +193,17 @@ class Ai {
         */
 
 
-        //this.taxActions = 0;
         //this.buildActions = 0;
         //this.moveActions = 0;
-        //this.attackActions = 0;
+
         if (player.troopsToDeploy > 0) {
             this.muster(game, player);
         }
         if (player.taxActions > 0) {
             this.tax(game, player);
+        }
+        if (player.attackActions > 0) {
+            this.attack(game, player);
         }
 
         // Determine candidate actions.
@@ -220,6 +219,7 @@ class Ai {
     }
 
     muster(game, player) {
+        console.log("ai muster()");
         var color = player.color;
         //var aiCard = player.aiCard;
         //var locationNames = aiCard.locationOrder.split(",");
@@ -249,6 +249,7 @@ class Ai {
     }
 
     tax(game, player) {
+        console.log("ai tax()");
         var color = player.color;
         var canTax = true;
         while (player.taxActions > 0 && canTax) {
@@ -342,7 +343,111 @@ class Ai {
 
     }
 
+    
+    pickTarget(player, location, firstPlacePlayerColors) {
+        var target = null;
+        var possibleTargets = [];
+        if (location.rebels.length > 0) {
+            possibleTargets.push("rebel");
+        }
+        var colors = ["blue", "white", "red", "yellow"];
+        for (var i=0; i< colors.length; i++) {
+            var color = colors[i];
+            if (player.color == color) {
+                continue;
+            }
+            if (location.troopsByColor[color] > 0 || location.leaderByColor[color] > 0) {
+                possibleTargets.push(color);
+            }
+        }
+        var firstPlaceTargets = lodash.intersection(possibleTargets, firstPlacePlayerColors);
+        if (firstPlaceTargets.length > 0) {
+            target = firstPlaceTargets[0];
+        } else {
+            if (possibleTargets.length > 0) {
+                target = possibleTargets[possibleTargets.length-1];
+            }
+        }
+        return target;
+    }
+
     attack(game, player) {
+        console.log("ai attack()");
+        var color = player.color;
+        var canAttack = true;
+        var clonedGame = lodash.cloneDeep(game);
+        var clonedPlayer = lodash.cloneDeep(player);
+        var endGameStats = clonedGame.calculateEndGameStats();
+        var firstPlacePlayerColors = clonedGame.getFirstPlacePlayers(endGameStats);
+
+        while (player.attackActions > 0 && canAttack) {
+            // Priorities:
+            // build or tax strategy - prefer to attack where rule
+            // attack-move strategy - prefer to attack where do not rule
+            // prefer to attack where can rule (0 -> +1 diff)
+            // prefer to attack where can disrupt rule of another player (-1 -> 0 diff)
+            // prefer to attack first place player
+            // if in first place, prefer to attack second place player
+            // prefer to attack another player vs. rebel 
+            // prefer to attack human player vs. ai player
+
+
+            canAttack = false;
+            var occupyMap = this.determineOccupiedLocations(player, game.gameMap.locationsForGame);
+            var occupiesButDoesNotRule = occupyMap["occupiesButDoesNotRule"];
+            var rules = occupyMap["rules"];
+            var occupies = occupyMap["occupies"];
+            var locationsWithEnemies = [];
+            var locationsWithRebels = [];
+            var locationsWithOtherPlayers = [];
+            for (var i=0; i<game.gameMap.locationsForGame.length; i++) {
+                var location = game.gameMap.locationsForGame[i];
+                if (location.rebels.length > 0) {
+                    locationsWithEnemies.push(location.name);
+                    locationsWithRebels.push(location.name);
+                }
+                if (location.hasPlayerEnemy(color)) {
+                    locationsWithOtherPlayers.push(location.name);
+                }
+            }
+            var locationName = null;
+            var target = null;
+            if (locationsWithEnemies.length > 0) {
+                var occupiesWithEnemies = lodash.intersection(locationsWithEnemies, occupies);
+                console.log("attack(): occupiesWithEnemies=" + JSON.stringify(occupiesWithEnemies));
+                if (occupiesWithEnemies.length > 0) {
+                    var r = Math.floor(Math.random() * occupiesWithEnemies.length);
+                    var locationName = occupiesWithEnemies[r];
+                    var location = game.gameMap.locationByName[locationName];
+                    target = this.pickTarget(player, location, firstPlacePlayerColors);
+                    console.log("attack(): target=" + target);
+                    if (target != null) {
+                        canAttack = true;
+                    }
+                }
+
+                // TODO: implement preferences
+                // attack-move, build, tax
+                if (player.aiStrategy == "attack-move") {
+                    // Prefer to attack where they do not rule.
+                    if (occupiesButDoesNotRule.length > 0) {
+                        var noRule = lodash.intersection(locationsWithEnemies, occupiesButDoesNotRule);
+                        if (noRule.length > 0) {
+                            
+                        }
+                    } else if (rules.length > 0) {
+
+                    }
+                } else {
+                    // Prefer to attack where they do rule.
+                }
+            }
+            if (canAttack) {
+                game.beginActionPhaseAction(color, "attackAction");
+                game.attack(color, locationName, target, 1)
+            }
+    
+        }
 
     }
 
@@ -429,23 +534,8 @@ class Ai {
     }
 
     schemeFirstPlayer(game, player) {
-        var sortedPlayers = game.players.sortedPlayers;
-        var firstPlayerColor = player.color;
-        for (var i=0; i < sortedPlayers.length; i++) {
-            if (sortedPlayers[i].color == player.color) {
-                var firstPlayer = player;
-                var index = i;
-                if (i == 0) {
-                    index = sortedPlayers.length - 1;
-                } else if (i > 0) {
-                    index = i - 1;
-                }
-                firstPlayer = sortedPlayers[index];
-                firstPlayerColor = firstPlayer.color;
-                break;
-            }
-        }
-        game.schemeFirstPlayer(player.color, firstPlayerColor)
+        var nextPlayer = game.players.getNextPlayer(player);
+        game.schemeFirstPlayer(player.color, nextPlayer.color)
     }
 
     drawSchemeCards(game, player) {
@@ -463,6 +553,10 @@ class Ai {
                 game.selectSchemeCardToReturn(player.color, player.returnSchemeDeck, schemeCard.id)
             }            
         }
+    }
+
+    endGame(game, player) {
+
     }
 
     createAiCards() {

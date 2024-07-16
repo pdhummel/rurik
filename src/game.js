@@ -675,7 +675,8 @@ class Game {
                 } else {
                     currentPlayer.boat.addGoodToBoatOrDock(reward);
                 }
-                currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;                            
+                currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;
+                console.log("attack(): " + color + " defeated rebel");
             } else {
                 throw new Error("There are no rebels  to attack in " + locationName + ".", "attack()");
             }
@@ -694,9 +695,11 @@ class Game {
             if (location.troopsByColor[targetColor] > 0) {
                 location.troopsByColor[targetColor]--;
                 targetPlayer.supplyTroops++;
+                console.log("attack(): " + color + " killed troop for " + targetPlayer.color);
             } else {
                 location.leaderByColor[targetColor]--;
                 targetPlayer.supplyLeader = 1;
+                console.log("attack(): " + color + " killed leader for " + targetPlayer.color);
             }
 
             if (location.countStrongholds(targetColor) > 0) {
@@ -730,7 +733,7 @@ class Game {
         currentPlayer.attackActions = currentPlayer.attackActions - 1;
         this.gameStates.setCurrentState("actionPhase");
 
-        console.log("attack(): troopsLost=" + troopsLost);
+        console.log("attack(): " + color + " troopsLost=" + troopsLost);
         return troopsLost;
     }
 
@@ -1169,6 +1172,24 @@ class Game {
               endGameStats["warfare"][color] + endGameStats["vp"][color] + endGameStats["deeds"][color] + endGameStats["secretAgenda"][color];
         }
         return endGameStats;
+    }
+
+    getFirstPlacePlayers(endGameStats) {
+        var firstPlacePlayers = [];
+        var firstPlaceScore = 0;
+        var colors = ["blue", "white", "yellow", "red"];
+        for (var i=0; i<colors; i++) {
+            var color = colors[i];
+            var score = endGameStats["total"][color];
+            if (score > firstPlaceScore) {
+                firstPlaceScore = score;
+                firstPlacePlayers = [];
+            }
+            if (score >= firstPlaceScore) {
+                firstPlacePlayers.push(color);
+            }
+        }
+        return firstPlacePlayers;
     }
 
     playMusterConversionTile(currentPlayer, resource1, resource2) {

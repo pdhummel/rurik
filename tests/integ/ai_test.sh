@@ -44,10 +44,14 @@ game_id=$(echo ${new_game_response} | jq -r '.id')
 
 
 echo "First player joining"
-r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "blue", "name": "Paul", "position": "N", "isAi": true }')
+r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "blue", "name": "p1", "position": "N", "isAi": true }')
 
 echo "Second player joining"
-r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "red", "name": "Glen", "position": "S", "isAi": true }')
+r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "red", "name": "p2", "position": "E", "isAi": true }')
+
+r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "yellow", "name": "p3", "position": "S", "isAi": true }')
+
+r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "white", "name": "p4", "position": "W", "isAi": true }')
 
 echo "Start the game"
 r=$(rest "${server}/game/${game_id}" PUT)

@@ -127,6 +127,39 @@ class Location {
         return false;
     }
 
+    hasEnemy(color) {
+        var hasEnemies = false;
+        if (location.rebels.length > 0) {
+            return true;
+        }
+        var colors = ["white", "red", "blue", "yellow"];
+        for (var i=0; i<colors.length; i++) {
+            var c = colors[i];
+            if (c == color) {
+                continue;
+            }
+            if (this.troopsByColor[c] > 0 || this.leaderByColor[c] > 0) {
+                return true;
+            }
+        }
+        return hasEnemies;
+    }
+
+
+    hasPlayerEnemy(color) {
+        var hasEnemies = false;
+        var colors = ["white", "red", "blue", "yellow"];
+        for (var i=0; i<colors.length; i++) {
+            var c = colors[i];
+            if (c == color) {
+                continue;
+            }
+            if (this.troopsByColor[c] > 0 || this.leaderByColor[c] > 0) {
+                return true;
+            }
+        }
+        return hasEnemies;
+    }
 
     whoRules() {
         var yellow = this.countStrongholds("yellow") + this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
