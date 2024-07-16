@@ -7,6 +7,7 @@ const Cards = require('./cards.js');
 const ClaimBoard = require('./claims.js');
 const Validator = require('./validations.js');
 const Ai = require('./ai.js');
+const lodash = require('lodash');
 
 
 class Games {

@@ -177,15 +177,37 @@ class Ai {
         var clonedGame = lodash.cloneDeep(game);
         var clonedPlayer = lodash.cloneDeep(player);
         var endGameStats = clonedGame.calculateEndGameStats();
-        var decisionValue = calculateDecisionValue();
+        var decisionValue = this.calculateDecisionValue(clonedGame, clonedPlayer);
         
-        // Determine candidate actions.
-        //this.troopsToDeploy = 3;
+        /*
+        beginActionPhaseAction(color, action) {
+        console.log("beginActionPhaseAction(): " + color + " " + action);
+        var actionToStateMap = {};
+        actionToStateMap["cancel"] = "actionPhase";
+        actionToStateMap["musterAction"] = "actionPhaseMuster";
+        actionToStateMap["moveAction"] = "actionPhaseMove";
+        actionToStateMap["attackAction"] = "actionPhaseAttack";
+        actionToStateMap["taxAction"] = "actionPhaseTax";
+        actionToStateMap["buildAction"] = "actionPhaseBuild";
+        actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
+        actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
+        actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
+        actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
+        */
+
+
         //this.taxActions = 0;
         //this.buildActions = 0;
         //this.moveActions = 0;
         //this.attackActions = 0;
+        if (player.troopsToDeploy > 0) {
+            this.muster(game, player);
+        }
+        if (player.taxActions > 0) {
+            this.tax(game, player);
+        }
 
+        // Determine candidate actions.
         // For each candidate action
             // Clone the game
             // Take the candidate action
@@ -197,16 +219,173 @@ class Ai {
         game.endTurn(player.color);
     }
 
+    muster(game, player) {
+        var color = player.color;
+        //var aiCard = player.aiCard;
+        //var locationNames = aiCard.locationOrder.split(",");
+    
+        while (player.troopsToDeploy > 0 && player.supplyTroops + player.supplyLeader > 0) {
+            var occupyMap = this.determineOccupiedLocations(player, game.gameMap.locationsForGame);
+            var occupies = occupyMap["occupies"];
+            var locationName = null;
+            if (occupies.length > 0) {
+                var occupiesButDoesNotRule = occupyMap["occupiesButDoesNotRule"];
+                if (occupiesButDoesNotRule.length > 0) {
+                    var r = Math.floor(Math.random() * occupiesButDoesNotRule.length);
+                    locationName = occupiesButDoesNotRule[r];
+                } else {
+                    var rules = occupyMap["rules"];
+                    var r = Math.floor(Math.random() * rules.length);
+                    locationName = rules[r];
+                }
+            } else {
+                // This should handle cases when wiped off the board.
+                var r = Math.floor(Math.random() * game.gameMap.locationsForGame.length);
+                locationName = game.gameMap.locationsForGame[r].name;
+            }
+            game.beginActionPhaseAction(color, "musterAction");
+            game.muster(color, locationName, 1);
+        }
+    }
+
+    tax(game, player) {
+        var color = player.color;
+        var canTax = true;
+        while (player.taxActions > 0 && canTax) {
+            // Priorities:
+            // locations with goods remaining
+            // locations with goods needed
+            // location ruled with market
+            // location ruled
+            // location occupied with market
+            // location occupied
+
+
+            // goodsNeeded = goodsOnBoatSlots - goodsOnBoat
+            var goodsNeeded = new Set();
+            var boat = player.boat;
+            var goods = ["stone", "wood", "fish", "fur", "honey"];
+            for (var i=0; i < goods.length; i++) {
+                if (boat.goodsOnBoatSlots[goods[i]] - boat.goodsOnBoat[goods[i]] > 0) {
+                    goodsNeeded.add(goods[i]);
+                }
+            }
+
+            var locationsWithGoods = [];
+            var locationsRuled = [];
+            var locationsOccupied = [];
+            var locationsWithMarket = [];
+            var locationsWithNeededGoods = [];
+
+            for (var i=0; i<game.gameMap.locationsForGame.length; i++) {
+                var location = game.gameMap.locationsForGame[i];
+                if (location.resourceCount > 0) {
+                    locationsWithGoods.push(location);
+                    if (goodsNeeded.has(location.defaultResource)) {
+                        locationsWithNeededGoods.push(location);
+                    }
+                }
+                if (location.doesPlayerHaveMarket(color)) {
+                    locationsWithMarket.push(location);
+                }
+                if (location.doesRule(color)) {
+                    locationsRuled.push(location);
+                }
+                if (location.doesOccupy(color)) {
+                    locationsOccupied.push(location);
+                }
+            }
+
+            canTax = false;
+            var locationName = null;
+            var intersectionSet = lodash.intersection(locationsWithGoods, locationsOccupied);
+            if (intersectionSet.length > 0) {
+                var intersectionSetGoodsNeeded = lodash.intersection(intersectionSet, locationsWithNeededGoods);
+                if (intersectionSetGoodsNeeded.length > 0) {
+                    var intersectionSetRuled = lodash.intersection(intersectionSetGoodsNeeded, locationsRuled);
+                    if (intersectionSetRuled.length > 0) {
+                        var intersectionSetRuledWithMarket = lodash.intersection(intersectionSetRuled, locationsWithMarket);
+                        if (intersectionSetRuledWithMarket.length > 0) {
+                            canTax = true;
+                            console.log("tax(): intersectionSetRuledWithMarket=" + intersectionSetRuledWithMarket.length);
+                            locationName = intersectionSetRuledWithMarket[0].name;
+                        } else {
+                            canTax = true;
+                            console.log("tax(): intersectionSetRuled=" + intersectionSetRuled.length);
+                            locationName = intersectionSetRuled[0].name;
+                        }
+                    } else {
+                        if (player.taxActions > 1) {
+                            canTax = true;
+                            console.log("tax(): intersectionSetGoodsNeeded=" + intersectionSetGoodsNeeded.length);
+                            locationName = intersectionSetGoodsNeeded[0].name;
+                        }
+                    }
+                } else {
+                    if (player.taxActions > 1) {
+                        canTax = true;
+                        console.log("tax(): intersectionSet=" + intersectionSet.length);
+                        locationName = intersectionSet[0].name;
+                    }
+                }
+            }
+            if (canTax == true) {
+                game.beginActionPhaseAction(color, "taxAction");
+                game.tax(color, locationName);
+            }
+
+        }
+        
+    }
+
+    build(game, player) {
+
+    }
+
+    attack(game, player) {
+
+    }
+
+    move(game, player) {
+
+    }
+
+    determineOccupiedLocations(player, locations) {
+        var color = player.color;
+        var occupyMap = {};
+        var occupies = [];
+        var rules = [];
+        var occupiesButDoesNotRule = [];
+        for (var i=0; i<locations.length; i++) {
+            //var location = game.gameMap.locationByName[locations[i]];
+            var location = locations[i];
+            var locationName = location.name;
+            if (location.doesOccupy(color)) {
+                occupies.push(locationName);
+                if (location.doesRule(color)) {
+                    rules.push(locationName);
+                } else {
+                    occupiesButDoesNotRule.push(locationName);
+                }
+            }
+        }
+        occupyMap["occupiesButDoesNotRule"] = occupiesButDoesNotRule;
+        occupyMap["occupies"] = occupies;
+        occupyMap["rules"] = rules;
+        return occupyMap;
+    }
+
     calculateDecisionValue(game, player) {
         // Clone the game and calculate current points for all players.
         var clonedGame = lodash.cloneDeep(game);
-        var endGameStats = clonedGame.calculateEndGameStats();
-        console.log("takeAction(): endGameStats=" + JSON.stringify(endGameStats));
+        var gameEndStats = clonedGame.calculateEndGameStats();
+        //console.log("takeAction(): gameEndStats=" + JSON.stringify(gameEndStats));
         // Descision value calculation:
         // + If winning, [ai points minus (second place points)] * 100.
         // - If losing, [ai points minus first place points] * 100.
         // + Money on-hand.
         // + Resources on dock.
+        // + Troops on the board.
         var playerPoints = 0;
         var decisionValue = 0;
         var firstPlacePlayerPoints = 0;

@@ -133,8 +133,9 @@ class Location {
         var red = this.countStrongholds("red") + this.troopsByColor["red"] + this.leaderByColor["red"];
         var white = this.countStrongholds("white") + this.troopsByColor["white"] + this.leaderByColor["white"];
         var blue = this.countStrongholds("blue") + this.troopsByColor["blue"] + this.leaderByColor["blue"];
-        var highValue = yellow;
-        var ruler = "yellow";
+        var rebels = this.rebels.length;
+        var highValue = rebels;
+        var ruler = null;
         if (red > highValue) {
             ruler = "red"
             highValue = red;
@@ -151,6 +152,12 @@ class Location {
             ruler = "white"
             highValue = white;
         } else if (white == highValue) {
+            ruler = null;
+        }
+        if (yellow > highValue) {
+            ruler = "yellow"
+            highValue = yellow;
+        } else if (yellow == highValue) {
             ruler = null;
         }
         //console.log(this.name + " is ruled by " + ruler);
