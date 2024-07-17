@@ -197,6 +197,30 @@ class Location {
         return ruler;
     }
 
+    calculateExcessTroopsForRule(rulingColor) {
+        var strength = {};
+        strength["yellow"] = this.countStrongholds("yellow") + this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
+        strength["red"] = this.countStrongholds("red") + this.troopsByColor["red"] + this.leaderByColor["red"];
+        strength["white"] = this.countStrongholds("white") + this.troopsByColor["white"] + this.leaderByColor["white"];
+        strength["blue"] = this.countStrongholds("blue") + this.troopsByColor["blue"] + this.leaderByColor["blue"];
+        strength["rebels"] = this.rebels.length;
+        var highValue = 0;
+        var nextHighValue = 0;
+        var enemies = ["yellow", "red", "white", "blue", "rebels"];
+        for (var i=0; i< enemies.length; i++) {
+            var enemy = enemies[i];
+            if (enemy == rulingColor) {
+                highValue = strength[rulingColor];
+                continue;
+            }
+            if (strength[enemy] > nextHighValue) {
+                nextHighValue = strength[enemy];
+            }
+        }
+        var excess = highValue - nextHighValue;
+        return excess;
+    }
+
     isNeighbor(locationName) {
         console.log("isNeighbor(): self=" + this.name + ", neighbor? " + locationName);
         for (var i=0; i<this.neighbors.length; i++) {
@@ -307,6 +331,14 @@ class GameMap {
             this.setLocationsForGame(numberOfPlayers);
         }
         return this.locationsForGame;
+    }
+
+    getLocationsForGameNames() {
+        var locationNames = [];
+        for (var i=0; i<this.locationsForGame.length; i++) {
+            locationNames.push(this.locationsForGame[i].name);
+        }
+        return locationNames;
     }
 
     getLocationsForPlayer(color) {

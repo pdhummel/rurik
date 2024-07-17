@@ -324,6 +324,7 @@ class Game {
                 auctionSpace = auctionSpaces.pop();
                 console.log("takeMainAction(): pop " + auctionSpace.actionName);
             } else {
+                // TODO: Error: Could not retrieve advisor.
                 throw new Error("Could not retrieve advisor.", "takeMainAction()");        
             }
 
@@ -406,13 +407,21 @@ class Game {
         currentPlayer.canKeepSchemeCard = true;
         if (currentPlayer.schemeCardsToDraw == 1) {
             var card = this.cards.drawSchemeCard(schemeDeck);
-            currentPlayer.temporarySchemeCards.push(card);
-            this.selectSchemeCardToKeep(color, card);
+            if (card == undefined || card == null) {
+                console.log("drawSchemeCards(): Warning null card: schemeCardsToDraw=1");
+            } else {
+                currentPlayer.temporarySchemeCards.push(card);
+                this.selectSchemeCardToKeep(color, card);
+            }
         } else {
             for (var i=0; i<currentPlayer.schemeCardsToDraw; i++) {
                 var card = this.cards.drawSchemeCard(schemeDeck);
-                currentPlayer.temporarySchemeCards.push(card);
-                currentPlayer.returnSchemeDeck = schemeDeck;
+                if (card == undefined || card == null) {
+                    console.log("drawSchemeCards(): Warning null card: schemeCardsToDraw=" + currentPlayer.schemeCardsToDraw);
+                } else {
+                    currentPlayer.temporarySchemeCards.push(card);
+                    currentPlayer.returnSchemeDeck = schemeDeck;
+                }
             }
             this.gameStates.setCurrentState("selectSchemeCard");
         }
@@ -458,8 +467,11 @@ class Game {
         var tempCards = [];
         var found = false;
         var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
+        console.log("selectSchemeCardToReturn(): " + JSON.stringify(currentPlayer.temporarySchemeCards));
         for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
-            if (schemeCardId == currentPlayer.temporarySchemeCards[i].id && found == false) {
+            // TODO: TypeError: Cannot read property 'id' of undefined
+            var tempSchemeCardId = currentPlayer.temporarySchemeCards[i].id;
+            if (schemeCardId == tempSchemeCardId && found == false) {
                 schemeDeck.unshift(currentPlayer.temporarySchemeCards[i]);
                 found = true;
             } else {
@@ -509,7 +521,7 @@ class Game {
     }
 
     move(color, fromLocationName, toLocationName, numberOfTroops=1, moveLeader=false) {
-        console.log("move(): " + color + ": from " + fromLocationName + " to " + toLocationName);
+        console.log("move(): " + color + ": from " + fromLocationName + " to " + toLocationName + " " + numberOfTroops);
         this.validateGameStatus("actionPhaseMove", "move");
         var currentPlayer = this.validateCurrentPlayer(color, "move");
 
@@ -523,10 +535,11 @@ class Game {
             throw new Error(toLocationName + " is not a neighbor of " + fromLocationName + ".", "move()");
         }
 
-        if (moveLeader && fromLocation.isLeaderInLocation(color) && numberOfTroops == 1) {
-            fromLocation.leaderByColor[color] = fromLocation.leaderByColor[color] - numberOfTroops;
-            toLocation.leaderByColor[color] = toLocation.leaderByColor[color] + numberOfTroops;
+        if (moveLeader && fromLocation.isLeaderInLocation(color) && (numberOfTroops == 1 || numberOfTroops == 0)) {
+            fromLocation.leaderByColor[color] = fromLocation.leaderByColor[color] - 1;
+            toLocation.leaderByColor[color] = toLocation.leaderByColor[color] + 1;
         } else if (moveLeader) {
+            console.log("move(): fromLocation=" + fromLocation.name + " isLeaderInLocation=" + fromLocation.isLeaderInLocation(color) + " " + JSON.stringify(fromLocation));
             throw new Error("Leader must be in location and cannot move other troops at the same time.", "move()");
         } else {
             fromLocation.troopsByColor[color] = fromLocation.troopsByColor[color] - numberOfTroops;
@@ -708,13 +721,16 @@ class Game {
             var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
             for (var i=0; i<schemeCardsToDraw; i++) {
                 var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
-                var deaths = card.deaths;
+                var deaths = 0;
                 var removeLeader = false;
-                if (deaths > location.troopsByColor[color]) {
-                    if (location.leaderByColor[color] > 0) {
-                        removeLeader = true;
-                    }
-                    deaths = location.troopsByColor[color];
+                if (card != undefined && card != null) {
+                    deaths = card.deaths;
+                    if (deaths > location.troopsByColor[color]) {
+                        if (location.leaderByColor[color] > 0) {
+                            removeLeader = true;
+                        }
+                        deaths = location.troopsByColor[color];
+                    }    
                 }
                 location.troopsByColor[color] = location.troopsByColor[color] - deaths;
                 currentPlayer.supplyTroops = currentPlayer.supplyTroops + deaths;

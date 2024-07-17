@@ -1,5 +1,7 @@
 //
 
+const { json } = require("express");
+
 class Cards {
     constructor() {
         this.setupSecretAgendaCards();
@@ -211,29 +213,39 @@ class Cards {
         return this.schemeCardIds[schemeCardId];
     }
 
+    // schemeDeck=1 or 2 or a list
     drawSchemeCard(schemeDeck) {
-        console.log("drawSchemeCard(): " + schemeDeck);
+        console.log("cards drawSchemeCard(): schemeDeck= " + schemeDeck);
         var schemeDeckList = null;
         if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
             schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
         } else {
+            console.log("drawSchemeCard(): schemeDeck=" + JSON.stringify(schemeDeck));
             schemeDeckList = schemeDeck;
         }
+        console.log("drawSchemeCard(): length of schemeDeckList=" + schemeDeckList.length);
         var card = schemeDeckList.shift();
-        console.log("drawSchemeCard(): " + this.schemeDeck1.length + " " + this.schemeDeck2.length);
+        console.log("drawSchemeCard(): length: " + this.schemeDeck1.length + " " + this.schemeDeck2.length);
+        console.log("drawSchemeCard(): card=" + JSON.stringify(card));
         return card;
     }
 
+    // schemeDeck=1 or 2 or a list
     drawAndDiscardSchemeCard(schemeDeck) {
         console.log("drawAndDiscardSchemeCard(): " + schemeDeck);
         var schemeDeckList = null;
         if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
             schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
         } else {
+            console.log("drawSchemeCard(): schemeDeck=" + JSON.stringify(schemeDeck));
             schemeDeckList = schemeDeck;
         }
-        var card = schemeDeckList.shift();
-        this.discardedSchemeCards.push(card);
+        var card = null;
+        if (schemeDeckList != undefined && schemeDeckList.length > 0) {
+            var card = schemeDeckList.shift();
+            this.discardedSchemeCards.push(card);    
+        }
+        console.log("drawAndDiscardSchemeCard(): card=" + JSON.stringify(card));
         return card;
     }
 

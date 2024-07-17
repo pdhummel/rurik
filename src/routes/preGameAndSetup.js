@@ -67,7 +67,11 @@ app.get('/game', (req, res) => {
         res.status(400).send({ "error": "Player name is required."});
         return;
       }
-      var isAi = req.body.isAi;
+      var isAi = false;
+      var isAiValue = req.body.isAi;
+      if (isAiValue == "true" || isAiValue == true) {
+        isAi = true;
+      }
       game.joinGame(name, color, position, isAi);
 
     } catch(error) {

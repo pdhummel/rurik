@@ -46,7 +46,8 @@ class Ai {
     }
 
     evaluateGame(game) {
-        if (! game.players.getCurrentPlayer().isPlayerAi) {
+        var currentPlayer =  game.players.getCurrentPlayer();
+        if (! currentPlayer.isPlayerAi) {
             return;
         }
         console.log("evaluateGame(): isPlayerAi=true");
@@ -192,10 +193,6 @@ class Ai {
         actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
         */
 
-
-        //this.buildActions = 0;
-        //this.moveActions = 0;
-
         if (player.troopsToDeploy > 0) {
             this.muster(game, player);
         }
@@ -205,7 +202,12 @@ class Ai {
         if (player.attackActions > 0) {
             this.attack(game, player);
         }
-
+        if (player.moveActions > 0) {
+            this.move(game, player);
+        }
+        if (player.buildActions > 0) {
+            this.build(game, player);
+        }
         // Determine candidate actions.
         // For each candidate action
             // Clone the game
@@ -339,10 +341,6 @@ class Ai {
         
     }
 
-    build(game, player) {
-
-    }
-
     
     pickTarget(player, location, firstPlacePlayerColors) {
         var target = null;
@@ -452,8 +450,92 @@ class Ai {
     }
 
     move(game, player) {
+        console.log("ai move()");
+        var color = player.color;
+        var canMove = true;
+        while (player.moveActions > 0 && canMove) {
+            var canMove = false;
+            // Priorities:
+            // build or tax strategy - prefer to move to a location they do not occupy
+            // attack-move strategy - prefer to move to a location they do not rule
+            // will not move if it will make someone else gain rule
+            // will not move if it will make them lose rule
+            // prefers to move leader over troop
+            var occupyMap = this.determineOccupiedLocations(player, game.gameMap.locationsForGame);
+            var occupiesButDoesNotRule = occupyMap["occupiesButDoesNotRule"];
+            var rules = occupyMap["rules"];
+            var occupies = occupyMap["occupies"];
+            var fromLocationName = null;
+            var toLocationName = null;
+            var moveLeader = false;
+            var locationsForGameNames = game.gameMap.getLocationsForGameNames();
+            for (var i=0; i<rules.length; i++) {
+                moveLeader = false;
+                fromLocationName = rules[i];
+                console.log("move(): fromLocationName=" + fromLocationName);
+                var fromLocation = game.gameMap.locationByName[fromLocationName];
+                if (fromLocation.leaderByColor[color] > 0) {
+                    console.log("move(): leader in fromLocation=" + JSON.stringify(fromLocation));
+                    moveLeader = true;
+                }
+                var excess = fromLocation.calculateExcessTroopsForRule(color);
+                if (excess > 1) {
+                    var neighbors = fromLocation.neighbors;
+                    console.log("move(): neighbors=" + neighbors);
+                    var validNeighbors = lodash.intersection(locationsForGameNames, neighbors);
+                    console.log("move(): validNeighbors=" + validNeighbors);
+                    for (var n=0; n<validNeighbors.length; n++) {
+                        var neighbor = game.gameMap.locationByName[validNeighbors[n]];
+                        if (player.aiStrategy == "attack-move") {
+                            if (neighbor.doesOccupy(color) && ! neighbor.doesRule(color)) {
+                                toLocationName = validNeighbors[n];
+                                canMove = true;
+                                break;
+                            }
+                        } else {
+                            if (! neighbor.doesOccupy(color)) {
+                                toLocationName = validNeighbors[n];
+                                canMove = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (! canMove) {
+                        var r = Math.floor(Math.random() * validNeighbors.length);
+                        toLocationName = validNeighbors[r];
+                        canMove = true;
+                    }
+                    break;
+                }
+            }
+            if (canMove) {
+                game.beginActionPhaseAction(color, "moveAction");
+                game.move(color, fromLocationName, toLocationName, 1, moveLeader);
+            }
+
+        }
+    }
+
+    build(game, player) {
+        console.log("ai build()");
+        var color = player.color;
+        var aiCard = player.aiCard;
+        var buildingOrder = aiCard.strategies[player.aiStrategy].buildingOrder;
+        var canBuild = true;
+
+        while (player.buildActions > 0 && canBuild) {
+            var canBuild = false;
+            // Priorities:
+            // build where they rule
+            // build where there are none of their buildings
+            // build where there are enemy or neutral troops
+            // build where there are no enemy or neutral troops
+
+        }
 
     }
+
+
 
     determineOccupiedLocations(player, locations) {
         var color = player.color;
@@ -556,7 +638,6 @@ class Ai {
     }
 
     endGame(game, player) {
-
     }
 
     createAiCards() {
