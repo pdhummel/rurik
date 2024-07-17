@@ -36,7 +36,11 @@ function placeAdvisor() {
     var sb = "sb-3-4-";
     if (numberOfPlayers <= 2) {
       sb = "sb-1-2-";
+      show("strategyBoard-1-2");
+    } else {
+      show("strategyBoard-3-4");
     }
+
     console.log("board", board);
     for (var k=0; k < Object.keys(board).length; k ++) {
       var key = Object.keys(board)[k];

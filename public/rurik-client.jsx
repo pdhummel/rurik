@@ -169,7 +169,7 @@ function refreshGameStatusResponseHandler(response) {
       show("advisors");
       if (currentPlayer == myColor) {
         show("placeAdvisorDiv");
-        hide("strategyBoard-3-4");
+        //hide("strategyBoard-3-4");
       } else {
         hide("placeAdvisorDiv");
       }
@@ -179,6 +179,7 @@ function refreshGameStatusResponseHandler(response) {
     ) {
       if (gameStatus.numberOfPlayers <= 2) {
         show("strategyBoard-1-2");
+        hide("strategyBoard-3-4");
       } else {
         show("strategyBoard-3-4");
         hide("strategyBoard-1-2");
