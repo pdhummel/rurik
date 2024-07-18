@@ -51,9 +51,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * show total victory points for others
 
 * add support for AI players
-  * AI strategy phase logic -- based on solo
   * AI action phase logic
-  * Add AI to game creation/setup views
 
 
 * game status -- show players joined before 
@@ -128,7 +126,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * hack api -- add actions for muster, move, tax, build, attack
 * hack api -- add resource to dock
 * playAdvisor - check for 2 advisors from the same player in the same column
-
+* AI strategy phase logic -- based on solo
+* Add AI to game creation/setup views
 
 
 

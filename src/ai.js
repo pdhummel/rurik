@@ -181,12 +181,7 @@ class Ai {
         var decisionValue = this.calculateDecisionValue(clonedGame, clonedPlayer);
         
         /*
-        beginActionPhaseAction(color, action) {
-        console.log("beginActionPhaseAction(): " + color + " " + action);
-        var actionToStateMap = {};
         actionToStateMap["cancel"] = "actionPhase";
-        actionToStateMap["moveAction"] = "actionPhaseMove";
-        actionToStateMap["buildAction"] = "actionPhaseBuild";
         actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
         actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
         actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
@@ -389,7 +384,6 @@ class Ai {
             // prefer to attack another player vs. rebel 
             // prefer to attack human player vs. ai player
 
-
             canAttack = false;
             var occupyMap = this.determineOccupiedLocations(player, game.gameMap.locationsForGame);
             var occupiesButDoesNotRule = occupyMap["occupiesButDoesNotRule"];
@@ -516,13 +510,79 @@ class Ai {
         }
     }
 
+    checkLocationForBuildingsToPlay(location, player) {
+        console.log("checkLocationForBuildingsToPlay(): " + JSON.stringify(location) + " " + player.color);
+        var locationBuildings = [];
+        for (var i=0; i<location.buildings.length; i++) {
+            locationBuildings.push(location.buildings[i].name);
+        }
+        var allBuildings = ["stable", "tavern", "church", "market", "stronghold"];
+        var playerBuildings = [];
+        for (var i=0; i<allBuildings.length; i++) {
+            var building = allBuildings[i];
+            if (player.buildings[building] > 0) {
+                playerBuildings.push(building);
+            }
+        }
+        var buildingsAllowed = [];
+        //console.log("checkLocationForBuildingsToPlay(): locationBuildings=" + JSON.stringify(locationBuildings));
+        //console.log("checkLocationForBuildingsToPlay(): playerBuildings=" + JSON.stringify(playerBuildings));
+        var buildingsAllowedInLocation = lodash.difference(allBuildings, locationBuildings);
+        console.log("checkLocationForBuildingsToPlay(): buildingsAllowedInLocation=" + JSON.stringify(buildingsAllowedInLocation));
+        if (buildingsAllowedInLocation.length > 0) {
+            var candidateBuildings = lodash.intersection(buildingsAllowedInLocation, playerBuildings);
+            console.log("checkLocationForBuildingsToPlay(): candidateBuildings=" + JSON.stringify(candidateBuildings));
+            for (var i=0; i < candidateBuildings.length; i++) {
+                var candidate = candidateBuildings[i];
+                if (candidate == "stable" && location.doesRule(player.color)) {
+                    if (location.calculateExcessTroopsForRule(player.color) >= 3) {
+                        buildingsAllowed.push(candidate);
+                        break;                        
+                    }
+                }
+                if (candidate == "tavern" && locationBuildings.length == 2) {
+                    buildingsAllowed.push(candidate);
+                    break;
+                }
+                if (candidate == "church" && location.hasEnemy(player.color)) {
+                    buildingsAllowed.push(candidate);
+                    break;
+                }
+                if (candidate == "stronghold" || candidate == "market") {
+                    buildingsAllowed.push(candidate);
+                }
+            }
+        }
+        console.log("checkLocationForBuildingsToPlay(): buildingsAllowed=" + JSON.stringify(buildingsAllowed));
+        return buildingsAllowed;        
+    }
+
+    pickLocationAndBuilding(gameMap, locationNames, player, buildingOrder) {
+        var buildingAndLocation = {};
+        buildingAndLocation["location"] = null;
+        buildingAndLocation["building"] = null;
+        for (var i=0; i < locationNames.length; i++) {
+            buildingAndLocation["location"] = locationNames[i];
+            var location = gameMap.locationByName[locationNames[i]];
+            var buildingsAllowed = this.checkLocationForBuildingsToPlay(location, player);
+            if (buildingsAllowed.length > 0) {
+                // TODO: consider buildingOrder or at least use random
+                buildingAndLocation["building"] = buildingsAllowed[0];
+                break;
+            }
+        }
+        return buildingAndLocation;
+    }
+
     build(game, player) {
         console.log("ai build()");
         var color = player.color;
         var aiCard = player.aiCard;
+        var gameMap = game.gameMap;
         var buildingOrder = aiCard.strategies[player.aiStrategy].buildingOrder;
         var canBuild = true;
 
+        var locationsForGame = gameMap.locationsForGame;
         while (player.buildActions > 0 && canBuild) {
             var canBuild = false;
             // Priorities:
@@ -530,7 +590,81 @@ class Ai {
             // build where there are none of their buildings
             // build where there are enemy or neutral troops
             // build where there are no enemy or neutral troops
-
+            var rules = [];
+            var occupies = [];
+            var enemies = [];
+            var noPlayerBuildings = [];
+            var openings = [];
+            var targetToConvert = null;
+            for (var i=0; i < locationsForGame.length; i++) {
+                var location = locationsForGame[i];
+                if (location.doesRule(color)) {
+                    rules.push(location.name);
+                }
+                if (location.doesOccupy(color)) {
+                    occupies.push(location.name);
+                }
+                if (location.hasPlayerEnemy(color)) {
+                    enemies.push(location.name);
+                }
+                if (!location.doesPlayerHaveBuilding(color)) {
+                    noPlayerBuildings.push(location.name);
+                }
+                if (location.buildings.length < 3) {
+                    openings.push(location.name);
+                }
+            }
+            var buildingAndLocation = null;
+            var occupiesWithOpenings = lodash.intersection(occupies, openings);
+            console.log("ai build(): rules=" + JSON.stringify(rules));
+            console.log("ai build(): occupies=" + JSON.stringify(occupies));
+            console.log("ai build(): openings=" + JSON.stringify(openings));
+            console.log("ai build(): occupiesWithOpenings=" + JSON.stringify(occupiesWithOpenings));
+            if (occupiesWithOpenings.length > 0) {
+                var openWithNoPlayerBuildings = lodash.intersection(occupiesWithOpenings, noPlayerBuildings);
+                if (openWithNoPlayerBuildings.length > 0) {
+                    console.log("ai build(): openWithNoPlayerBuildings=" + JSON.stringify(openWithNoPlayerBuildings));
+                    var rulesWithNoPlayerBuildings = lodash.intersection(rules, openWithNoPlayerBuildings);
+                    if (rulesWithNoPlayerBuildings.length > 0) {
+                        console.log("ai build(): rulesWithNoPlayerBuildings=" + JSON.stringify(rulesWithNoPlayerBuildings));
+                        buildingAndLocation = this.pickLocationAndBuilding(gameMap, rulesWithNoPlayerBuildings, player, buildingOrder);
+                        if (buildingAndLocation["location"] != null && buildingAndLocation["building"] != null) {
+                            canBuild = true;
+                        }
+                    }
+                    if (! canBuild) {
+                        buildingAndLocation = this.pickLocationAndBuilding(gameMap, openWithNoPlayerBuildings, player, buildingOrder);
+                        if (buildingAndLocation["location"] != null && buildingAndLocation["building"] != null) {
+                            var location = gameMap.locationByName[buildingAndLocation["location"]];
+                            if (location.doesRule(color) || player.buildActions >= 2) {
+                                canBuild = true;
+                            }
+                        }
+                    }
+                }
+                if (! canBuild) {
+                    buildingAndLocation = this.pickLocationAndBuilding(gameMap, occupiesWithOpenings, player, buildingOrder);
+                    if (buildingAndLocation["location"] != null && buildingAndLocation["building"] != null) {
+                        var location = gameMap.locationByName[buildingAndLocation["location"]];
+                        if (location.doesRule(color) || player.buildActions >= 2) {
+                            canBuild = true;
+                        }
+                    }
+                }
+            }
+            console.log("ai build(): buildingAndLocation=" + JSON.stringify(buildingAndLocation) + " " + canBuild);
+            if (canBuild) {
+                if (buildingAndLocation["building"] == "church") {
+                    var clonedGame = lodash.cloneDeep(game);
+                    var endGameStats = clonedGame.calculateEndGameStats();
+                    var firstPlacePlayerColors = clonedGame.getFirstPlacePlayers(endGameStats);
+                    var location = game.gameMap.locationByName[buildingAndLocation["location"]];
+                    targetToConvert = this.pickTarget(player, location, firstPlacePlayerColors);
+                    console.log("ai build(): targetToConvert=" + targetToConvert);
+                }
+                game.beginActionPhaseAction(color, "buildAction");
+                game.build(color, buildingAndLocation["location"], buildingAndLocation["building"], targetToConvert);
+            }
         }
 
     }

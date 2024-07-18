@@ -127,9 +127,10 @@ class Location {
         return false;
     }
 
+
     hasEnemy(color) {
         var hasEnemies = false;
-        if (location.rebels.length > 0) {
+        if (this.rebels.length > 0) {
             return true;
         }
         var colors = ["white", "red", "blue", "yellow"];

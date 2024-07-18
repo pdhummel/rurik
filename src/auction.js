@@ -88,6 +88,7 @@ class AuctionBoard {
 
     // row=0-3
     auctionBid(actionName, color, advisor, bidCoins) {
+        console.log("auctionBid(): " + color + " " + actionName + " " + advisor);
         if (this.isColumnFull(actionName)) {
             throw new Error("Cannot place advisor in " + actionName + " column, because it is full.");
         }
@@ -98,14 +99,19 @@ class AuctionBoard {
             }
         }
 
-        var totalBid = advisor + bidCoins;
+        var totalBid = Number(advisor) + Number(bidCoins);
+        console.log("auctionBid(): totalBid=" + totalBid);
         for (var i=0; i < this.numberOfRows; i++) {
-            var currentBid = this.board[actionName][i].advisor + this.board[actionName][i].bidCoins;
+            var currentBid = Number(this.board[actionName][i].advisor) + Number(this.board[actionName][i].bidCoins);
+            console.log("auctionBid(): currentBid=" + currentBid + ", row " + i);
             if (totalBid > currentBid) {
                 // "move" everything down
                 for (var j=this.numberOfRows-1; j>i; j--) {
-                    this.board[actionName][j].copyBid(this.board[actionName][j-1]);
+                    var aboveAuctionSpace = this.board[actionName][j-1];
+                    console.log("auctionBid(): aboveAuctionSpace " + (j-1) + "=" + JSON.stringify(aboveAuctionSpace));
+                    this.board[actionName][j].copyBid(aboveAuctionSpace);
                 }
+                console.log("auctionBid(): auctionBid " + i + ":" + color + " " + advisor + " " + bidCoins);
                 this.board[actionName][i].auctionBid(color, advisor, bidCoins);
                 break;
             }

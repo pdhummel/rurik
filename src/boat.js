@@ -47,10 +47,12 @@ class BoatMat {
     }
 
     addGoodToDock(resource) {
+        console.log("addGoodToDock(): " + resource);
         this.goodsOnDock[resource]++;
     }
 
     addGoodToBoat(resource) {
+        console.log("addGoodToBoat(): " + resource);
         var openSlots = this.goodsOnBoatSlots[resource] - this.goodsOnBoat[resource];
         if (openSlots > 0) {
             this.goodsOnBoat[resource] = this.goodsOnBoat[resource] + 1;

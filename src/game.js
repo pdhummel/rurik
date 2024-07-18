@@ -683,10 +683,13 @@ class Game {
                 var reward = location.rebels.shift();
                 if (reward == "coin") {
                     currentPlayer.boat.money = currentPlayer.boat.money + 1;
+                    console.log("attack(): rebel award coin");
                 } else if (reward == "2 coins") {
                     currentPlayer.boat.money = currentPlayer.boat.money + 2;
+                    console.log("attack(): rebel award 2 coins");
                 } else {
                     currentPlayer.boat.addGoodToBoatOrDock(reward);
+                    console.log("attack(): rebel award " + reward);
                 }
                 currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;
                 console.log("attack(): " + color + " defeated rebel");

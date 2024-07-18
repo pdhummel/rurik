@@ -14,7 +14,7 @@ app.get('/game/:id/auction', (req, res) => {
   });
   
   app.put('/game/:id/advisorBid/:action', (req, res) => {
-    console.log("put " + req.path + " " + req.params);
+    console.log("put " + req.path + " " + JSON.stringify(req.params) + " " + JSON.stringify(req.body));
     var game = games.getGameById(req.params.id);
     if (game === undefined) {
       res.status(404).send({"error": "Game not found"});

@@ -46,7 +46,7 @@ function refreshPlayer() {
     setInnerHtml("playerCoins", money);
     var supplyTroops = response.data["supplyTroops"];
     setInnerHtml("troopCount", supplyTroops);
-    var capturedRebels = response.data["capturedRebels"];
+    var capturedRebels = response.data["boat"]["capturedRebels"];
     setInnerHtml("rebelCount", capturedRebels);
     var buildings = response.data["buildings"];
     setInnerHtml("tavernCount", buildings["tavern"]);
