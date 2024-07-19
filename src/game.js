@@ -314,10 +314,7 @@ class Game {
             currentPlayer.advisors.shift();
             var auctionSpaces = currentPlayer.advisorsToAuctionSpace[advisor];
             var auctionSpace = null;
-            var boardAuctionSpaces = this.auctionBoard.board[actionColumnName];
-            //if (row != undefined && row != null && row > 0) {
-            //    auctionSpace =  boardAuctionSpaces[row-1];
-            //    console.log("takeMainAction(): row=" + row + " " + auctionSpace.actionName + " quantity=" + auctionSpace.quantity);
+            // auctionSpaces should only be length of 1 or 2
             if (auctionSpaces.length > 0 && auctionSpaces[0].actionName == actionColumnName) {
                 auctionSpace = auctionSpaces.shift();
                 console.log("takeMainAction(): shift " + auctionSpace.actionName);

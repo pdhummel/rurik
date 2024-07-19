@@ -65,6 +65,7 @@ class Ai {
             this[method](game, currentPlayer);
         } catch(error) {
             console.log("ai evaluateGame(): " + error.message);
+            //process.exit(1);
         }
         
     }
@@ -166,15 +167,23 @@ class Ai {
         console.log("ai retrieveAdvisor(): player=" + player.color + ", advisors=" + JSON.stringify(player.advisors));
         var color = player.color;
         var advisor = player.advisors[0];
+        var advisorCount = player.advisors.length;
         var auctionSpaces = player.advisorsToAuctionSpace[advisor];
-        // TODO: TypeError: Cannot read property '0' of undefined
         var auctionSpace = auctionSpaces[0];
         var actionColumnName = auctionSpace.actionName;
         var row = auctionSpace.row;
         try {
-            game.takeMainAction(color, advisor, actionColumnName, row);  
+            game.takeMainAction(color, advisor, actionColumnName, row);
         } catch(error) {
-            game.takeMainAction(color, advisor, actionColumnName, row, true);  
+            console.log("ai retrieveAdvisor(): Warning player=" + player.color + " forfeiting " + auctionSpace.actionName);
+            if (player.advisors.length < advisorCount) {
+                player.boat.money++;
+                player.tookMainActionForTurn = true;
+                game.gameStates.setCurrentState("actionPhase");
+                game.endTurn(player.color);
+            } else {
+                game.takeMainAction(color, advisor, actionColumnName, row, true); 
+            }            
         }
     }
 
@@ -757,6 +766,7 @@ class Ai {
     }
 
     schemeFirstPlayer(game, player) {
+        console.log("ai schemeFirstPlayer(): player=" + player.color);
         var nextPlayer = game.players.getNextPlayer(player);
         game.schemeFirstPlayer(player.color, nextPlayer.color)
     }

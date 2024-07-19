@@ -3,61 +3,48 @@ set -e
 
 server=http://localhost:3000
 
-move_or_scheme=scheme
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+pushd ${SCRIPT_DIR} > /dev/null
+source ./rest.sh
+popd  > /dev/null
 
-rest() {
-  url=$1
-  method=$2
-  data=$3
-  if [ "${data}" != "" ];then
-    r=$(curl -s -X ${method} -w ";%{http_code}" -H "Content-Type: application/json" \
-      --data "${data}" "${url}")
-  else
-    r=$(curl -s -X ${method} -w ";%{http_code}" -H "Content-Type: application/json" "${url}")    
-  fi
-  set +e
-  response=$(echo ${r} |  cut -d ";" -f 1)
-  http_code=$(echo ${r} |  cut -d ";" -f 2 | cut -c1)
-  echo ${response} | jq
-  rc=$?
-  if [ ${rc} -ne 0 ] || [ "${http_code}" != "2" ];then
-    set -x
-    if [ "${data}" != "" ];then
-      echo curl -s -X ${method} -H \""Content-Type: application/json"\" --data \'"${data}"\' \""${url}"\"
-    else
-      echo curl -s -X ${method} -H \""Content-Type: application/json"\" \""${url}"\"
-    fi
-    echo ${response}
-    set -e
-    echo ${response} | jq
-    exit 1
-
-  fi
-  set -e
-}
-
-
-
-echo "Creating game"
+#echo "Creating game"
 new_game_response=$(rest "${server}/game" POST '{"gameName": "AI Game"}')
 game_id=$(echo ${new_game_response} | jq -r '.id')
+echo "Created game ${game_id}"
 
-
-echo "First player joining"
+#echo "First player joining"
 r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "blue", "name": "p1", "position": "N", "isAi": true }')
 
-echo "Second player joining"
+#echo "Second player joining"
 r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "red", "name": "p2", "position": "E", "isAi": true }')
 
 r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "yellow", "name": "p3", "position": "S", "isAi": true }')
 
 r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "white", "name": "p4", "position": "W", "isAi": true }')
 
-echo "Start the game"
+#echo "Start the game"
 r=$(rest "${server}/game/${game_id}" PUT)
 
-echo "Choose the starting player"
+#echo "Choose the starting player"
 r=$(rest "${server}/game/${game_id}/firstPlayer/blue" PUT)
+
+
+count=0
+currentState=nothing
+while [ "${currentState}" != "endGame" ] && [ ${count} -lt 10 ];do
+  sleep 10
+  r=$(rest "${server}/gameStatus/${game_id}" GET)
+  currentState=$(echo ${r} | jq -r '.currentState' | tr -d '\n')
+  count=$((count + 1))
+done
+if [ "${currentState}" != "endGame" ];then
+  echo "Game ${game_id} appears to have a problem"
+  exit 1
+else
+  echo "Game ${game_id} completed"
+fi
+
 
 
 

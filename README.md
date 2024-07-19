@@ -2,6 +2,7 @@
 WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
+
 ## TODO
 * game log
 * show upcoming advisors on map board
@@ -50,8 +51,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
   * show player boat, dock, supply
   * show total victory points for others
 
-* add support for AI players
-  * AI action phase logic
+  
 
 
 * game status -- show players joined before 
@@ -67,6 +67,9 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 * integration tests
 * refactor/redesign psychotic apis
+
+
+## Bugs
 
 
 
@@ -128,6 +131,10 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * playAdvisor - check for 2 advisors from the same player in the same column
 * AI strategy phase logic -- based on solo
 * Add AI to game creation/setup views
+* AI action phase logic
+* bug - "Return Scheme Card to Deck" -- no cards in dropdown
+* bug - retrieveAdvisor() - TypeError: Cannot read property '0' of undefined
+
 
 
 
@@ -177,3 +184,4 @@ ssh -L 127.0.0.1:8080:127.0.0.1:8080 opc@${rurik_server} -N
 curl http://localhost:8080
 # In a browser: http://localhost:8080
 ```
+
