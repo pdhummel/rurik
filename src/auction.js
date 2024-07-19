@@ -87,7 +87,7 @@ class AuctionBoard {
     }
 
     // row=0-3
-    auctionBid(actionName, color, advisor, bidCoins) {
+    auctionBid(actionName, color, advisor, bidCoins=0) {
         console.log("auctionBid(): " + color + " " + actionName + " " + advisor);
         if (this.isColumnFull(actionName)) {
             throw new Error("Cannot place advisor in " + actionName + " column, because it is full.");

@@ -26,11 +26,11 @@ class BoatMat {
         this.goodsOnBoat["fur"] = 0;
 
         this.tradeBoon = {};
-        this.tradeBoon["wood"] = 1;
-        this.tradeBoon["fish"] = 1;        
+        this.tradeBoon["wood"] = 0;
+        this.tradeBoon["fish"] = 0;        
         this.tradeBoon["honey"] = 1;
-        this.tradeBoon["stone"] = 0;
-        this.tradeBoon["fur"] = 0;
+        this.tradeBoon["stone"] = 1;
+        this.tradeBoon["fur"] = 1;
 
         this.canPlayMusterConversionTile = true;
         this.canPlayAttackConversionTile = true;

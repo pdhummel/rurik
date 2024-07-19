@@ -243,13 +243,22 @@ function refreshClaimBoardHandler(response) {
   console.log("refreshClaimBoardHandler(): " + JSON.stringify(response.data));
   var claimsByTrack = response.data.claimsByTrack
   var columns = ["rule", "build", "trade"];
+  var all_colors = ["blue", "white", "yellow", "red"];
   for (var i=0; i<columns.length; i++) {
     var column = columns[i];
     var track = claimsByTrack[column];
     var keys = Object.keys(track);
     for (var j=0; j < keys.length; j++) {
       var pointValue = keys[j];
-      var colors = track[pointValue];
+      // first clear things out
+      for (var k=0; k<all_colors.length; k++) {
+        var color = all_colors[k];
+        // red-regions-5, red-build-5, red-boat-9
+        var claim = color  + "-" + column + "-" + pointValue;
+        hide(claim);
+      }
+      // set what needs to be set
+      var colors = track[pointValue];      
       for (var k=0; k<colors.length; k++) {
         var color = colors[k];
         // red-regions-5, red-build-5, red-boat-9

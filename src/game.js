@@ -1297,7 +1297,7 @@ class Game {
             var hasAdvisors = false;
             for (var i=0; i<colors.length; i++) {
                 var player = this.players.getPlayerByColor(colors[i]);
-                if (player.advisors.length > 0) {
+                if (player != undefined && player.advisors.length > 0) {
                     hasAdvisors = true;
                     console.log("endTurn(): Warning: remaining advisors for color=" + colors[i] + ", " + JSON.stringify(player.advisors));
                 }

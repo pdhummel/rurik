@@ -70,6 +70,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 ## Bugs
+bug: did not earn boon token when honey column filled
+bug: claim track does not clear lower values.
 
 
 
