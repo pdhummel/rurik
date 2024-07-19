@@ -61,9 +61,9 @@ r=$(rest "${server}/game/${game_id}/firstPlayer/blue" PUT)
 
 
 
-echo "Dump game"
-echo ${game_id}
-r=$(rest "${server}/test/game/${game_id}/dump" GET)
-echo $r
+#echo "Dump game"
+#echo ${game_id}
+#r=$(rest "${server}/test/game/${game_id}/dump" GET)
+#echo $r
 
 

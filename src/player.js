@@ -69,6 +69,8 @@ class GamePlayers {
             var coinCompensation = claimBoard.calculateCoins(player.color);
             player.boat.money = player.boat.money + coinCompensation;
             player.finishedRound = false;
+            player.aiCard = null;
+            player.aiStrategy = null;
         }
     }
 

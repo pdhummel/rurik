@@ -158,6 +158,7 @@ class Cards {
         this.schemeDeck1 = [];
         this.schemeDeck2 = [];
         this.schemeCardList = [];
+        this.temporarySchemeCards = [];
         var schemeCards = this.schemeCardList;
         // Rewards, coin cost, deaths
         this.addSchemeCard(["deedCard", "coin"], 0, 1);
@@ -213,6 +214,21 @@ class Cards {
         return this.schemeCardIds[schemeCardId];
     }
 
+    reshuffleSchemeCards() {
+        var combinedSchemeCards = lodash.union(this.discardedSchemeCards, this.schemeDeck1, this.schemeDeck2);
+        var half = Math.floor(combinedSchemeCards / 2);
+        this.discardedSchemeCards = [];
+        this.schemeDeck1 = [];
+        for (var i=0; i<half; i++) {
+            var r = Math.floor(Math.random() * combinedSchemeCards.length);
+            var schemeCard = combinedSchemeCards[r];
+            this.schemeDeck1.push(schemeCard);
+            combinedSchemeCards[r] = combinedSchemeCards[combinedSchemeCards.length - 1];
+            combinedSchemeCards.pop();
+        }
+        this.schemeDeck2 = combinedSchemeCards;
+    }
+
     // schemeDeck=1 or 2 or a list
     drawSchemeCard(schemeDeck) {
         console.log("cards drawSchemeCard(): schemeDeck= " + schemeDeck);
@@ -221,9 +237,14 @@ class Cards {
             schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
         } else {
             console.log("drawSchemeCard(): schemeDeck=" + JSON.stringify(schemeDeck));
-            schemeDeckList = schemeDeck;
+            //schemeDeckList = schemeDeck;
+            throw new Error("Not a valid schemeDeckNumber " + schemeDeck, "drawAndDiscardSchemeCard()");
         }
         console.log("drawSchemeCard(): length of schemeDeckList=" + schemeDeckList.length);
+        if (schemeDeckList.length < 1) {
+            this.reshuffleSchemeCards();
+            schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
+        }
         var card = schemeDeckList.shift();
         console.log("drawSchemeCard(): length: " + this.schemeDeck1.length + " " + this.schemeDeck2.length);
         console.log("drawSchemeCard(): card=" + JSON.stringify(card));
@@ -237,8 +258,9 @@ class Cards {
         if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
             schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
         } else {
-            console.log("drawSchemeCard(): schemeDeck=" + JSON.stringify(schemeDeck));
-            schemeDeckList = schemeDeck;
+            console.log("drawAndDiscardSchemeCard(): schemeDeck=" + JSON.stringify(schemeDeck));
+            //schemeDeckList = schemeDeck;
+            throw new Error("Not a valid schemeDeckNumber " + schemeDeck, "drawAndDiscardSchemeCard()");
         }
         var card = null;
         if (schemeDeckList != undefined && schemeDeckList.length > 0) {
@@ -246,6 +268,34 @@ class Cards {
             this.discardedSchemeCards.push(card);    
         }
         console.log("drawAndDiscardSchemeCard(): card=" + JSON.stringify(card));
+        return card;
+    }
+
+
+    // schemeDeck=1 or 2 or a list
+    drawAndReturnSchemeCard(schemeDeck, schemeCardsToDraw) {
+        console.log("drawAndReturnSchemeCard(): " + schemeDeck);
+        var schemeDeckList = null;
+        if (typeof schemeDeck == "number" || typeof schemeDeck == "string") {
+            schemeDeckList = this.getSchemeDeckByNumber(schemeDeck);
+        } else {
+            console.log("drawAndReturnSchemeCard(): schemeDeck=" + JSON.stringify(schemeDeck));
+            //schemeDeckList = schemeDeck;
+            throw new Error("Not a valid schemeDeckNumber " + schemeDeck, "drawAndReturnSchemeCard()");
+        }
+        var card = null;
+        if (schemeDeckList != undefined && schemeDeckList.length > 0) {
+            var card = schemeDeckList.pop();
+            this.temporarySchemeCards.push(card);
+            if (this.temporarySchemeCards.length >= schemeCardsToDraw) {
+                for (var i=0; i<this.temporarySchemeCards.length; i++) {
+                    var tcard = this.temporarySchemeCards.shift();
+                    schemeDeckList.push(tcard);
+                }
+                console.log("drawAndReturnSchemeCard(): temporarySchemeCards=" + JSON.stringify(this.temporarySchemeCards));
+            }
+        }
+        console.log("drawAndReturnSchemeCard(): card=" + JSON.stringify(card));
         return card;
     }
 

@@ -304,7 +304,8 @@ class Game {
         }
 
         if (currentPlayer.advisors.length < 1 || advisor != currentPlayer.advisors[0]) {
-            console.log("takeMainAction(): advisor does not match: " + advisor + " " + currentPlayer.color + " " + currentPlayer.advisors);
+            // TODO: fix thlis
+            console.log("takeMainAction(): advisor does not match: " + advisor + " " + currentPlayer.color + " " + JSON.stringify(currentPlayer.advisors));
         }
 
         // TODO: figure out how to differentiate if there are 2 with the same advisor number 
@@ -325,6 +326,11 @@ class Game {
                 console.log("takeMainAction(): pop " + auctionSpace.actionName);
             } else {
                 // TODO: Error: Could not retrieve advisor.
+                console.log("takeMainAction(): auctionSpaces.length=" + auctionSpaces.length);
+                console.log("takeMainAction(): actionColumnName=" + actionColumnName);
+                console.log("takeMainAction(): auctionSpaces0=" + auctionSpaces[0].actionName);
+                console.log("takeMainAction(): auctionSpaces1=" + auctionSpaces[1].actionName);
+                console.log("takeMainAction(): " + JSON.stringify(this.auctionBoard));
                 throw new Error("Could not retrieve advisor.", "takeMainAction()");        
             }
 
@@ -389,6 +395,7 @@ class Game {
     }
 
     schemeFirstPlayer(currentPlayerColor, firstPlayerColor) {
+        console.log("schemeFirstPlayer(): " + currentPlayerColor + " " + firstPlayerColor);
         this.validateGameStatus("schemeFirstPlayer", "schemeFirstPlayer");
         this.validateCurrentPlayer(currentPlayerColor, "schemeFirstPlayer");
         this.players.setNextFirstPlayerByColor(firstPlayerColor);
@@ -409,6 +416,7 @@ class Game {
             var card = this.cards.drawSchemeCard(schemeDeck);
             if (card == undefined || card == null) {
                 console.log("drawSchemeCards(): Warning null card: schemeCardsToDraw=1");
+                this.gameStates.setCurrentState("actionPhase");
             } else {
                 currentPlayer.temporarySchemeCards.push(card);
                 this.selectSchemeCardToKeep(color, card);
@@ -418,12 +426,13 @@ class Game {
                 var card = this.cards.drawSchemeCard(schemeDeck);
                 if (card == undefined || card == null) {
                     console.log("drawSchemeCards(): Warning null card: schemeCardsToDraw=" + currentPlayer.schemeCardsToDraw);
+                    this.gameStates.setCurrentState("actionPhase");
                 } else {
                     currentPlayer.temporarySchemeCards.push(card);
                     currentPlayer.returnSchemeDeck = schemeDeck;
+                    this.gameStates.setCurrentState("selectSchemeCard");
                 }
             }
-            this.gameStates.setCurrentState("selectSchemeCard");
         }
         currentPlayer.schemeCardsToDraw == 0;
         this.aiEvaluateGame();
@@ -721,9 +730,10 @@ class Game {
             if (location.countStrongholds(targetColor) > 0) {
                 schemeCardsToDraw++;
             }
-            var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
+            //var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
             for (var i=0; i<schemeCardsToDraw; i++) {
-                var card = this.cards.drawAndDiscardSchemeCard(schemeDeck);
+                //var card = this.cards.drawAndDiscardSchemeCard(schemeDeckNumber);
+                var card = this.cards.drawAndReturnSchemeCard(schemeDeckNumber, schemeCardsToDraw);
                 var deaths = 0;
                 var removeLeader = false;
                 if (card != undefined && card != null) {
@@ -1286,6 +1296,18 @@ class Game {
             this.gameStates.setCurrentState("retrieveAdvisor");
             this.aiEvaluateGame();
         } else {
+            var colors = ["blue", "white", "red", "yellow"];
+            var hasAdvisors = false;
+            for (var i=0; i<colors.length; i++) {
+                var player = this.players.getPlayerByColor(colors[i]);
+                if (player.advisors.length > 0) {
+                    hasAdvisors = true;
+                    console.log("endTurn(): Warning: remaining advisors for color=" + colors[i] + ", " + JSON.stringify(player.advisors));
+                }
+            }
+            if (hasAdvisors) {
+                console.log("endTurn(): currentPlayer was " + currentPlayer.color + ", nextPlayer=" + nextPlayer.color);
+            }
             this.gameStates.setCurrentState("claimPhase");
             this.updateClaimsForClaimsPhase();
         }

@@ -61,7 +61,12 @@ class Ai {
         }
         console.log("evaluateGame(): currentState=" + currentStateName + ", currentPlayer=" + currentPlayer.color + 
             ", method=" + method);
-        this[method](game, currentPlayer);
+        try {
+            this[method](game, currentPlayer);
+        } catch(error) {
+            console.log("ai evaluateGame(): " + error.message);
+        }
+        
     }
 
     selectLeader(game, player) {
@@ -92,7 +97,6 @@ class Ai {
     }
 
     placeAdvisor(game, player) {
-        // TODO: make sure the aiCard is set to null at the end of a round
         if (player.aiCard == undefined || player.aiCard == null) {
             var r = Math.floor(Math.random() * this.aiCards.length);
             var aiCard = this.aiCards[r];
@@ -159,10 +163,11 @@ class Ai {
     
 
     retrieveAdvisor(game, player) {
-        console.log("retrieveAdvisor(): advisors=" + JSON.stringify(player.advisors));
+        console.log("ai retrieveAdvisor(): player=" + player.color + ", advisors=" + JSON.stringify(player.advisors));
         var color = player.color;
         var advisor = player.advisors[0];
         var auctionSpaces = player.advisorsToAuctionSpace[advisor];
+        // TODO: TypeError: Cannot read property '0' of undefined
         var auctionSpace = auctionSpaces[0];
         var actionColumnName = auctionSpace.actionName;
         var row = auctionSpace.row;
@@ -174,6 +179,7 @@ class Ai {
     }
 
     takeAction(game, player) {
+        console.log("ai takeAction(): player=" + player.color);
         // Clone the game and calculate current points for all players.
         var clonedGame = lodash.cloneDeep(game);
         var clonedPlayer = lodash.cloneDeep(player);
@@ -216,7 +222,7 @@ class Ai {
     }
 
     muster(game, player) {
-        console.log("ai muster()");
+        console.log("ai muster(): player=" + player.color);
         var color = player.color;
         //var aiCard = player.aiCard;
         //var locationNames = aiCard.locationOrder.split(",");
@@ -246,7 +252,7 @@ class Ai {
     }
 
     tax(game, player) {
-        console.log("ai tax()");
+        console.log("ai tax(): player=" + player.color);
         var color = player.color;
         var canTax = true;
         while (player.taxActions > 0 && canTax) {
@@ -337,7 +343,7 @@ class Ai {
     }
 
     
-    pickTarget(player, location, firstPlacePlayerColors) {
+    pickTarget(player, location, firstPlacePlayerColors, convert=false) {
         var target = null;
         var possibleTargets = [];
         if (location.rebels.length > 0) {
@@ -349,7 +355,7 @@ class Ai {
             if (player.color == color) {
                 continue;
             }
-            if (location.troopsByColor[color] > 0 || location.leaderByColor[color] > 0) {
+            if (location.troopsByColor[color] > 0 || (convert == false && location.leaderByColor[color] > 0)) {
                 possibleTargets.push(color);
             }
         }
@@ -365,7 +371,7 @@ class Ai {
     }
 
     attack(game, player) {
-        console.log("ai attack()");
+        console.log("ai attack(): player=" + player.color);
         var color = player.color;
         var canAttack = true;
         var clonedGame = lodash.cloneDeep(game);
@@ -444,7 +450,7 @@ class Ai {
     }
 
     move(game, player) {
-        console.log("ai move()");
+        console.log("ai move(): player=" + player.color);
         var color = player.color;
         var canMove = true;
         while (player.moveActions > 0 && canMove) {
@@ -575,7 +581,7 @@ class Ai {
     }
 
     build(game, player) {
-        console.log("ai build()");
+        console.log("ai build(): player=" + player.color);
         var color = player.color;
         var aiCard = player.aiCard;
         var gameMap = game.gameMap;
@@ -659,7 +665,7 @@ class Ai {
                     var endGameStats = clonedGame.calculateEndGameStats();
                     var firstPlacePlayerColors = clonedGame.getFirstPlacePlayers(endGameStats);
                     var location = game.gameMap.locationByName[buildingAndLocation["location"]];
-                    targetToConvert = this.pickTarget(player, location, firstPlacePlayerColors);
+                    targetToConvert = this.pickTarget(player, location, firstPlacePlayerColors, true);
                     console.log("ai build(): targetToConvert=" + targetToConvert);
                 }
                 game.beginActionPhaseAction(color, "buildAction");
@@ -744,6 +750,7 @@ class Ai {
     }
 
     takeDeedCard(game, player) {
+        console.log("ai takeDeedCard(): player=" + player.color);
         var color = player.color;
         var deedCardName = game.cards.displayedDeedCards[0].name;
         game.takeDeedCard(color, deedCardName)
