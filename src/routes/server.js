@@ -224,6 +224,6 @@ app.get('/game/:id/gameLog', (req, res) => {
   if (count != undefined && count != null) {
     position = Number(count) - 1;
   }
-  var entries = game.gameLog.getEntriesAfterPosition(position);
+  var entries = game.log.getEntriesAfterPosition(position);
   res.send(entries);
 });

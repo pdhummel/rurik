@@ -103,8 +103,7 @@ class Game {
     
     // validate targetNumberOfPlayers
     constructor(gameName, targetNumberOfPlayers=4, password="") {
-        this.gameLog = new GameLog(this);
-        this.log = this.gameLog;
+        this.log = new GameLog(this);
         this.currentRound = 1;
         this.auctionBoard = null;
         this.gameMap = new GameMap();
@@ -412,7 +411,7 @@ class Game {
         this.validateGameStatus("schemeFirstPlayer", "schemeFirstPlayer");
         this.validateCurrentPlayer(currentPlayerColor, "schemeFirstPlayer");
         this.players.setNextFirstPlayerByColor(firstPlayerColor);
-        this.log.info(color + " chose " + firstPlayerColor + " to be first player.");
+        this.log.info(currentPlayerColor + " chose " + firstPlayerColor + " to be first player.");
         this.gameStates.setCurrentState("drawSchemeCards");
         this.aiEvaluateGame();
     }
@@ -1171,7 +1170,7 @@ class Game {
 
     endRound() {
         console.log("endRound()");
-        this.log.info("end round " + is.currentRound);
+        this.log.info("end round " + this.currentRound);
         this.currentRound++;
         if (this.currentRound > 4) {
             this.endGame();

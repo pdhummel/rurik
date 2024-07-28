@@ -33,7 +33,7 @@ class GameLog {
         return entries;
     }
 
-    getEntriesAfterPosition(count) {
+    getEntriesAfterPosition(count=-1) {
         var entries = [];
         for (var i=0; i<this.entries.length; i++) {
             if (i > count) {
