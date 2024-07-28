@@ -36,6 +36,7 @@ function refreshPlayer() {
     setInnerHtml("dockFish", goodsOnDock["fish"]);
     setInnerHtml("dockHoney", goodsOnDock["honey"]);
     setInnerHtml("dockFur", goodsOnDock["fur"]);
+    setInnerHtml("tradeBoon", goodsOnDock["tradeBoon"]);
     var goodsOnBoat = response.data["boat"]["goodsOnBoat"];
     setInnerHtml("boatStone", goodsOnBoat["stone"]);
     setInnerHtml("boatWood", goodsOnBoat["wood"]);

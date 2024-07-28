@@ -9,6 +9,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * show reward for deed cards
 * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
 * handle moveFromLocation and moveToAnywhere
+* add version info
 
 * action phase
   * build action - stable, tavern
@@ -70,8 +71,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 ## Bugs
-bug: did not earn boon token when honey column filled
-bug: claim track does not clear lower values.
 
 
 
@@ -136,7 +135,9 @@ bug: claim track does not clear lower values.
 * AI action phase logic
 * bug - "Return Scheme Card to Deck" -- no cards in dropdown
 * bug - retrieveAdvisor() - TypeError: Cannot read property '0' of undefined
-
+* bug: claim track does not clear lower values.
+* bug: did not earn boon token when honey column filled
+* bug: Move leader instead of troops - "from" location.
 
 
 

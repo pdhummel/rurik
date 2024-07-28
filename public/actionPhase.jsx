@@ -338,7 +338,7 @@ function getNextAdvisor() {
     var moveLeader = 'N';
     var moveLeaderYN = document.getElementById("moveLeaderYN");
     if (moveLeaderYN.checked) {
-      moveLeaderYN = getValue("moveLeaderYN");
+      moveLeader = getValue("moveLeaderYN");
     }
     var data = '{ "fromLocationName": "' + fromLocation + '", "toLocationName": "' + toLocation + '", "moveLeaderYN": "' + moveLeader + '" }';
     callApi("/game/" + gameId + "/player/" + color + "/move", "post", data, refreshGameHandler);

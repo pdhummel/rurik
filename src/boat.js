@@ -26,11 +26,11 @@ class BoatMat {
         this.goodsOnBoat["fur"] = 0;
 
         this.tradeBoon = {};
-        this.tradeBoon["wood"] = 0;
-        this.tradeBoon["fish"] = 0;        
+        this.tradeBoon["wood"] = 1;
+        this.tradeBoon["fish"] = 1;        
         this.tradeBoon["honey"] = 1;
-        this.tradeBoon["stone"] = 1;
-        this.tradeBoon["fur"] = 1;
+        this.tradeBoon["stone"] = 0;
+        this.tradeBoon["fur"] = 0;
 
         this.canPlayMusterConversionTile = true;
         this.canPlayAttackConversionTile = true;
@@ -57,6 +57,7 @@ class BoatMat {
         if (openSlots > 0) {
             this.goodsOnBoat[resource] = this.goodsOnBoat[resource] + 1;
             if (openSlots == 1 && this.tradeBoon[resource] > 0) {
+                console.log("addGoodToBoat(): tradeBoon bonus for " + resource);
                 this.goodsOnDock["tradeBoon"]++;
                 this.tradeBoon[resource] = 0;
             }
