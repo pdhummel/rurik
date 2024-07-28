@@ -1,9 +1,9 @@
-const Games = require('./game.js');
-const Validator = require('./validations.js');
-const preGameAndSetupRoutes = require("./routes/preGameAndSetup");
-const strategyPhaseRoutes = require("./routes/strategyPhase");
-const actionPhaseRoutes = require("./routes/actionPhase");
-const testRoutes = require("./routes/tests");
+const Games = require('../game.js');
+const Validator = require('../validations.js');
+const preGameAndSetupRoutes = require("./preGameAndSetup.js");
+const strategyPhaseRoutes = require("./strategyPhase.js");
+const actionPhaseRoutes = require("./actionPhase.js");
+const testRoutes = require("./tests.js");
 
 var games = Games.Games.getInstance();
 
@@ -212,3 +212,18 @@ app.get('/game/:id/endGame', (req, res) => {
   res.send(endGameStats);
 });
 
+app.get('/game/:id/gameLog', (req, res) => {
+  console.log("get " + req.path + " " + req.query);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send({"error": "Game not found"});
+    return;
+  }
+  var count = req.query.count;
+  var position = -1;
+  if (count != undefined && count != null) {
+    position = Number(count) - 1;
+  }
+  var entries = game.gameLog.getEntriesAfterPosition(position);
+  res.send(entries);
+});

@@ -8,6 +8,7 @@ const ClaimBoard = require('./claims.js');
 const Validator = require('./validations.js');
 const Ai = require('./ai.js');
 const lodash = require('lodash');
+const GameLog = require('./gameLog.js');
 
 
 class Games {
@@ -102,6 +103,8 @@ class Game {
     
     // validate targetNumberOfPlayers
     constructor(gameName, targetNumberOfPlayers=4, password="") {
+        this.gameLog = new GameLog(this);
+        this.log = this.gameLog;
         this.currentRound = 1;
         this.auctionBoard = null;
         this.gameMap = new GameMap();
@@ -173,6 +176,7 @@ class Game {
         var player = this.players.getPlayerByColor(color);
         this.players.setFirstPlayer(player);
         this.players.setCurrentPlayer(player);
+        this.log.info("First player is " + color);
         this.gameStates.setCurrentState("waitingForLeaderSelection");
         this.aiEvaluateGame();
     }
@@ -180,10 +184,7 @@ class Game {
     selectRandomFirstPlayer() {
         this.validateGameStatus("waitingForFirstPlayerSelection", "selectRandomFirstPlayer");
         var randomPlayer = this.players.getRandomPlayer();
-        this.players.setFirstPlayer(randomPlayer);
-        this.players.setCurrentPlayer(randomPlayer);
-        this.gameStates.setCurrentState("waitingForLeaderSelection");
-        this.aiEvaluateGame();
+        this.selectFirstPlayer(randomPlayer.color);
     }    
 
     chooseLeader(color, leaderName) {
@@ -194,6 +195,7 @@ class Game {
 
         var leader = this.availableLeaders.chooseLeader(leaderName);
         currentPlayer.setLeader(leader);
+        this.log.info(color + " chose " + leaderName + " as leader.");
         var nextPlayer = this.players.getNextPlayer(currentPlayer);
         if (nextPlayer.leader == null) {
             this.players.setCurrentPlayer(nextPlayer);
@@ -232,6 +234,7 @@ class Game {
 
         this.gameMap.locationByName[locationName].addTroop(color);
         currentPlayer.troopsToDeploy--;
+        this.log.info(color + " placed troop at " + locationName);
         var nextPlayer = this.players.getNextPlayer(currentPlayer);
         if (nextPlayer.troopsToDeploy > 0) {
             this.players.setCurrentPlayer(nextPlayer);
@@ -247,6 +250,7 @@ class Game {
         this.validateGameStatus("waitingForLeaderPlacement", "placeLeader");
         var currentPlayer = this.validateCurrentPlayer(color, "placeLeader");
         this.gameMap.locationByName[locationName].addLeader(color);
+        this.log.info(color + " placed leader at " + locationName);
         currentPlayer.troopsToDeploy--;
         var nextPlayer = this.players.getNextPlayer(currentPlayer);
         if (nextPlayer.troopsToDeploy > 0) {
@@ -264,7 +268,6 @@ class Game {
         console.log("playAdvisor():", color, columnName, advisor, bidCoins);
         this.validateGameStatus("strategyPhase", "playAdvisor");
         var currentPlayer = this.validateCurrentPlayer(color, "playAdvisor");
-        //console.log("playAdvisor(): currentPlayer=" + currentPlayer);
         if (! currentPlayer.isAdvisorAvailable(advisor)) {
             throw new Error("No advisor=" + advisor + " is available.", "playAdvisor");
         }
@@ -281,6 +284,7 @@ class Game {
         this.auctionBoard.auctionBid(columnName, color, advisor, bidCoins);
         currentPlayer.boat.money = currentPlayer.boat.money - bidCoins;
         currentPlayer.useAdvisor(advisor);
+        this.log.info(color + " placed advisor " + advisor + " at " + columnName + " with " + bidCoins + " coins.");
         var nextPlayer = this.players.getNextPlayer(currentPlayer);
         if (nextPlayer.advisors.length > 0) {
             this.players.setCurrentPlayer(nextPlayer);
@@ -340,6 +344,7 @@ class Game {
             }
             if (! occupiesSomewhere) {
                 currentPlayer.troopsToDeploy = 2;
+                this.log.info(color + " has no troops on the board and can deploy leader+troop anywhere.");
             }
 
             // remove advisor from auctionSpace
@@ -347,23 +352,31 @@ class Game {
             auctionSpace.advisor = 0;
             auctionSpace.bidCoins = 0;
             console.log("takeMainAction(): advisor removed");
+            this.log.info(color + " retrieved advisor " + advisor + " from " + actionColumnName);
 
             if (forfeitAction == true) {
                 currentPlayer.boat.money++;
+                this.log.info(color + " forfeited their action for money.");
             } else {
                 if (auctionSpace.extraCoin > currentPlayer.boat.money) {
-                    throw new Error("Not enough money to take action.", "takeMainAction()");        
+                    currentPlayer.boat.money++;
+                    this.log.info(color + " was forced to forfeit their action for money.");
+                    //throw new Error("Not enough money to take action.", "takeMainAction()");
+                    // TODO: send message to player.
                 } else {
                     currentPlayer.boat.money = currentPlayer.boat.money - auctionSpace.extraCoin;
                 }
                 if (actionColumnName == "build") {
                     currentPlayer.buildActions = currentPlayer.buildActions + auctionSpace.quantity;
                     console.log("takeMainAction(): build actions=" + currentPlayer.buildActions);
+                    this.log.info(color + " got " + auctionSpace.quantity + " build actions.");
                 } else if (actionColumnName == "tax") {
                     currentPlayer.taxActions = currentPlayer.taxActions + auctionSpace.quantity;
                     console.log("takeMainAction(): tax actions=" + currentPlayer.taxActions);
+                    this.log.info(color + " got " + auctionSpace.quantity + " tax actions.");
                 } else if (actionColumnName == "move") {
                     currentPlayer.moveActions = currentPlayer.moveActions + auctionSpace.quantity;
+                    this.log.info(color + " got " + auctionSpace.quantity + " move actions.");
                 } else if (actionColumnName == "attack") {
                     currentPlayer.attackActions = currentPlayer.attackActions + auctionSpace.quantity;
                 } else if (actionColumnName == "muster") {
@@ -372,12 +385,15 @@ class Game {
                         quantity = currentPlayer.supplyTroops;
                     }
                     currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy + quantity;
+                    this.log.info(color + " got " + quantity + " troops to deploy.");
                 } else if (actionColumnName == "scheme") {
                     currentPlayer.schemeCardsToDraw = auctionSpace.quantity;
                     if (auctionSpace.quantity = 3) {
                         this.gameStates.setCurrentState("schemeFirstPlayer");
+                        this.log.info(color + " will scheme first player.");
                     } else {
                         this.gameStates.setCurrentState("drawSchemeCards");
+                        this.log.info(color + " will draw scheme cards.");
                     }
                 }
 
@@ -396,6 +412,7 @@ class Game {
         this.validateGameStatus("schemeFirstPlayer", "schemeFirstPlayer");
         this.validateCurrentPlayer(currentPlayerColor, "schemeFirstPlayer");
         this.players.setNextFirstPlayerByColor(firstPlayerColor);
+        this.log.info(color + " chose " + firstPlayerColor + " to be first player.");
         this.gameStates.setCurrentState("drawSchemeCards");
         this.aiEvaluateGame();
     }
@@ -409,6 +426,7 @@ class Game {
         }
 
         currentPlayer.canKeepSchemeCard = true;
+        this.log.info(color + " is drawing " + currentPlayer.schemeCardsToDraw + " scheme cards from scheme deck " + schemeDeck);
         if (currentPlayer.schemeCardsToDraw == 1) {
             var card = this.cards.drawSchemeCard(schemeDeck);
             if (card == undefined || card == null) {
@@ -457,6 +475,7 @@ class Game {
         }                
         currentPlayer.temporarySchemeCards = tempCards;
         if (currentPlayer.temporarySchemeCards.length < 1) {
+            this.log.info(color + " finished selecting a scheme card.");
             this.gameStates.setCurrentState("actionPhase");
         }
         this.aiEvaluateGame();
@@ -491,6 +510,7 @@ class Game {
             currentPlayer.canKeepSchemeCard = false;
         }
         if (currentPlayer.temporarySchemeCards.length < 1) {
+            this.log.info(color + " finished selecting a scheme card.");
             this.gameStates.setCurrentState("actionPhase");
         }
         this.aiEvaluateGame();
@@ -519,10 +539,12 @@ class Game {
             currentPlayer.supplyLeader = 0;
             currentPlayer.troopsToDeploy--;
             numberOfTroops--;
+            this.log.info(color + " mustered their leader at " + locationName);
         }
         location.troopsByColor[color] = location.troopsByColor[color] + numberOfTroops;
         currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy - numberOfTroops;
         currentPlayer.supplyTroops = currentPlayer.supplyTroops - numberOfTroops;
+        this.log.info(color + " mustered at " + locationName);
         this.gameStates.setCurrentState("actionPhase");
     }
 
@@ -544,12 +566,14 @@ class Game {
         if (moveLeader && fromLocation.isLeaderInLocation(color) && (numberOfTroops == 1 || numberOfTroops == 0)) {
             fromLocation.leaderByColor[color] = fromLocation.leaderByColor[color] - 1;
             toLocation.leaderByColor[color] = toLocation.leaderByColor[color] + 1;
+            this.log.info(color + " moved their leader from " + fromLocationName + " to " + toLocationName);
         } else if (moveLeader) {
             console.log("move(): fromLocation=" + fromLocation.name + " isLeaderInLocation=" + fromLocation.isLeaderInLocation(color) + " " + JSON.stringify(fromLocation));
             throw new Error("Leader must be in location and cannot move other troops at the same time.", "move()");
         } else {
             fromLocation.troopsByColor[color] = fromLocation.troopsByColor[color] - numberOfTroops;
             toLocation.troopsByColor[color] = toLocation.troopsByColor[color] + numberOfTroops;    
+            this.log.info(color + " moved troops from " + fromLocationName + " to " + toLocationName);
         }
         for (var i=0; i < numberOfTroops; i++) {
             if (currentPlayer.moveActionsFromLocation[fromLocationName] > 0) {
@@ -593,16 +617,19 @@ class Game {
         } else {
             currentPlayer.boat.addGoodToDock(resource);
         }
+        this.log.info(color + " taxed " + locationName + " for " + resource);
         // check for market
         if (location.doesPlayerHaveMarket(color)) {
             if (marketCoinNotResource) {
                 currentPlayer.boat.money++;
+                this.log.info(color + " gained a coin from their market at " + locationName);
             } else {
                 if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
                     currentPlayer.boat.addGoodToBoat(resource);
                 } else {
                     currentPlayer.boat.addGoodToDock(resource);
-                }                                
+                }
+                this.log.info(color + " gained " + resource + " from their market at " + locationName);
             }
         }
         this.gameStates.setCurrentState("actionPhase");
@@ -639,10 +666,12 @@ class Game {
         currentPlayer.buildings[buildingName]--;
         location.addBuilding(color, buildingName);
         currentPlayer.buildActions = currentPlayer.buildActions - buildActionsRequired;
+        this.log.info(color + " built a " + buildingName + " at " + locationName);
 
         this.gameStates.setCurrentState("actionPhase");
         if (buildingName == "stable") {
             currentPlayer.moveActionsFromLocation[locationName] = 2;
+            this.log.info(color + " gained movement " + " at " + locationName + " for building a stable");
         } else if (buildingName == "church") {
             var converted = false;
             // Per rules, you can convert an enemy even if you don't have any troops in supply.
@@ -665,11 +694,13 @@ class Game {
             if (converted  == false && targetToConvert != undefined && targetToConvert != null && targetToConvert.length > 0) {
                 this.throwError("Could not convert enemy " + targetToConvert, "build");
             }
+            this.log.info(color + " converted " + targetToConvert + " by building a church");
         } else if (buildingName == "tavern") {
             currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
             // Per rules, if you have not played a scheme card yet this turn, you may play the top card
             // from the scheme discard pile and then remove it from the game.
             //this.gameStates.setCurrentState("oneTimeScheme");
+            this.log.info(color + " gained " + location.buildings.length + " money by building a tavern");
         }
 
     }
@@ -699,6 +730,7 @@ class Game {
                 }
                 currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;
                 console.log("attack(): " + color + " defeated rebel");
+                this.log.info(color + " defeated a rebel at " + locationName);
             } else {
                 throw new Error("There are no rebels  to attack in " + locationName + ".", "attack()");
             }
@@ -718,10 +750,12 @@ class Game {
                 location.troopsByColor[targetColor]--;
                 targetPlayer.supplyTroops++;
                 console.log("attack(): " + color + " killed troop for " + targetPlayer.color);
+                this.log.info(color + " killed a troop of " + targetPlayer.color + " at " + locationName);
             } else {
                 location.leaderByColor[targetColor]--;
                 targetPlayer.supplyLeader = 1;
                 console.log("attack(): " + color + " killed leader for " + targetPlayer.color);
+                this.log.info(color + " killed the leader for " + targetPlayer.color + " at " + locationName);
             }
 
             if (location.countStrongholds(targetColor) > 0) {
@@ -748,9 +782,11 @@ class Game {
                     location.leaderByColor[color] = 0;
                     currentPlayer.supplyLeader = 1;
                     deaths++;
+                    this.log.info(color + " lost their leader as a casualty at " + locationName);
                 }
                 if (deaths > 0) {
                     troopsLost = deaths;
+                    this.log.info(color + " had a casualty at " + locationName);
                     break;
                 }
             }
@@ -769,6 +805,7 @@ class Game {
         var warPoints = this.claimBoard.claimsByPlayer[color]["warfare"];
         warPoints++;
         this.claimBoard.claimsByPlayer[color]["warfare"] = warPoints;
+        this.log.info(color + " went up on the war track.");
         var reward = this.claimBoard.warfareRewards[warPoints];
         this.handleWarTrackReward(currentPlayer, reward);
     }
@@ -779,15 +816,19 @@ class Game {
             if (reward == "2 wood") {
                 currentPlayer.boat.addGoodToBoatOrDock("wood");
                 currentPlayer.boat.addGoodToBoatOrDock("wood");
+                this.log.info(currentPlayer.color + " gained 2 wood from the war track.");
             } else if (reward == "2 coins") {
                 currentPlayer.boat.money++;
                 currentPlayer.boat.money++;
+                this.log.info(currentPlayer.color + " gained 2 coins from the war track.");
             } else if (reward == "fur") {
                 currentPlayer.boat.addGoodToBoatOrDock("fur");
+                this.log.info(currentPlayer.color + " gained fur from the war track.");
             } else if (reward == "schemeCard") {
                 // TODO: scheme card
             } else if (reward == "victoryPoint") {
                 currentPlayer.victoryPoints++;
+                this.log.info(currentPlayer.color + " gained a victory point from the war track.");
             }
         }
     }
@@ -798,8 +839,10 @@ class Game {
         var currentPlayer = this.validateCurrentPlayer(color, "transferGood");
         if (direction == "boatToDock") {
             currentPlayer.boat.moveResourceFromBoatToDock(resource);
+            this.log.info(color + " transferred " + resource + "from boat to dock");
         } else {
             currentPlayer.boat.moveResourceFromDockToBoat(resource);
+            this.log.info(color + " transferred " + resource + "from dock to boat");
         }
         this.gameStates.setCurrentState("actionPhase"); 
     }
@@ -811,6 +854,7 @@ class Game {
         if (currentPlayer.oneTimeSchemeCard == null) {
             var card = this.cards.drawSchemeCard(schemeDeck);
             this.currentPlayer.oneTimeSchemeCard = card;
+            this.log.info(color + " got a scheme card from schemeDeck " + schemeDeck);
         } else {
             this.throwError("Player cannot draw scheme card.", "drawOneTimeSchemeCard");
         }
@@ -858,52 +902,63 @@ class Game {
     }
 
     collectSchemeCardReward(currentPlayer, schemeCard, schemeCardActionChoice=null) {
-        console.log("collectSchemeCardReward(): " + currentPlayer.color + " " + schemeCard.id + " " + schemeCardActionChoice);
+        var color = currentPlayer.color;
+        console.log("collectSchemeCardReward(): " + color + " " + schemeCard.id + " " + schemeCardActionChoice);
         var takeDeedCard = false;
         for (var i=0; i<schemeCard.rewards.length; i++) {
             var reward = schemeCard.rewards[i];
             // coin, tax, muster, move, build, attack, deedCard, warTrack, buildOrAttack, taxOrMuster
             if (reward == "coin") {
                 currentPlayer.boat.money++;
+                this.log.info(color + " got a coin from a scheme card");
             } else if (reward == "tax") {
                 currentPlayer.taxActions++;
+                this.log.info(color + " got a tax action from a scheme card");
             } else if (reward == "move") {
                 currentPlayer.moveActions++;
+                this.log.info(color + " got a move action from a scheme card");
             } else if (reward == "build") {
                 currentPlayer.buildActions++;
+                this.log.info(color + " got a build action from a scheme card");
             } else if (reward == "attack") {
                 currentPlayer.attackActions++;
             } else if (reward == "muster") {
                 if (currentPlayer.supplyTroops > 0) {
                     currentPlayer.supplyTroops--;
                     currentPlayer.troopsToDeploy++;
+                    this.log.info(color + " can muster troops from a scheme card");
                 }
             } else if (reward == "warTrack") {
                 this.goUpWarTrack(currentPlayer);
-                // TODO: handle warTrack reward being a scheme card
+                this.log.info(color + " moved up the war track from a scheme card");
             } else if (reward == "deedCard") {
                 takeDeedCard = true;
             } else if (reward == "buildOrAttack") {
                 if (schemeCardActionChoice == "build") {
                     currentPlayer.buildActions++;
+                    this.log.info(color + " got a build action from a scheme card");
                 }
                 if (schemeCardActionChoice == "attack") {
                     currentPlayer.attackActions++;
+                    this.log.info(color + " got an attack action from a scheme card");
                 }
             } else if (reward == "taxOrMuster") {
                 if (schemeCardActionChoice == "tax") {
                     currentPlayer.taxActions++;
+                    this.log.info(color + " got a tax action from a scheme card");
                 }
                 if (schemeCardActionChoice == "muster") {
                     if (currentPlayer.supplyTroops > 0) {
                         currentPlayer.supplyTroops--;
                         currentPlayer.troopsToDeploy++;
+                        this.log.info(color + " can muster troops from a scheme card");
                     }
                 }
             }
         }
         if (takeDeedCard) {
             this.gameStates.setCurrentState("takeDeedCardForActionPhase");
+            this.log.info(color + " can take a deed card from a scheme card");
         }
         if (this.gameStates.currentState.name == "actionPhasePlaySchemeCard") {
             this.gameStates.setCurrentState("actionPhase");
@@ -919,6 +974,7 @@ class Game {
         this.validateGameStatus2(["takeDeedCardForActionPhase", "takeDeedCardForClaimPhase"], "takeDeedCard");
         var currentPlayer = this.validateCurrentPlayer(color, "takeDeedCard");
         this.cards.takeDeedCard(currentPlayer, deedCardName);
+        this.log.info(color + " took deed card, " + deedCardName);
         if (this.gameStates.currentState.name == "takeDeedCardForActionPhase") {
             this.gameStates.setCurrentState("actionPhase");
         } else {
@@ -997,7 +1053,8 @@ class Game {
             this.deedCardToVerify.verifiedByPlayers[nextPlayer.color] = true;
             nextPlayer = this.players.getNextPlayer(nextPlayer);
         }
-        this.players.setCurrentPlayer(nextPlayer);        
+        this.players.setCurrentPlayer(nextPlayer);
+        this.log.info(color + " is claiming deed, " + deedCardName + ", has been fulfilled.");
         return this.deedCardToVerify;
     }
 
@@ -1015,6 +1072,7 @@ class Game {
             for (var c=0; c<colors.length; c++) {
                 if (deedCard.verifiedByPlayers[colors[c]] == false) {
                     isGood = false;
+                    this.log.info("Deed card, " + deedCardName + ", for " + color + " was rejected by " + colors[c]);
                 }
             }
             if (isGood) {
@@ -1032,6 +1090,7 @@ class Game {
             while (nextPlayer.isPlayerAi && nextPlayer.color) {
                 deedCard.verifiedByPlayers[nextPlayer.color] = true;
                 nextPlayer = this.players.getNextPlayer(nextPlayer);
+                this.log.info(nextPlayer.color + " verified deed, " + deedCardName + " for " + color);
             }
             this.players.setCurrentPlayer(nextPlayer);   
         }
@@ -1049,11 +1108,13 @@ class Game {
                         this.throwError("You do not have enough money", "reedeemDeed");
                     }
                     player.boat.money--;
+                    this.log.info(player.color + " paid money for deed, " + deedCard.name);
                 } else if (claimStatement.claimPayChoice == "resource") {
                     if (! player.boat.goodsOnDock[claimStatement.claimPayResourceChoice] > 0) {
                         this.throwError("You do not have " + claimStatement.claimPayResourceChoice + " on your dock.", "reedeemDeed");
                     }
                     player.boat.goodsOnDock[claimStatement.claimPayResourceChoice]--;
+                    this.log.info(player.color + " paid " + mStatement.claimPayResourceChoice + " for deed, " + deedCard.name);
                 } else if (claimStatement.claimPayChoice == "scheme card") {
                     if (player.schemeCards.length < 1) {
                         this.throwError("You do not have a scheme card");
@@ -1069,6 +1130,7 @@ class Game {
                         }
                     }
                     currentPlayer.schemeCards = playerSchemeCards;
+                    this.log.info(player.color + " paid a scheme card for deed, " + deedCard.name);
                 }
             } else if (claimStatement.claimStatementChoice == "remove") {
                 var location = this.gameMap.locationByName(claimStatement.claimRemoveLocationChoice);
@@ -1079,6 +1141,7 @@ class Game {
                     }
                     location.troopsByColor[player.color]--;
                     player.supplyTroops++;
+                    this.log.info(player.color + " removed a troop from " + claimStatement.claimRemoveLocationChoice + " for deed, " + deedCard.name);
                 } else if (claimStatement.claimRemoveChoice == "building") {
                     if (! location.doesPlayerHaveThisBuilding(color, claimStatement.claimRemoveBuildingChoice)) {
                         this.throwError("You do not have a " + claimStatement.claimRemoveBuildingChoice + " in " + claimStatement.claimRemoveLocationChoice, "accomplishDeed");
@@ -1093,10 +1156,12 @@ class Game {
                     }
                     location.buildings = locationBuildings;
                     player.buildings[claimStatement.claimRemoveBuildingChoice]++;
+                    this.log.info(player.color + " removed a " + claimStatement.claimRemoveBuildingChoice + " from " + claimStatement.claimRemoveLocationChoice + " for deed, " + deedCard.name);
                 }
             }
         }
         deedCard.accomplished = true;
+        this.log.info(player.color + " accomplished deed, " + deedCard.name);
         for (var i=0; i<deedCard.rewards.length; i++) {
             // TODO: collect deed card rewards
             // scheme2cards, attackMinusScheme, moveAnywhere, warTrack,
@@ -1106,6 +1171,7 @@ class Game {
 
     endRound() {
         console.log("endRound()");
+        this.log.info("end round " + is.currentRound);
         this.currentRound++;
         if (this.currentRound > 4) {
             this.endGame();
@@ -1122,6 +1188,7 @@ class Game {
     endGame() {
         console.log("endGame() ");
         this.gameStates.setCurrentState("endGame");
+        this.log.info("game over");
     }
 
     calculateEndGameStats() {
@@ -1224,6 +1291,7 @@ class Game {
         if (currentPlayer.supplyTroops >= actions) {
             currentPlayer.troopsToDeploy = currentPlayer.troopsToDeploy + actions;
             currentPlayer.supplyTroops = currentPlayer.supplyTroops - actions;
+            this.log.info(currentPlayer.color + " played muster conversion tile and used " + resource1 + " and " + resource2);
         }
     }
 
@@ -1231,12 +1299,14 @@ class Game {
         console.log("playBuildConversionTile(): " + currentPlayer.color + " " + resource1 + " " + resource2);
         var actions = currentPlayer.boat.useBuildConversionTile(resource1, resource2);
         currentPlayer.buildActions = currentPlayer.buildActions + actions;
+        this.log.info(currentPlayer.color + " played build conversion tile and used " + resource1 + " and " + resource2);
     }
 
     playAttackConversionTile(currentPlayer) {
         console.log("playBuildAttackConversionTile(): " + currentPlayer.color);
         var actions = currentPlayer.boat.useAttackConversionTile();
         currentPlayer.attackActions = currentPlayer.attackActions + actions;
+        this.log.info(currentPlayer.color + " played attack conversion tile");
     }
 
     playConversionTile(color, conversionTileName, resource1, resource2) {
@@ -1287,6 +1357,7 @@ class Game {
         currentPlayer.accomplishedDeedForTurn = false;
         currentPlayer.convertedGoodsForTurn = false;
         currentPlayer.resetMoveActionsFromLocation(this.gameMap.locations);
+        this.log.info(color + " ended their turn");
         var nextPlayer = this.players.getNextPlayer(currentPlayer);            
         if (nextPlayer.advisors.length > 0) {
             this.players.setCurrentPlayer(nextPlayer);

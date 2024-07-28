@@ -40,17 +40,17 @@ while [ "${currentState}" != "endGame" ] && [ ${count} -lt 10 ];do
 done
 if [ "${currentState}" != "endGame" ];then
   echo "Game ${game_id} appears to have a problem"
+
+  echo "Dump game"
+  echo ${game_id}
+  r=$(rest "${server}/test/game/${game_id}/dump" GET)
+  echo $r
+
+  echo "Game ${game_id} appears to have a problem"
   exit 1
 else
   echo "Game ${game_id} completed"
+  r=$(rest "${server}/test/game/${game_id}" DELETE)
 fi
-
-
-
-
-#echo "Dump game"
-#echo ${game_id}
-#r=$(rest "${server}/test/game/${game_id}/dump" GET)
-#echo $r
 
 

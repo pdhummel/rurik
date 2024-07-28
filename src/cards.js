@@ -1,7 +1,3 @@
-//
-
-const { json } = require("express");
-
 class Cards {
     constructor() {
         this.setupSecretAgendaCards();

@@ -9,6 +9,7 @@ class GamePlayers {
         this.playersByColor = {};
         this.playersByName = {};
         this.playersByPosition = {};
+        this.lastActionTimeStamp = Date.now();
     }
 
     addPlayer(name, color, position, isPlayerAi, cards) {

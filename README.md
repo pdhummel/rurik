@@ -4,7 +4,6 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 
 
 ## TODO
-* game log
 * show upcoming advisors on map board
 * show reward for deed cards
 * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
@@ -138,7 +137,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * bug: claim track does not clear lower values.
 * bug: did not earn boon token when honey column filled
 * bug: Move leader instead of troops - "from" location.
-
+* game log
 
 
 ## Notes

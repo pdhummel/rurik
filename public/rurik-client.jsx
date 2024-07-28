@@ -6,14 +6,16 @@ function onLoad() {
   var gameCardsModal = setupPopupWindow("gameCardsModal", "gameCardsButton", "closeGameCardsModal");
   var boatAndSupplyModal = setupPopupWindow("boatAndSupplyModal", "boatAndSupplyButton", "closeBoatAndSupplyModal");
   var claimBoardModal = setupPopupWindow("claimBoardModal", "claimBoardButton", "closeClaimBoardModal");
+  var gameLogModal = setupPopupWindow("gameLogModal", "gameLogButton", "closeGameLogModal");
 
   // When the user clicks anywhere outside of the modal, close it
   window.onclick = function(event) {
     if (event.target == myCardsModal || event.target == gameCardsModal || event.target == boatAndSupplyModal || 
-        event.target == claimBoardModal) {
+        event.target == claimBoardModal || event.target == gameLogModal) {
       myCardsModal.style.display = "none";
       gameCardsModal.style.display = "none";
       boatAndSupplyModal.style.display = "none";
+      gameLogModal.style.display = "none";
       claimBoardModal.style.display = "none";
     }
   }
@@ -34,6 +36,7 @@ function refreshGameStatus() {
     refreshStrategyBoard();
     refreshCards();
     refreshClaimBoard();
+    refreshLogs();
   }
 }
 function refreshGameStatusResponseHandler(response) {
@@ -533,4 +536,25 @@ function showEndGameHandler(response) {
   endGameTableDiv.innerHTML = "";
   endGameTableDiv.appendChild(table);
   show("endGameDiv");
+}
+
+function refreshLogs() {
+  var textArea = document.getElementById("gameLogTextArea").value;
+  var lines = textArea.split(/\r|\r\n|\n/);
+  var count = lines.length;
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/gameLog" + "?count=" + count, "get", "", refreshLogHandler);  
+}
+
+function refreshLogHandler(response) {
+  //console.log("refreshLogHandler(): " + JSON.stringify(response.data));
+  console.log("refreshLogHandler(): ");
+  //refreshLogHandler(): [
+  // {"timeStamp":1722190387996,"text":"yellow chose Maria as leader."},
+  // {"timeStamp":1722190387999,"text":"blue chose Agatha as leader."}]
+  var textArea = document.getElementById("gameLogTextArea");
+  var lines = response.data;
+  for (var i=0; i < lines.length; i++) {
+    textArea.value = lines[i].timeStamp + " " + lines[i].text + "\r\n" + textArea.value;
+  }
 }

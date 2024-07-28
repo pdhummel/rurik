@@ -12,7 +12,19 @@ var games = Games.Games.getInstance();
 
 app.get('/test/game/:id/dump', (req, res) => {
     var game = games.getGameById(req.params.id);
+    game.log.game = null;
     res.send(game);
+});
+
+app.delete('/test/game/:id', (req, res) => {
+  var gameId = req.params.id;
+  //if(games.games.hasKey(gameId)) {
+    //delete games.games[gameId];
+  //}
+  delete games.games[gameId];
+  //games.games.delete(gameId);
+  var gameList = games.listGames();
+  res.send(gameList);
 });
 
 
