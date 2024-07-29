@@ -138,6 +138,7 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * bug: did not earn boon token when honey column filled
 * bug: Move leader instead of troops - "from" location.
 * game log
+* fix screen to adapt to larger screens that are more than 1024px wide
 
 
 ## Notes

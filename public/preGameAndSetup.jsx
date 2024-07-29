@@ -163,9 +163,8 @@ function listGames() {
   
       var leftSideDiv = document.getElementById("leftSideDiv");
       var rightSideDiv = document.getElementById("rightSideDiv");
-      rightSideDiv.style.width = "47%";
-      leftSideDiv.style.width = "50%";
-      leftSideDiv.style.display = "block";
+      leftSideDiv.style.display = "table-cell";
+      rightSideDiv.style.display = "table-cell"
       refreshGameStatus();
       show("statusDiv");
       hide("gameListDiv");
@@ -187,12 +186,10 @@ function listGames() {
     var name = response.data.name;
     var position = response.data.tablePosition;
     if (name != undefined && position != undefined) {
-      rightSideDiv.style.width = "47%";
-      leftSideDiv.style.width = "50%";
-      leftSideDiv.style.display = "block";
+      leftSideDiv.style.display = "table-cell";
+      rightSideDiv.style.display = "table-cell";
       refreshGameStatus();
       setInnerHtml("myName", name);
-      //setInnerHtml("myPosition", position);
       show("statusDiv");
       hide("gameListDiv");
       hide("createGameDiv");
