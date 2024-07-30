@@ -16,5 +16,5 @@ ADD ./public /home/app/rurik/public
 ADD ./views /home/app/rurik/views
 WORKDIR /home/app/rurik
 RUN npm install
-CMD node ./src/server.js
+CMD node ./src/routes/server.js
 
