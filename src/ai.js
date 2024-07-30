@@ -384,7 +384,6 @@ class Ai {
         var color = player.color;
         var canAttack = true;
         var clonedGame = lodash.cloneDeep(game);
-        var clonedPlayer = lodash.cloneDeep(player);
         var endGameStats = clonedGame.calculateEndGameStats();
         var firstPlacePlayerColors = clonedGame.getFirstPlacePlayers(endGameStats);
 

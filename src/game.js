@@ -1388,7 +1388,8 @@ class Game {
             this.players.setCurrentPlayer(this.players.firstPlayer);
             this.gameStates.setCurrentState("takeDeedCardForClaimPhase")    
         } else {
-            this.gameStates.setCurrentState("endGame");
+            this.log.info("end round " + this.currentRound);
+            this.endGame();
         }
         this.aiEvaluateGame();
         console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);

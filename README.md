@@ -9,6 +9,8 @@ WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
 * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
 * handle moveFromLocation and moveToAnywhere
 * add version info
+* ability to delete game from UI
+* leader special abilities
 
 * action phase
   * build action - stable, tavern
