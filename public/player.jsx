@@ -1,12 +1,49 @@
 function refreshPlayer() {
     var gameId = getInnerHtmlValue("gameId");
     var color = getInnerHtmlValue("myColor");
+    var selectedColor = getSelectedValue("selectPlayerBoat");
+    if (color == selectedColor || selectedColor == "" || selectedColor == null) {
+      if (gameId != undefined && gameId != null && color != undefined && color != null) {
+        changeSupplyImages(color);
+        callApi('/game/' + gameId + '/player/' + color, "get", "", refreshPlayerResponseHandler);
+      } 
+    }
+
+  }
+  function selectPlayerBoatChanged() {
+    var gameId = getInnerHtmlValue("gameId");
+    var color = getSelectedValue("selectPlayerBoat");
     if (gameId != undefined && gameId != null && color != undefined && color != null) {
-      callApi('/game/' + gameId + '/player/' + color, "get", "", refreshPlayerResponseHandler);
+      callApi('/game/' + gameId + '/player/' + color, "get", "", refreshOtherPlayer);
     } 
   }
+
+  function refreshOtherPlayer(response) {
+    console.log("refreshOtherPlayer(): " + JSON.stringify(response.data));
+    var color = response.data.color;
+    changeSupplyImages(color);
+    this.refreshPlayerBoatAndSupply(response);
+  }
+
+  function changeSupplyImages(color) {
+    document.getElementById("tavernImage").src = "/assets/tavern-" + color + ".png";
+    document.getElementById("stableImage").src = "/assets/stable-" + color + ".png";
+    document.getElementById("marketImage").src = "/assets/market-" + color + ".png";
+    document.getElementById("churchImage").src = "/assets/church-" + color + ".png";
+    document.getElementById("strongholdImage").src = "/assets/stronghold-" + color + ".png";
+    document.getElementById("troopImage").src = "/assets/troop-" + color + ".png";
+  }
+
   function refreshPlayerResponseHandler(response) {
     console.log("refreshPlayerResponseHandler(): " + JSON.stringify(response.data));
+    var color = response.data.color;
+    this.refreshPlayerAdvisors(response);
+    this.refreshPlayerBoatAndSupply(response);
+    this.refreshPlayerCards(response);
+  }
+  
+  function refreshPlayerAdvisors(response) {
+    console.log("refreshPlayerAdvisors(): " + JSON.stringify(response.data));
     var color = response.data.color;
     var advisors = response.data.advisors;
     var advisorRow = document.getElementById("advisorRow");
@@ -18,7 +55,7 @@ function refreshPlayer() {
     advisorNumToText[3] = "three";
     advisorNumToText[4] = "four";
     advisorNumToText[5] = "five";
-    console.log("refreshPlayerResponseHandler(): advisors=" + advisors);
+    console.log("refreshPlayerAdvisors(): advisors=" + advisors);
     var selectAdvisor = document.getElementById("selectAdvisor");
     clearOptions(selectAdvisor);
     for (var i=0; i<advisors.length; i++) {
@@ -30,51 +67,12 @@ function refreshPlayer() {
       innerHtml = innerHtml + '<img height="40px" src="' + imageFile + '" />';
     }
     advisorRow.innerHTML = innerHtml;
-    var goodsOnDock = response.data["boat"]["goodsOnDock"];
-    setInnerHtml("dockStone", goodsOnDock["stone"]);
-    setInnerHtml("dockWood", goodsOnDock["wood"]);
-    setInnerHtml("dockFish", goodsOnDock["fish"]);
-    setInnerHtml("dockHoney", goodsOnDock["honey"]);
-    setInnerHtml("dockFur", goodsOnDock["fur"]);
-    setInnerHtml("tradeBoon", goodsOnDock["tradeBoon"]);
-    var goodsOnBoat = response.data["boat"]["goodsOnBoat"];
-    setInnerHtml("boatStone", goodsOnBoat["stone"]);
-    setInnerHtml("boatWood", goodsOnBoat["wood"]);
-    setInnerHtml("boatFish", goodsOnBoat["fish"]);
-    setInnerHtml("boatHoney", goodsOnBoat["honey"]);
-    setInnerHtml("boatFur", goodsOnBoat["fur"]);
-    var money = response.data["boat"]["money"];
-    setInnerHtml("playerCoins", money);
-    var supplyTroops = response.data["supplyTroops"];
-    setInnerHtml("troopCount", supplyTroops);
-    var capturedRebels = response.data["boat"]["capturedRebels"];
-    setInnerHtml("rebelCount", capturedRebels);
-    var buildings = response.data["buildings"];
-    setInnerHtml("tavernCount", buildings["tavern"]);
-    setInnerHtml("stableCount", buildings["stable"]);
-    setInnerHtml("marketCount", buildings["market"]);
-    setInnerHtml("strongholdCount", buildings["stronghold"]);
-    setInnerHtml("churchCount", buildings["church"]);
-    if (response.data.isFirstPlayer) {
-      show("firstPlayerBear");
-    } else {
-      hide("firstPlayerBear");
-    }
-    if (response.data["boat"]["canPlayAttackConversionTile"]) {
-      show("convertTroopAndMoneyForAttack");
-    } else {
-      hide("convertTroopAndMoneyForAttack");
-    }
-    if (response.data["boat"]["canPlayMusterConversionTile"]) {
-      show("convertHoneyOrFishAndAnyForMuster");
-    } else {
-      hide("convertHoneyOrFishAndAnyForMuster");
-    }
-    if (response.data["boat"]["canPlayBuildConversionTile"]) {
-      show("convertWoodOrStoneAndAnyForBuild");
-    } else {
-      hide("convertWoodOrStoneAndAnyForBuild");
-    }
+  }
+
+
+  function refreshPlayerCards(response) {
+    console.log("refreshPlayerCards(): " + JSON.stringify(response.data));
+    var color = response.data.color;
 
     // deedCards
     var deedCards = response.data.deedCards;
@@ -119,5 +117,63 @@ function refreshPlayer() {
       hide("mySecretAgendaCardDiv");
     }
   }
-  
-  
+    
+  function refreshPlayerBoatAndSupply(response) {
+    console.log("refreshPlayerBoatAndSupply(): " + JSON.stringify(response.data));
+    var color = response.data.color;
+    var goodsOnDock = response.data["boat"]["goodsOnDock"];
+    setInnerHtml("dockStone", goodsOnDock["stone"]);
+    setInnerHtml("dockWood", goodsOnDock["wood"]);
+    setInnerHtml("dockFish", goodsOnDock["fish"]);
+    setInnerHtml("dockHoney", goodsOnDock["honey"]);
+    setInnerHtml("dockFur", goodsOnDock["fur"]);
+    setInnerHtml("tradeBoon", goodsOnDock["tradeBoon"]);
+    var goodsOnBoat = response.data["boat"]["goodsOnBoat"];
+    setInnerHtml("boatStone", goodsOnBoat["stone"]);
+    setInnerHtml("boatWood", goodsOnBoat["wood"]);
+    setInnerHtml("boatFish", goodsOnBoat["fish"]);
+    setInnerHtml("boatHoney", goodsOnBoat["honey"]);
+    setInnerHtml("boatFur", goodsOnBoat["fur"]);
+    var money = response.data["boat"]["money"];
+    setInnerHtml("playerCoins", money);
+    var supplyTroops = response.data["supplyTroops"];
+    setInnerHtml("troopCount", supplyTroops);
+    var capturedRebels = response.data["boat"]["capturedRebels"];
+    setInnerHtml("rebelCount", capturedRebels);
+    var supplyLeader = response.data["supplyLeader"];
+    setInnerHtml("leaderCount", supplyLeader);
+    if (supplyLeader > 0) {
+      show("supplyLeader");
+    } else {
+      hide("supplyLeader");
+    }
+    var buildings = response.data["buildings"];
+    setInnerHtml("tavernCount", buildings["tavern"]);
+    setInnerHtml("stableCount", buildings["stable"]);
+    setInnerHtml("marketCount", buildings["market"]);
+    setInnerHtml("strongholdCount", buildings["stronghold"]);
+    setInnerHtml("churchCount", buildings["church"]);
+    var victoryPointTokens = response.data["victoryPoints"];
+    setInnerHtml("victoryPointTokens", victoryPointTokens);
+    if (response.data.isFirstPlayer) {
+      show("firstPlayerBear");
+    } else {
+      hide("firstPlayerBear");
+    }
+    if (response.data["boat"]["canPlayAttackConversionTile"]) {
+      show("convertTroopAndMoneyForAttack");
+    } else {
+      hide("convertTroopAndMoneyForAttack");
+    }
+    if (response.data["boat"]["canPlayMusterConversionTile"]) {
+      show("convertHoneyOrFishAndAnyForMuster");
+    } else {
+      hide("convertHoneyOrFishAndAnyForMuster");
+    }
+    if (response.data["boat"]["canPlayBuildConversionTile"]) {
+      show("convertWoodOrStoneAndAnyForBuild");
+    } else {
+      hide("convertWoodOrStoneAndAnyForBuild");
+    }
+  }
+    

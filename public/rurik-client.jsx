@@ -121,12 +121,6 @@ function refreshGameStatusResponseHandler(response) {
       hide("personalCardsDiv");
       hide("supplyDiv");
     } else {
-      document.getElementById("tavernImage").src = "/assets/tavern-" + myColor + ".png";
-      document.getElementById("marketImage").src = "/assets/market-" + myColor + ".png";
-      document.getElementById("churchImage").src = "/assets/church-" + myColor + ".png";
-      document.getElementById("strongholdImage").src = "/assets/stronghold-" + myColor + ".png";
-      document.getElementById("stableImage").src = "/assets/stable-" + myColor + ".png";
-      document.getElementById("troopImage").src = "/assets/troop-" + myColor + ".png";
       hide("startGameDiv");
       show("boatDiv");
       show("personalCardsDiv");

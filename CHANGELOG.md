@@ -1,5 +1,14 @@
 # Rurik Changelog
 
+## 2024-08-10 - v0.5.0.1 - 
+* player view
+  * show leader in supply  
+  * show victory point tokens
+
+* other players view
+  * show player boat, dock, supply
+  * show victory point tokens for others
+
 ## 2024-08-10 - v0.5 - Initial Release
 * refresh every 10 seconds
 * show compass for player position

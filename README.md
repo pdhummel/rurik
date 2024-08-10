@@ -1,5 +1,6 @@
 # rurik
-WIP - nodejs, javascript, and html for "Rurik: Dawn of Kiev" game.
+WIP - nodejs, javascript, 
+and html for "Rurik: Dawn of Kiev" game.
 The ruleset is fixed as a hybrid of Stone and Blade with taverns and stables.  
 The AI players follow the same ruleset as the human players; the AI does not play like the solo mode. 
 The AI is very weak, but can be useful for adding variety for 1v1 with human players.
@@ -11,15 +12,9 @@ My current priorities will be to add to the player view and also allow players t
 Ultimately this project was built so I could play Rurik against some competant AI opponents. So while rule and gameplay features may be important, I mostly want to get a challenging Rurik-like experience when there are no humans around who want to play.
 
 ### TODOs
-* player view
-  * show leader in supply  
-  * show victory point tokens
-
 * other players view
   * show scheme card count for others
   * show completed deed cards for others
-  * show player boat, dock, supply
-  * show victory point tokens for others
 
 * Miscellaneous
   * get rewards for accomplishing deeds

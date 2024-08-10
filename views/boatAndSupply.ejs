@@ -1,8 +1,18 @@
 <div id="boatAndSupplyModal" class="modal">
     <div id="boatAndSupplyContent" class="modal-content">
+      <span id="boatAndSupplyModalheader" style="display: table-cell; width:100%; background-color: grey; border: 1px solid black; text-align: center">Boat and Supply</span>
       <span id="closeBoatAndSupplyModal" class="close">&times;</span>
 
       <table>
+        <tr><td>
+          Player: <select id="selectPlayerBoat" onchange="javascript:selectPlayerBoatChanged();">
+            <option></option>
+            <option>blue</option>
+            <option>red</option>
+            <option>yellow</option>
+            <option>white</option>
+          </select>
+        </td></tr>
         <tr><td>
           <div id="boatDiv" style="display: none;">
             <br/>
@@ -76,6 +86,10 @@
                 <img src="/assets/coin.png" alt="coin" width="40px" height="45px" />
                 <span id="playerCoins" class="centered">0</span>
               </span>
+              <span class="container">
+                <img src="/assets/vpToken.png" alt="victorypoints" width="40px" height="45px" />
+                <span id="victoryPointTokens" class="centered">0</span>
+              </span>
               <img id="firstPlayerBear" src="/assets/bear.png" style="display: block" alt="bear" height="45px" />
               <br/>
             </div>
@@ -89,6 +103,7 @@
             <div style="display:flex; height: 50px;">
               <span class="container-b"><img id="troopImage" src="/assets/troop-blue.png" alt="troops" height="45px" width="40px" /><span id="troopCount" class="centered">0</span></span>
               <span class="container"><img id="rebelImage" src="/assets/rebel.png" alt="rebel" height="45px" width="40px" /><span id="rebelCount" class="centered">0</span></span>
+              <span class="container" id="supplyLeader"><img id="leaderImage" src="/assets/rurik-leader.png" alt="leader" height="45px" width="40px" /><span id="leaderCount" class="centered">0</span></span>
             </div><br/>
             <table border="1" style="background-color: white; border-collapse: collapse; border: 1px solid black">
               <tr id="convertTroopAndMoneyForAttack" style="display: block"><td height="30px"><img src="/assets/rebel.png" height="25px"  />+<img src="/assets/coin.png" height="25px"  />+<img src="/assets/coin.png" height="25px" /> -> <img src="/assets/scheme-attack.png" height="25px" /></td></tr>
