@@ -35,6 +35,8 @@ function listGames() {
         
       }
       row.push(playerSummary);
+      var deleteButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Delete" onclick=\'javascript:deleteGame("' + games[key].gameId + '");\' />'
+      row.push(deleteButton);
       rows.push(row);
     }
   
@@ -54,6 +56,14 @@ function listGames() {
   }
   function createGameResponseHandler(response) {
     console.log("createGameResponseHandler(): " + response.data);
+    listGames();
+  }
+
+  function deleteGame(gameId) {
+    callApi("/game/" + gameId, "delete", "", deleteGameHandler);
+  }
+  function deleteGameHandler(response) {
+    console.log("deleteGameHandler(): " + response.data);
     listGames();
   }
 

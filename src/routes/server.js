@@ -227,3 +227,10 @@ app.get('/game/:id/gameLog', (req, res) => {
   var entries = game.log.getEntriesAfterPosition(position);
   res.send(entries);
 });
+
+app.delete('/game/:id', (req, res) => {
+  var gameId = req.params.id;
+  delete games.games[gameId];
+  var gameList = games.listGames();
+  res.send(gameList);
+});
