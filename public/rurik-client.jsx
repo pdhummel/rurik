@@ -353,6 +353,26 @@ function assignOptionToClaimPaySchemeCardChoice(schemeCard) {
   }
 }
 
+function getRewardsForDeedCard(deedCard) {
+  var rewardString = "";
+  for (var j=0; j<deedCard.rewards.length; j++) {
+    if (rewardString != "") {
+      rewardString = rewardString + "-";
+    }
+    var reward = deedCard.rewards[j];
+    // scheme2cards, attackMinusScheme, moveAnywhere
+    if (reward == "scheme2cards" || reward == "scheme2Cards") {
+      reward = "scheme";
+    } else if (reward == "attackMinusScheme") {
+      reward = "attack";
+    } else if (reward == "moveAnywhere") {
+      reward = "move";
+    }
+    rewardString = rewardString + reward;
+  }
+  return rewardString;
+}
+
 function refreshCards() {
   var gameId = getInnerHtmlValue("gameId");
   callApi("/game/" + gameId + "/cards", "get", "", refreshCardsResponseHandler);      
@@ -374,17 +394,19 @@ function refreshCardsResponseHandler(response) {
   var rows = [];
   for (var i=0; i < cardsResponse['deedCards'].length; i++) {
     var deedCard = cardsResponse['deedCards'][i];
+    var rewardString = getRewardsForDeedCard(deedCard);
     var row = [];
     row.push(deedCard.name);
     row.push(deedCard.victoryPoints);
     row.push(deedCard.requirementText);
+    row.push(rewardString);
     rows.push(row);
     var radioButton = document.getElementById("deedCardChoice" + i);
     radioButton.value = deedCard.name;
     var label = document.getElementById("deedCardLabel" + i);
     label.innerHTML = "(" + deedCard.victoryPoints + ") " + deedCard.name + ": " + deedCard.requirementText;
   }
-  var table = createTable(rows, ["Name", "VPs", "Description"], "white");
+  var table = createTable(rows, ["Name", "VPs", "Description", "Reward"], "white");
   deedCardsDiv.appendChild(table);
 }
 

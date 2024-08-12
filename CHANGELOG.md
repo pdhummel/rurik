@@ -1,6 +1,12 @@
 # Rurik Changelog
 
-## 2024-08-10 - v0.5.0.1 - 
+## 2024-08-11 - v0.5.0.2 - player view enhancements.
+* other players view
+  * show scheme card count for others
+  * show completed deed cards for others
+* get rewards for accomplishing deeds
+
+## 2024-08-10 - v0.5.0.1 - player view enhancements.
 * player view
   * show leader in supply  
   * show victory point tokens

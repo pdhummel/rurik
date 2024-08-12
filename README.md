@@ -8,23 +8,18 @@ The AI is also useful as an opponent when someone is first learning the game.
 The game is incomplete, but playable. Please review the TODOs for game-play gaps and features that are missing. 
 
 ## Roadmap
-My current priorities will be to add to the player view and also allow players to see the other player's boat and resources.  
 Ultimately this project was built so I could play Rurik against some competant AI opponents. So while rule and gameplay features may be important, I mostly want to get a challenging Rurik-like experience when there are no humans around who want to play.
 
 ### TODOs
-* other players view
-  * show scheme card count for others
-  * show completed deed cards for others
 
 * Miscellaneous
-  * get rewards for accomplishing deeds
-    * show reward for deed cards
-    * handle moveFromLocation and moveToAnywhere deed card bonuses
+  * fix deed card bonuses - scheme2cards, attackMinusScheme, moveAnywhere
   * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
   * end game secret agenda evaluation
   * leader special abilities
   * add version info
   * show upcoming advisors on map board
+  * no scheme card option for tavern
 
 * AI
   * ai scheme

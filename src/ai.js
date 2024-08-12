@@ -36,6 +36,7 @@ class Ai {
             "retrieveAdvisor": "retrieveAdvisor",
             "actionPhase": "takeAction",
             "takeDeedCardForClaimPhase": "takeDeedCard",
+            "takeDeedCardForActionPhase": "takeDeedCardForActionPhase",
             "schemeFirstPlayer": "schemeFirstPlayer",
             "drawSchemeCards": "drawSchemeCards",
             "selectSchemeCard": "selectSchemeCard",
@@ -53,21 +54,23 @@ class Ai {
         console.log("evaluateGame(): isPlayerAi=true");
         var currentPlayer =  game.players.getCurrentPlayer();
         var currentState = game.gameStates.currentState;
-        var currentStateName = currentState.name;
-        var method = this.mapStateToFunction[currentStateName];
-        if (method == undefined || method == null || method.length <= 0) {
-            console.log("evaluateGame(): method not found for " + currentStateName);
-            return
-        }
-        console.log("evaluateGame(): currentState=" + currentStateName + ", currentPlayer=" + currentPlayer.color + 
-            ", method=" + method);
-        try {
-            this[method](game, currentPlayer);
-        } catch(error) {
-            console.log("ai evaluateGame(): " + error.message);
-            //process.exit(1);
-        }
-        
+        if (currentState != undefined && currentState != null) {
+            var currentStateName = currentState.name;
+            var method = this.mapStateToFunction[currentStateName];
+            if (method == undefined || method == null || method.length <= 0) {
+                console.log("evaluateGame(): method not found for " + currentStateName);
+                return
+            }
+            console.log("evaluateGame(): currentState=" + currentStateName + ", currentPlayer=" + currentPlayer.color + 
+                ", method=" + method);
+            try {
+                this[method](game, currentPlayer);
+            } catch(error) {
+                console.log("ai evaluateGame(): " + error.message);
+                //process.exit(1);
+            }
+    
+        }        
     }
 
     selectLeader(game, player) {
@@ -203,21 +206,38 @@ class Ai {
         actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
         */
 
-        if (player.troopsToDeploy > 0) {
-            this.muster(game, player);
-        }
-        if (player.taxActions > 0) {
-            this.tax(game, player);
-        }
-        if (player.attackActions > 0) {
-            this.attack(game, player);
-        }
-        if (player.moveActions > 0) {
-            this.move(game, player);
-        }
-        if (player.buildActions > 0) {
-            this.build(game, player);
-        }
+        var takeAction = true;
+        //while (takeAction) {
+            takeAction = false;
+            if (player.schemeCards.length > 0 && player.schemeCardsCanPlay > 0) {
+                this.playSchemeCard(game, player);
+            }
+            if (player.troopsToDeploy > 0) {
+                if (this.muster(game, player)) {
+                    takeAction = true;
+                }
+            }
+            if (player.taxActions > 0) {
+                if (this.tax(game, player)) {
+                    takeAction = true;
+                }
+            }
+            if (player.attackActions > 0) {
+                if (this.attack(game, player)) {
+                    takeAction = true;
+                }
+            }
+            if (player.moveActions > 0) {
+                if (this.move(game, player)) {
+                    takeAction = true;
+                }
+            }
+            if (player.buildActions > 0) {
+                if (this.build(game, player)) {
+                    takeAction = true;
+                }
+            }    
+        //}
         // Determine candidate actions.
         // For each candidate action
             // Clone the game
@@ -230,8 +250,24 @@ class Ai {
         game.endTurn(player.color);
     }
 
+    playSchemeCard(game, player) {
+        console.log("ai playSchemeCard(): player=" + player.color);
+        var color = player.color;
+        // For now, just play the first scheme car available which won't be too smart,
+        // but better than holding the cards for the whole game.
+        if (player.boat.money >= 3) {
+            var r = Math.floor(Math.random() * player.schemeCards.length);
+            if (player.schemeCards[r].rewards.indexOf("deedCard") < 0) {
+                game.beginActionPhaseAction(color, "schemeAction");
+                game.playSchemeCard(color, player.schemeCards[r].id, null);    
+            }
+            //game.gameStates.setCurrentState("actionPhase");
+        }
+    }
+
     muster(game, player) {
         console.log("ai muster(): player=" + player.color);
+        var tookAction = false;
         var color = player.color;
         //var aiCard = player.aiCard;
         //var locationNames = aiCard.locationOrder.split(",");
@@ -257,11 +293,14 @@ class Ai {
             }
             game.beginActionPhaseAction(color, "musterAction");
             game.muster(color, locationName, 1);
+            tookAction = true;
         }
+        return tookAction;
     }
 
     tax(game, player) {
         console.log("ai tax(): player=" + player.color);
+        var tookAction = false;
         var color = player.color;
         var canTax = true;
         while (player.taxActions > 0 && canTax) {
@@ -345,10 +384,10 @@ class Ai {
             if (canTax == true) {
                 game.beginActionPhaseAction(color, "taxAction");
                 game.tax(color, locationName);
+                tookAction = true;
             }
-
         }
-        
+        return tookAction;
     }
 
     
@@ -381,6 +420,7 @@ class Ai {
 
     attack(game, player) {
         console.log("ai attack(): player=" + player.color);
+        var tookAction = false;
         var color = player.color;
         var canAttack = true;
         var clonedGame = lodash.cloneDeep(game);
@@ -450,15 +490,17 @@ class Ai {
             }
             if (canAttack) {
                 game.beginActionPhaseAction(color, "attackAction");
-                game.attack(color, locationName, target, 1)
+                game.attack(color, locationName, target, 1);
+                tookAction = true;
             }
     
         }
-
+        return tookAction;
     }
 
     move(game, player) {
         console.log("ai move(): player=" + player.color);
+        var tookAction = false;
         var color = player.color;
         var canMove = true;
         while (player.moveActions > 0 && canMove) {
@@ -519,9 +561,10 @@ class Ai {
             if (canMove) {
                 game.beginActionPhaseAction(color, "moveAction");
                 game.move(color, fromLocationName, toLocationName, 1, moveLeader);
+                tookAction = true;
             }
-
         }
+        return tookAction;
     }
 
     checkLocationForBuildingsToPlay(location, player) {
@@ -590,6 +633,7 @@ class Ai {
 
     build(game, player) {
         console.log("ai build(): player=" + player.color);
+        var tookAction = false;
         var color = player.color;
         var aiCard = player.aiCard;
         var gameMap = game.gameMap;
@@ -678,9 +722,10 @@ class Ai {
                 }
                 game.beginActionPhaseAction(color, "buildAction");
                 game.build(color, buildingAndLocation["location"], buildingAndLocation["building"], targetToConvert);
+                tookAction = true;
             }
         }
-
+        return tookAction;
     }
 
 
@@ -762,6 +807,10 @@ class Ai {
         var color = player.color;
         var deedCardName = game.cards.displayedDeedCards[0].name;
         game.takeDeedCard(color, deedCardName)
+    }
+
+    takeDeedCardForActionPhase(game, player) {
+        game.gameStates.setCurrentState("actionPhase");
     }
 
     schemeFirstPlayer(game, player) {

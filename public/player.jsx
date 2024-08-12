@@ -13,6 +13,9 @@ function refreshPlayer() {
   function selectPlayerBoatChanged() {
     var gameId = getInnerHtmlValue("gameId");
     var color = getSelectedValue("selectPlayerBoat");
+    if (color == undefined && color == null || color == "") {
+      var color = getInnerHtmlValue("myColor");
+    }
     if (gameId != undefined && gameId != null && color != undefined && color != null) {
       callApi('/game/' + gameId + '/player/' + color, "get", "", refreshOtherPlayer);
     } 
@@ -84,11 +87,13 @@ function refreshPlayer() {
     var accomplishRows = [];
     for (var i=0; i < deedCards.length; i++) {
       var deedCard = deedCards[i];
+      var rewardString = getRewardsForDeedCard(deedCard);
       var row = [];
       var accomplishRow = [];
       row.push(deedCard.name);
       row.push(deedCard.victoryPoints);
       row.push(deedCard.requirementText);
+      row.push(rewardString);
       row.push(deedCard.accomplished);
       rows.push(row);
       if (deedCard.accomplished == false) {
@@ -96,11 +101,12 @@ function refreshPlayer() {
         accomplishRow.push(deedCard.name);
         accomplishRow.push(deedCard.victoryPoints);
         accomplishRow.push(deedCard.requirementText);
+        accomplishRow.push(rewardString);
         accomplishRows.push(accomplishRow);  
       }
     }
-    var table = createTable(rows, ["Name", "VPs", "Description", "Accomplished?"], "white");
-    var accomplishTable = createTable(accomplishRows, ["", "Name", "VPs", "Description"], "white");
+    var table = createTable(rows, ["Name", "VPs", "Description", "Reward", "Accomplished?"], "white");
+    var accomplishTable = createTable(accomplishRows, ["", "Name", "VPs", "Description", "Reward"], "white");
     deedCardsDiv.appendChild(table);  
     playDeedCardChoices.appendChild(accomplishTable);
     show("myDeedCardsDiv");
@@ -175,5 +181,21 @@ function refreshPlayer() {
     } else {
       hide("convertWoodOrStoneAndAnyForBuild");
     }
+    var completedDeedCards = 0;
+    var deedCards = response.data["deedCards"];
+    if (deedCards != undefined && deedCards != null) {
+      for (var i=0; i < deedCards.length; i++) {
+        if (deedCards[i].accomplished == true) {
+          completedDeedCards++;
+        }
+      }
+    }
+    setInnerHtml("accomplishedDeedsCount", completedDeedCards);
+    var schemeCardCount = 0;
+    var schemeCards = response.data["schemeCards"];
+    if (schemeCards != undefined && schemeCards != null) {
+      schemeCardCount = schemeCards.length;
+    }
+    setInnerHtml("schemeCardsCount", schemeCardCount);
   }
     

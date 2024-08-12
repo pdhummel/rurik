@@ -886,6 +886,7 @@ class Game {
         if (currentPlayer.hasSchemeCard(schemeCardId) && 
             schemeCard.rewardCoinCost <= currentPlayer.boat.money) {
             currentPlayer.boat.money = currentPlayer.boat.money - schemeCard.rewardCoinCost;
+            this.log.info(color + " played scheme card " + schemeCardId);
             this.collectSchemeCardReward(currentPlayer, schemeCard, schemeCardActionChoice);
             this.cards.discardedSchemeCards.push(schemeCard);
             var playerSchemeCards = [];
@@ -936,8 +937,8 @@ class Game {
                 if (schemeCardActionChoice == "build") {
                     currentPlayer.buildActions++;
                     this.log.info(color + " got a build action from a scheme card");
-                }
-                if (schemeCardActionChoice == "attack") {
+                } else {
+                //if (schemeCardActionChoice == "attack") {
                     currentPlayer.attackActions++;
                     this.log.info(color + " got an attack action from a scheme card");
                 }
@@ -945,8 +946,8 @@ class Game {
                 if (schemeCardActionChoice == "tax") {
                     currentPlayer.taxActions++;
                     this.log.info(color + " got a tax action from a scheme card");
-                }
-                if (schemeCardActionChoice == "muster") {
+                } else {
+                //if (schemeCardActionChoice == "muster") {
                     if (currentPlayer.supplyTroops > 0) {
                         currentPlayer.supplyTroops--;
                         currentPlayer.troopsToDeploy++;
@@ -1162,9 +1163,41 @@ class Game {
         deedCard.accomplished = true;
         this.log.info(player.color + " accomplished deed, " + deedCard.name);
         for (var i=0; i<deedCard.rewards.length; i++) {
-            // TODO: collect deed card rewards
-            // scheme2cards, attackMinusScheme, moveAnywhere, warTrack,
-            // muster, move, build, coin, tax
+            // Collect deed card rewards.
+            // TODO: fix scheme2cards, attackMinusScheme, moveAnywhere
+            var reward = deedCard.rewards[i];
+            if (reward == "warTrack") {
+                this.this.goUpWarTrack(player);
+                this.log.info("deed card reward for " + player.color + " was to move up the war track.");
+            } else if (reward == "moveAnywhere") {
+                player.moveActions++;
+                this.log.info("deed card reward for " + player.color + " was a move action.");
+            } else if (reward == "attackMinusScheme") {
+                player.attackActions++;
+                this.log.info("deed card reward for " + player.color + " was an attack action.");
+            } else if (reward == "muster" && player.supplyTroops > 0) {
+                player.troopsToDeploy++;
+                this.log.info("deed card reward for " + player.color + " was to muster a troop.");
+            } else if (reward == "move") {
+                player.moveActions++;
+                this.log.info("deed card reward for " + player.color + " was a move action.");
+            } else if (reward == "build") {
+                player.buildActions++;
+                this.log.info("deed card reward for " + player.color + " was a build action.");
+            } else if (reward == "tax") {
+                player.taxActions++;
+                this.log.info("deed card reward for " + player.color + " was a tax action.");
+            } else if (reward == "coin") {
+                player.boat.money++;
+                this.log.info("deed card reward for " + player.color + " was a coin.");
+            } else if (reward == "scheme2cards" || reward == "scheme2Cards") {
+                player.schemeCardsToDraw = 1;
+                var r = Math.floor(Math.random() * 2);
+                var schemeDeck = r + 1;
+                this.log.info("deed card reward for " + player.color + " was a scheme card.");
+                this.gameStates.setCurrentState("drawSchemeCards");
+                this.drawSchemeCards(player.color, schemeDeck);
+            }
         }
     }
 
