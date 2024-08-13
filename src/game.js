@@ -1422,10 +1422,311 @@ class Game {
             this.gameStates.setCurrentState("takeDeedCardForClaimPhase")    
         } else {
             this.log.info("end round " + this.currentRound);
+            this.evaluateSecretAgendas();
             this.endGame();
         }
         this.aiEvaluateGame();
         console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);
+    }
+
+    evaluateSecretAgendas() {
+        console.log("evaluateSecretAgendas():");
+        var evaluationFunctions = {};
+        evaluationFunctions["Prosperous"] = "evaluateSecretAgendaProsperous";
+        evaluationFunctions["Esteemed"] = "evaluateSecretAgendaEsteemed";
+        evaluationFunctions["Capable"] = "evaluateSecretAgendaCapable";
+        evaluationFunctions["Conquering"] = "evaluateSecretAgendaConquering";
+        evaluationFunctions["Protective"] = "evaluateSecretAgendaProtective";
+        evaluationFunctions["Successful"] = "evaluateSecretAgendaSuccessful";
+        evaluationFunctions["Regal"] = "evaluateSecretAgendaRegal";
+        evaluationFunctions["Committed"] = "evaluateSecretAgendaCommitted";
+        evaluationFunctions["Dignified"] = "evaluateSecretAgendaDignified";
+        evaluationFunctions["Courageous"] = "evaluateSecretAgendaCourageous";
+        evaluationFunctions["Wealthy"] = "evaluateSecretAgendaWealthy";
+
+        
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var secretAgenda = player.secretAgenda[0];
+            console.log("evaluateSecretAgendas(): secretAgenda=" + secretAgenda.name);
+            if (this[evaluationFunctions[secretAgenda.name]](color)) {
+                secretAgenda.accomplished = true;
+            }
+        }
+
+    }
+
+    evaluateSecretAgendaProsperous(color) {
+        console.log("evaluateSecretAgendaProsperous()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var tradePoints = this.claimBoard.claimsByPlayer[color]["trade"];
+            if (tradePoints > most) {
+                most = tradePoints;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (tradePoints == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaEsteemed() {
+        console.log("evaluateSecretAgendaEsteemed()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var count = 0;
+            for (var j=0; j<this.gameMap.locationsForGame.length; j++) {
+                var location = this.gameMap.locationsForGame[j];
+                if (location.doesOccupy(color)) {
+                    count++;
+                }
+            }
+            if (count > most) {
+                most = count;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (count == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaCapable(color) {
+        console.log("evaluateSecretAgendaCapable()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var goodsOnBoat = player.boat.goodsOnBoat["stone"] + player.boat.goodsOnBoat["wood"] +
+                player.boat.goodsOnBoat["fish"] + player.boat.goodsOnBoat["honey"] + 
+                player.boat.goodsOnBoat["fur"];
+            var goodsOnDock = player.boat.goodsOnDock["stone"] + player.boat.goodsOnDock["wood"] +
+                player.boat.goodsOnDock["fish"] + player.boat.goodsOnDock["honey"] + 
+                player.boat.goodsOnDock["fur"] + player.boat.goodsOnDock["tradeBoon"];
+            var goods = goodsOnDock + goodsOnBoat;
+            if (goods > most) {
+                most = goods;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (goods == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaConquering(color) {
+        console.log("evaluateSecretAgendaConquering()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var warFare = this.claimBoard.claimsByPlayer[color]["warfare"];
+            if (warFare > most) {
+                most = warFare;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (warFare == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaProtective(color) {
+        console.log("evaluateSecretAgendaProtective()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var count = 0;
+            for (var j=0; j<this.gameMap.locationsForGame.length; j++) {
+                var location = this.gameMap.locationsForGame[j];
+                if (location.doesRule(color)) {
+                    for (var k=0; k<location.buildings.length; k++) {
+                        if (location.buildings[k].color == color) {
+                            count++;
+                        }
+                    }
+                }
+            }
+            if (count > most) {
+                most = count;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (count == most) {
+                mostPlayers.push(color);
+            }
+
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaSuccessful(color) {
+        console.log("evaluateSecretAgendaSuccessful()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var rules = this.claimBoard.claimsByPlayer[color]["rule"];
+            if (rules > most) {
+                most = rules;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (rules == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaRegal(color) {
+        console.log("evaluateSecretAgendaRegal()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var goods = player.boat.goodsOnBoat["honey"] + player.boat.goodsOnBoat["fur"] +
+                player.boat.goodsOnDock["honey"] + player.boat.goodsOnDock["fur"];
+            if (goods > most) {
+                most = goods;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (goods == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaCommitted(color) {
+        console.log("evaluateSecretAgendaCommitted()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var build = this.claimBoard.claimsByPlayer[color]["build"];
+            if (build > most) {
+                most = build;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (build == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaDignified(color) {
+        console.log("evaluateSecretAgendaDignified()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var count = 0;
+            for (var j=0; j<player.deedCards.length; j++) {
+                if (player.deedCards[j].accomplished) {
+                    count++;
+                }
+            }
+            if (count > most) {
+                most = count;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (count == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaCourageous(color) {
+        console.log("evaluateSecretAgendaCourageous()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var count = player.capturedRebels;
+            if (count > most) {
+                most = count;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (count == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
+    }
+    evaluateSecretAgendaWealthy(color) {
+        console.log("evaluateSecretAgendaWealthy()");
+        var hasAccomplished = false;
+        var most = 0;
+        var mostPlayers = [];
+        for (var i=0; i<this.players.players.length; i++) {
+            var player = this.players.players[i];
+            var color = player.color;
+            var count = player.boat.money;
+            if (count > most) {
+                most = count;
+                mostPlayers = [];
+                mostPlayers.push(color);
+            } else if (count == most) {
+                mostPlayers.push(color);
+            }
+        }
+        if (lodash.includes(mostPlayers, color)) {
+            hasAccomplished = true;
+        }
+        return hasAccomplished;
     }
 
     beginActionPhaseAction(color, action) {

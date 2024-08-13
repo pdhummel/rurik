@@ -15,14 +15,13 @@ Ultimately this project was built so I could play Rurik against some competant A
 * Miscellaneous
   * fix deed card bonuses - scheme2cards, attackMinusScheme, moveAnywhere
   * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
-  * end game secret agenda evaluation
   * leader special abilities
   * add version info
   * show upcoming advisors on map board
   * no scheme card option for tavern
 
 * AI
-  * ai scheme
+  * ai complete deed cards
   * ai conversion token
   * ai bid money
   * ai adjacency

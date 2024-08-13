@@ -234,3 +234,19 @@ app.delete('/game/:id', (req, res) => {
   var gameList = games.listGames();
   res.send(gameList);
 });
+
+app.get('/game/:id/secretAgendas', (req, res) => {
+  console.log("get " + req.path + " " + req.query);
+  var game = games.getGameById(req.params.id);
+  if (game === undefined) {
+    res.status(404).send({"error": "Game not found"});
+    return;
+  }
+  var secretAgendas = {};
+  for (var i=0; i< game.players.sortedPlayers.length; i++) {
+    var player = game.players.sortedPlayers[i];
+    secretAgendas[player.color] = player.secretAgenda[0];
+  }
+  res.send(secretAgendas);
+});
+

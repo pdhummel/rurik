@@ -199,9 +199,7 @@ class Ai {
         var decisionValue = this.calculateDecisionValue(clonedGame, clonedPlayer);
         
         /*
-        actionToStateMap["cancel"] = "actionPhase";
         actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
-        actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
         actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
         actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
         */
@@ -261,7 +259,6 @@ class Ai {
                 game.beginActionPhaseAction(color, "schemeAction");
                 game.playSchemeCard(color, player.schemeCards[r].id, null);    
             }
-            //game.gameStates.setCurrentState("actionPhase");
         }
     }
 

@@ -33,7 +33,6 @@ function refreshGameStatus() {
     callApi("/gameStatus/" + gameId + clientColorParam, "get", "", refreshGameStatusResponseHandler);
     refreshMap();
     refreshPlayer();
-    refreshStrategyBoard();
     refreshCards();
     refreshClaimBoard();
     refreshLogs();
@@ -223,8 +222,12 @@ function refreshGameStatusResponseHandler(response) {
     }
 
     if (currentState == "endGame") {
+      showSecretAgendas();
       showEndGameStats();
+      hide("strategyBoard-1-2");
+      hide("strategyBoard-3-4");
     } else {
+      refreshStrategyBoard();
       hide("endGameDiv");
     }
 
@@ -573,4 +576,42 @@ function refreshLogHandler(response) {
   for (var i=0; i < lines.length; i++) {
     textArea.value = lines[i].timeStamp + " " + lines[i].text + "\r\n" + textArea.value;
   }
+}
+
+function showSecretAgendas() {
+  var gameId = getInnerHtmlValue("gameId");
+  callApi("/game/" + gameId + "/secretAgendas", "get", "", showSecretAgendasHandler);  
+}
+
+function showSecretAgendasHandler(response) {
+  console.log("showSecretAgendasHandler(): " + JSON.stringify(response.data));
+  var colors = ["blue", "red", "white", "yellow"];
+  var rows = [];
+  for (var i=0; i<colors.length; i++) {
+    var row = [];
+    var secretAgenda = response.data[colors[i]];
+    if (secretAgenda != undefined) {
+      var color = colors[i];
+      var playerSpan = '<span>&nbsp;&nbsp;<span class="' + color + ' numberBox">&nbsp;&nbsp;</span></span>';
+      //row.push(color);
+      row.push(playerSpan);
+      row.push(secretAgenda.name);
+      row.push(secretAgenda.text);
+      row.push(secretAgenda.points);
+      //row.push('<input type="checkbox" value="Y" id="' + color+"SecretAgendaCheckbox" + '"/>');
+      if (secretAgenda.accomplished) {
+        row.push('yes');
+      } else {
+        row.push('no');
+      }
+      rows.push(row);
+    }
+
+  }
+  var headings = ["Player", "Name", "Description", "Points", "Accomplished?"];
+  var table = createTable(rows, headings, "white");
+  show("verifySecretAgenda");
+  var secretAgendaDiv = document.getElementById("allSecretAgendasDiv");
+  secretAgendaDiv.innerHTML = "";
+  secretAgendaDiv.appendChild(table);
 }

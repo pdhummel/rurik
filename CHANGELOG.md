@@ -1,5 +1,10 @@
 # Rurik Changelog
 
+
+## 2024-08-13 - v0.5.0.3 - secret agenda scoring.
+* end game secret agenda evaluation
+* ai scheme
+
 ## 2024-08-11 - v0.5.0.2 - player view enhancements.
 * other players view
   * show scheme card count for others
