@@ -112,8 +112,8 @@ class BoatMat {
         console.log("useResourceConversionTile(): " + resource1 + " " + resource2 + " " + resourceToMatch1 + " " + resourceToMatch2);
         var actions = 0;
         var canConvert = false;
-        if (resource1 == resourceToMatch1 || resource1 == resourceToMatch2 || 
-            resource2 == resourceToMatch1 || resource2 == resourceToMatch2) {
+        if (resource1 == resourceToMatch1 || resource1 == resourceToMatch2 || resource1 == "tradeboon" || 
+            resource2 == resourceToMatch1 || resource2 == resourceToMatch2 || resource2 == "tradeboon") {
             if (resource1 == resource2 && this.goodsOnDock[resource1] > 1) {
                 canConvert = true;
             } else if (this.goodsOnDock[resource1] > 0 && this.goodsOnDock[resource2] > 0 ) {

@@ -266,7 +266,7 @@ class Player {
         this.temporarySecretAgenda = [];
         this.deedCards = [];
         this.victoryPoints = 0;
-        this.capturedRebels = 0;
+        //this.capturedRebels = 0;
 
         this.schemeCards = [];
         this.temporarySchemeCards = [];

@@ -52,6 +52,8 @@ Ultimately this project was built so I could play Rurik against some competant A
   * scheme
   * remove advisor
   * place advisor
+  * switch human player to AI
+  * switch AI player to human
 
 ### Known Bugs not in TODOs
 

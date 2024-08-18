@@ -308,7 +308,7 @@ class Game {
         }
 
         if (currentPlayer.advisors.length < 1 || advisor != currentPlayer.advisors[0]) {
-            // TODO: fix thlis
+            // TODO: fix this
             console.log("takeMainAction(): advisor does not match: " + advisor + " " + currentPlayer.color + " " + JSON.stringify(currentPlayer.advisors));
         }
 
@@ -388,7 +388,7 @@ class Game {
                     this.log.info(color + " got " + quantity + " troops to deploy.");
                 } else if (actionColumnName == "scheme") {
                     currentPlayer.schemeCardsToDraw = auctionSpace.quantity;
-                    if (auctionSpace.quantity = 3) {
+                    if (auctionSpace.quantity == 3) {
                         this.gameStates.setCurrentState("schemeFirstPlayer");
                         this.log.info(color + " will scheme first player.");
                     } else {
@@ -577,7 +577,7 @@ class Game {
         }
         for (var i=0; i < numberOfTroops; i++) {
             if (currentPlayer.moveActionsFromLocation[fromLocationName] > 0) {
-                currentPlayer.moveActionsFromLocation[fromLocationName] - 1;
+                currentPlayer.moveActionsFromLocation[fromLocationName] = currentPlayer.moveActionsFromLocation[fromLocationName] - 1;
             } else {
                 currentPlayer.moveActions = currentPlayer.moveActions - 1;
             }
@@ -810,7 +810,7 @@ class Game {
         this.handleWarTrackReward(currentPlayer, reward);
     }
 
-    // TODO: warfare rewards
+    // TODO: warfare rewards - scheme card
     handleWarTrackReward(currentPlayer, reward) {
         if (reward != undefined && reward != null) {
             if (reward == "2 wood") {
@@ -1168,7 +1168,7 @@ class Game {
             // TODO: fix scheme2cards, attackMinusScheme, moveAnywhere
             var reward = deedCard.rewards[i];
             if (reward == "warTrack") {
-                this.this.goUpWarTrack(player);
+                this.goUpWarTrack(player);
                 this.log.info("deed card reward for " + player.color + " was to move up the war track.");
             } else if (reward == "moveAnywhere") {
                 player.moveActions++;
@@ -1450,7 +1450,7 @@ class Game {
             var player = this.players.players[i];
             var color = player.color;
             var secretAgenda = player.secretAgenda[0];
-            console.log("evaluateSecretAgendas(): secretAgenda=" + secretAgenda.name);
+            console.log("evaluateSecretAgendas(): secretAgenda=" + secretAgenda.name + " for " + color);
             if (this[evaluationFunctions[secretAgenda.name]](color)) {
                 secretAgenda.accomplished = true;
             }
@@ -1458,7 +1458,7 @@ class Game {
 
     }
 
-    evaluateSecretAgendaProsperous(color) {
+    evaluateSecretAgendaProsperous(playerColor) {
         console.log("evaluateSecretAgendaProsperous()");
         var hasAccomplished = false;
         var most = 0;
@@ -1471,16 +1471,16 @@ class Game {
                 most = tradePoints;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (tradePoints == most) {
+            } else if (tradePoints == most && tradePoints > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaEsteemed() {
+    evaluateSecretAgendaEsteemed(playerColor) {
         console.log("evaluateSecretAgendaEsteemed()");
         var hasAccomplished = false;
         var most = 0;
@@ -1499,16 +1499,16 @@ class Game {
                 most = count;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (count == most) {
+            } else if (count == most && count > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaCapable(color) {
+    evaluateSecretAgendaCapable(playerColor) {
         console.log("evaluateSecretAgendaCapable()");
         var hasAccomplished = false;
         var most = 0;
@@ -1527,16 +1527,16 @@ class Game {
                 most = goods;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (goods == most) {
+            } else if (goods == most && goods > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaConquering(color) {
+    evaluateSecretAgendaConquering(playerColor) {
         console.log("evaluateSecretAgendaConquering()");
         var hasAccomplished = false;
         var most = 0;
@@ -1549,16 +1549,16 @@ class Game {
                 most = warFare;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (warFare == most) {
+            } else if (warFare == most && warFare > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaProtective(color) {
+    evaluateSecretAgendaProtective(playerColor) {
         console.log("evaluateSecretAgendaProtective()");
         var hasAccomplished = false;
         var most = 0;
@@ -1581,17 +1581,17 @@ class Game {
                 most = count;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (count == most) {
+            } else if (count == most && count > 0) {
                 mostPlayers.push(color);
             }
 
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaSuccessful(color) {
+    evaluateSecretAgendaSuccessful(playerColor) {
         console.log("evaluateSecretAgendaSuccessful()");
         var hasAccomplished = false;
         var most = 0;
@@ -1604,16 +1604,16 @@ class Game {
                 most = rules;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (rules == most) {
+            } else if (rules == most && rules > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaRegal(color) {
+    evaluateSecretAgendaRegal(playerColor) {
         console.log("evaluateSecretAgendaRegal()");
         var hasAccomplished = false;
         var most = 0;
@@ -1627,16 +1627,18 @@ class Game {
                 most = goods;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (goods == most) {
+            } else if (goods == most && goods > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaCommitted(color) {
+
+    // TODO: Bug: Finish in first place on the build track.
+    evaluateSecretAgendaCommitted(playerColor) {
         console.log("evaluateSecretAgendaCommitted()");
         var hasAccomplished = false;
         var most = 0;
@@ -1649,16 +1651,16 @@ class Game {
                 most = build;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (build == most) {
+            } else if (build == most && build > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaDignified(color) {
+    evaluateSecretAgendaDignified(playerColor) {
         console.log("evaluateSecretAgendaDignified()");
         var hasAccomplished = false;
         var most = 0;
@@ -1676,16 +1678,17 @@ class Game {
                 most = count;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (count == most) {
+            } else if (count == most && count > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaCourageous(color) {
+
+    evaluateSecretAgendaCourageous(playerColor) {
         console.log("evaluateSecretAgendaCourageous()");
         var hasAccomplished = false;
         var most = 0;
@@ -1693,21 +1696,21 @@ class Game {
         for (var i=0; i<this.players.players.length; i++) {
             var player = this.players.players[i];
             var color = player.color;
-            var count = player.capturedRebels;
+            var count = player.boat.capturedRebels;
             if (count > most) {
                 most = count;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (count == most) {
+            } else if (count == most && count > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
     }
-    evaluateSecretAgendaWealthy(color) {
+    evaluateSecretAgendaWealthy(playerColor) {
         console.log("evaluateSecretAgendaWealthy()");
         var hasAccomplished = false;
         var most = 0;
@@ -1720,11 +1723,11 @@ class Game {
                 most = count;
                 mostPlayers = [];
                 mostPlayers.push(color);
-            } else if (count == most) {
+            } else if (count == most && count > 0) {
                 mostPlayers.push(color);
             }
         }
-        if (lodash.includes(mostPlayers, color)) {
+        if (lodash.includes(mostPlayers, playerColor)) {
             hasAccomplished = true;
         }
         return hasAccomplished;
