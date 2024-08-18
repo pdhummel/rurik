@@ -34,14 +34,14 @@
         
       }
       row.push(playerSummary);
+      var deleteButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Delete" onclick=\'javascript:deleteGame("' + games[key].gameId + '");\' />'
+      row.push(deleteButton);
       if (games[key].currentState == "waitingForPlayers") {
         var joinButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Join" onclick=\'javascript:joinGameByRow("' + games[key].gameId + '", "' + gameName + '");\' />'
         row.push(joinButton);
       } else {
         row.push("&nbsp")
       }
-      var deleteButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Delete" onclick=\'javascript:deleteGame("' + games[key].gameId + '");\' />'
-      row.push(deleteButton);
       rows.push(row);
     }
   
@@ -64,7 +64,17 @@
   }
   function createGameResponseHandler(response) {
     console.log("createGameResponseHandler(): " + response.data);
-    listGames();
+    //var gameId = getSelectedValue("selectGameId");
+    var gameId = response.data.gameId;
+    var color = getSelectedValue("selectCreateGameColor");
+    var position = getSelectedValue("selectCreateGamePosition");
+    var name = getInnerHtmlValue("playerName");
+    var isAi = false;
+    var data = '{ "color": "' + color + '", "position": "' + position + '", "name":"' + name + '", "isAi": "' + isAi + '" }'
+    callApi("/game/" + gameId + "/player", "post", data, joinGameResponseHandler);
+    setInnerHtml("gameId", gameId);
+    setInnerHtml("myName", name);
+    setInnerHtml("myColor", color);
   }
 
   function deleteGame(gameId) {
@@ -171,13 +181,26 @@
     selectGameId.append(element);
     show("joinGameDiv");
   }
+  function aiJoinGame() {
+    //var gameId = getSelectedValue("selectGameId");
+    var gameId = getInnerHtmlValue("gameId");
+    var color = getSelectedValue("selectAiColor");
+    var position = getSelectedValue("selectAiPosition");
+    var isAi = true;
+    var name = "Ai-" + color;
+    if (gameId != undefined && gameId != null && gameId.length > 0) {
+      var data = '{ "color": "' + color + '", "position": "' + position + '", "name":"' + name + '", "isAi": "' + isAi + '" }'
+      callApi("/game/" + gameId + "/player", "post", data, joinGameResponseHandler);
+    }
+  }
   function joinGame() {
     var gameId = getSelectedValue("selectGameId");
     var color = getSelectedValue("selectColor");
     var position = getSelectedValue("selectPosition");
     var name = getInnerHtmlValue("playerName");
     var isAi = false;
-    if (document.getElementById("isAi").checked) {
+    var aiElement = document.getElementById("isAi");
+    if (aiElement != undefined && aiElement.checked) {
       isAi = true;
     }
     if (gameId != undefined && gameId != null && gameId.length > 0) {
@@ -190,7 +213,7 @@
   }
   function joinGameResponseHandler(response) {
       console.log("joinGameResponseHandler(): " + JSON.stringify(response.data));
-      if (! response.data.isPlayerAi) {
+      //if (! response.data.isPlayerAi) {
         var leftSideDiv = document.getElementById("leftSideDiv");
         var rightSideDiv = document.getElementById("rightSideDiv");
         leftSideDiv.style.display = "table-cell";
@@ -201,11 +224,11 @@
         hide("createGameDiv");
         hide("joinGameDiv");
         hide("rejoinGameDiv");
-      } else {
-        setInnerHtml("gameId", "");
-        listGames();
-        hide("joinGameDiv");
-      }
+      //} else {
+      //  setInnerHtml("gameId", "");
+      //  listGames();
+      //  hide("joinGameDiv");
+      //}
   }
   
   function rejoinGame(gameId, color) {
@@ -256,6 +279,8 @@
     if (playerName != undefined && playerName != null && playerName.trim().length > 0) {
       setInnerHtml("playerName", playerName);
       setInnerHtml("playerName2", playerName);
+      var addPlayerButton = document.getElementById("addPlayerButton");
+      addPlayerButton.value = "Join as " + playerName;
       hide("login");
       show("gameListDiv");
       show("createGameDiv");

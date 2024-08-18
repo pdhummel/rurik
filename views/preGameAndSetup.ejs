@@ -11,7 +11,28 @@
   </div>
 
   <div id="createGameDiv" style="display: none">
-    Game Name: <input id="gameName" type="text" />
+    <table>
+      <tr><td align="right">Game Name:</td><td><input id="gameName" type="text" /></td></tr>
+      <tr><td align="right">Player Color:</td>
+        <td>
+          <select id="selectCreateGameColor">
+          <option>blue</option>
+          <option>red</option>
+          <option>white</option>
+          <option>yellow</option>
+          </select>
+        </td>
+      </tr>
+      <tr><td align="right">Player Position:</td><td>
+        <select id="selectCreateGamePosition">
+          <option value="N">North</option>
+          <option value="E">East</option>
+          <option value="S">South</option>
+          <option value="W">West</option>
+        </select>    
+      </td>
+    </tr>
+    </table>
     <input type="button" value="Create Game" onclick="javascript:createGame();"/><br/>
     <br/>
   </div>
@@ -32,12 +53,27 @@
       <option value="S">South</option>
       <option value="W">West</option>
     </select>
-    <input type="checkbox" value="true" id="isAi" />Is AI? (leave unchecked to join as <span id="playerName2"></span>)<br/>
-    <input type="button" value="Join Game" onclick="javascript:joinGame();"/><br/>
+    <!--<input type="checkbox" value="true" id="isAi" />Is AI? --><span id="playerName2" style="display:none"></span><br/>
+    <input id="addPlayerButton" type="button" value="Add Player" onclick="javascript:joinGame();"/><br/>
     <br/>
   </div>
 
   <div id="startGameDiv" style="display:none;">
+    Add AI Player: 
+    <select id="selectAiColor">
+      <option>blue</option>
+      <option>red</option>
+      <option>white</option>
+      <option>yellow</option>
+    </select>
+    <select id="selectAiPosition">
+      <option value="N">North</option>
+      <option value="E">East</option>
+      <option value="S">South</option>
+      <option value="W">West</option>
+    </select>
+    <input type="button" value="Add Player" onclick="javascript:aiJoinGame();"/><br/>
+    <br/>
     <input type="button" value="Start Game" onclick="javascript:startGame();"/><br/>
   </div>
   <div id="pickFirstPlayerDiv" style="display:none;">

@@ -22,6 +22,9 @@ class GamePlayers {
         if (this.playersByPosition[position] != undefined && this.playersByPosition[position] != null) {
             throw new Error("Position " + position + " has already been selected.", "addPlayer()");
         }
+        if (this.playersByName[name] != undefined && this.playersByName[name] != null) {
+            throw new Error("Player " + name + " has already joined the game.", "addPlayer()");
+        }
         var player = new Player(name, color, position, isPlayerAi);
         console.log("addPlayer(): player created")
         this.players.push(player);
