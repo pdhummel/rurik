@@ -37,6 +37,8 @@
       if (games[key].currentState == "waitingForPlayers") {
         var joinButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Join" onclick=\'javascript:joinGameByRow("' + games[key].gameId + '", "' + gameName + '");\' />'
         row.push(joinButton);
+      } else {
+        row.push("&nbsp")
       }
       var deleteButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Delete" onclick=\'javascript:deleteGame("' + games[key].gameId + '");\' />'
       row.push(deleteButton);
@@ -253,6 +255,7 @@
     var playerName = getValue("playerNameInput");
     if (playerName != undefined && playerName != null && playerName.trim().length > 0) {
       setInnerHtml("playerName", playerName);
+      setInnerHtml("playerName2", playerName);
       hide("login");
       show("gameListDiv");
       show("createGameDiv");
