@@ -1,4 +1,4 @@
-function listGames() {
+  function listGames() {
     callApi("/game", "get", "", listGamesResponseHandler);
   }
   function listGamesResponseHandler(response) {
@@ -7,8 +7,6 @@ function listGames() {
     if (gameId != undefined && gameId != null && gameId.length > 0) {
       return;
     }  
-    selectGameId = document.getElementById("selectGameId");
-    clearOptions(selectGameId);
     var games = response.data;
     var rows = [];
     for (var i=0; i < Object.keys(games).length; i++) {
@@ -16,13 +14,14 @@ function listGames() {
       var element = document.createElement("option");
       element.innerText = games[key].gameId + " " + games[key].gameName;
       element.value = games[key].gameId;
-      selectGameId.append(element);
       element = document.createElement("option");
       element.innerText = games[key].gameId + " " + games[key].gameName;
       element.value = games[key].gameId;        
       var row = [];
+      var gameName = games[key].gameName.replaceAll("'", "");
       row.push(games[key].gameId);
-      row.push(games[key].gameName);
+      row.push(gameName);
+      row.push(games[key].owner);
       row.push(games[key].currentState);
       var playerSummary = "";
       if (games[key].numberOfPlayers > 0) {
@@ -35,14 +34,19 @@ function listGames() {
         
       }
       row.push(playerSummary);
+      if (games[key].currentState == "waitingForPlayers") {
+        var joinButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Join" onclick=\'javascript:joinGameByRow("' + games[key].gameId + '", "' + gameName + '");\' />'
+        row.push(joinButton);
+      }
       var deleteButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Delete" onclick=\'javascript:deleteGame("' + games[key].gameId + '");\' />'
       row.push(deleteButton);
       rows.push(row);
     }
   
-    populateTable(rows, ["Game Id", "Game Name", "Status", "Players"]);
-    if (Object.keys(games).length > 0) {
-      show("joinGameDiv");
+    populateTable(rows, ["Game Id", "Game Name", "Owner", "Status", "Players"]);
+    var myName = getInnerHtmlValue("playerName");
+    if (Object.keys(games).length > 0 && myName.length > 0) {
+      //show("joinGameDiv");
     }
     gameId = getInnerHtmlValue("gameId");
     if (gameId == undefined || gameId == null || gameId.length <= 0) {
@@ -51,7 +55,9 @@ function listGames() {
   }
   
   function createGame() {
-    var data = '{ "gameName": "' + document.getElementById("gameName").value + '" }';
+    var gameName = document.getElementById("gameName").value;
+    var owner = getInnerHtmlValue("playerName");
+    var data = '{ "owner": "' + owner + '", "gameName": "' + gameName + '" }';
     callApi("/game", "post", data, createGameResponseHandler);
   }
   function createGameResponseHandler(response) {
@@ -107,7 +113,10 @@ function listGames() {
   function startGameResponseHandler(response) {
     console.log("startGameResponseHandler(): " + JSON.stringify(response.data));
     hide("startGameDiv");
-    show("pickFirstPlayerDiv");
+    var myColor = getInnerHtmlValue("myColor");
+    if (myColor == response.data.ownerColor) {
+      show("pickFirstPlayerDiv");
+    }
     refreshGameStatus();
   }
   
@@ -151,11 +160,20 @@ function listGames() {
     show("chooseSecretAgendaDiv");
   }
 
+  function joinGameByRow(gameId, gameName) {
+    selectGameId = document.getElementById("selectGameId");
+    clearOptions(selectGameId);
+    var element = document.createElement("option");
+    element.innerText = gameId + " " + gameName;
+    element.value = gameId;
+    selectGameId.append(element);
+    show("joinGameDiv");
+  }
   function joinGame() {
     var gameId = getSelectedValue("selectGameId");
     var color = getSelectedValue("selectColor");
     var position = getSelectedValue("selectPosition");
-    var name = getValue("playerName");
+    var name = getInnerHtmlValue("playerName");
     var isAi = false;
     if (document.getElementById("isAi").checked) {
       isAi = true;
@@ -170,17 +188,22 @@ function listGames() {
   }
   function joinGameResponseHandler(response) {
       console.log("joinGameResponseHandler(): " + JSON.stringify(response.data));
-  
-      var leftSideDiv = document.getElementById("leftSideDiv");
-      var rightSideDiv = document.getElementById("rightSideDiv");
-      leftSideDiv.style.display = "table-cell";
-      rightSideDiv.style.display = "table-cell"
-      refreshGameStatus();
-      show("statusDiv");
-      hide("gameListDiv");
-      hide("createGameDiv");
-      hide("joinGameDiv");
-      hide("rejoinGameDiv");
+      if (! response.data.isPlayerAi) {
+        var leftSideDiv = document.getElementById("leftSideDiv");
+        var rightSideDiv = document.getElementById("rightSideDiv");
+        leftSideDiv.style.display = "table-cell";
+        rightSideDiv.style.display = "table-cell"
+        refreshGameStatus();
+        show("statusDiv");
+        hide("gameListDiv");
+        hide("createGameDiv");
+        hide("joinGameDiv");
+        hide("rejoinGameDiv");
+      } else {
+        setInnerHtml("gameId", "");
+        listGames();
+        hide("joinGameDiv");
+      }
   }
   
   function rejoinGame(gameId, color) {
@@ -224,4 +247,14 @@ function listGames() {
     console.log("placeTroopResponseHandler(): " + JSON.stringify(response.data));
     hide("placeInitialTroopsDiv");
     refreshGameStatus();  
+  }
+
+  function login() {
+    var playerName = getValue("playerNameInput");
+    if (playerName != undefined && playerName != null && playerName.trim().length > 0) {
+      setInnerHtml("playerName", playerName);
+      hide("login");
+      show("gameListDiv");
+      show("createGameDiv");
+    }
   }

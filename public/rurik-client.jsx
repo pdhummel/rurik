@@ -115,7 +115,10 @@ function refreshGameStatusResponseHandler(response) {
     console.log("refreshGameStatusResponseHandler: currentState=" + currentState + ", currentPlayer=" + currentPlayer + ", myColor=" + myColor);
 
     if (currentState == "waitingForPlayers") {
-      show("startGameDiv");
+      if (gameStatus.ownerColor == myColor) {
+        show("startGameDiv");
+      }
+      
       hide("boatDiv");
       hide("personalCardsDiv");
       hide("supplyDiv");
@@ -127,7 +130,11 @@ function refreshGameStatusResponseHandler(response) {
     }
 
     if (currentState == "waitingForFirstPlayerSelection") {
-      show("pickFirstPlayerDiv");
+      if (myColor == gameStatus.ownerColor) {
+        show("pickFirstPlayerDiv");
+      } else {
+        hide("pickFirstPlayerDiv");  
+      }
     } else {
       hide("pickFirstPlayerDiv");
     }

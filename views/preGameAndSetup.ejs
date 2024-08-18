@@ -1,9 +1,16 @@
-  <div id="gameListDiv">
+  <div id="login">
+    Who are you? <input id="playerNameInput" type="text"><input type="button" value="Login" onclick="javascript:login();"/><br/>
+  </div>
+
+
+
+  <div id="gameListDiv" style="display:none">
+    Hello <span><span id="playerName"></span>!</span><br/><br/>
     <div id="gameListData"></div>
     <br/>
   </div>
 
-  <div id="createGameDiv">
+  <div id="createGameDiv" style="display: none">
     Game Name: <input id="gameName" type="text" />
     <input type="button" value="Create Game" onclick="javascript:createGame();"/><br/>
     <br/>
@@ -11,7 +18,7 @@
 
 
   <div id="joinGameDiv" style="display:none;">
-    Player Name: <input id="playerName" type="text">          
+    <!--Player Name: <input id="playerName" type="text">-->
     <select id="selectGameId"></select>
     <select id="selectColor">
       <option>blue</option>

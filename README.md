@@ -15,16 +15,16 @@ Ultimately this project was built so I could play Rurik against some competant A
 * Miscellaneous
   * fix deed card bonuses - scheme2cards, attackMinusScheme, moveAnywhere
   * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
-  * leader special abilities
+  * add leader special abilities
   * add version info
   * show upcoming advisors on map board
-  * no scheme card option for tavern
+  * add support for scheme card option for building a tavern
 
 * AI
   * ai complete deed cards
   * ai conversion token
   * ai bid money
-  * ai adjacency
+  * ai build adjacency
   * try and compare candidate moves and pick the best
 
 * Game management
@@ -35,13 +35,6 @@ Ultimately this project was built so I could play Rurik against some competant A
   * load game
 
 * Table/game setup
-  * game status -- show players joined before 
-  * game creator - 
-    * create and join game in one action
-    * only creator can start game
-    * only creator can assign first player
-    * join - game dropdown -- show only games waitingForPlayers
-  * join from list
   * join game -- only show available positions in dropdown
   * join game -- only show available colors in dropdown  
 

@@ -1,5 +1,11 @@
 # Rurik Changelog
 
+## 2024-08-17 - v0.5.1.0 - game setup enhancements.
+* Table/game setup
+  * game creator - 
+    * only creator can start game
+    * only creator can assign first player
+  * join from list
 
 ## 2024-08-13 - v0.5.0.3 - secret agenda scoring.
 * end game secret agenda evaluation

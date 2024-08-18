@@ -43,7 +43,7 @@ rest() {
 
 
 echo "Creating game"
-new_game_response=$(rest "${server}/game" POST '{"gameName": "Pauls Game"}')
+new_game_response=$(rest "${server}/game" POST '{"owner": "Paul", "gameName": "Pauls Game"}')
 game_id=$(echo ${new_game_response} | jq -r '.id')
 
 

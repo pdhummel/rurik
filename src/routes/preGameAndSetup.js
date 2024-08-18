@@ -22,10 +22,14 @@ app.get('/game', (req, res) => {
         res.status(400).send({"error": "Game name is required."});
         return;
     }
-  
+    var owner = req.body.owner;
+    if (owner == undefined || owner.length < 1) {
+      res.status(400).send({"error": "Player owner is required."});
+      return;
+    }
     var gameStatus = null;
     try {
-        gameStatus = games.createGame(name, targetPlayers);
+        gameStatus = games.createGame(name, owner, targetPlayers);
     } catch(error) {
         console.log(error.message);
         res.status(400).send(error.message);
@@ -71,6 +75,7 @@ app.get('/game', (req, res) => {
       var isAiValue = req.body.isAi;
       if (isAiValue == "true" || isAiValue == true) {
         isAi = true;
+        name = "Ai-" + color;
       }
       game.joinGame(name, color, position, isAi);
 

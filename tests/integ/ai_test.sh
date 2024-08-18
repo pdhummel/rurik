@@ -2,6 +2,9 @@
 set -e
 
 server=http://localhost:3000
+#server=http://localhost:8080
+#server=https://real-parts-run.loca.lt/
+#server=https://c409-174-87-173-45.ngrok-free.app
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 pushd ${SCRIPT_DIR} > /dev/null
@@ -9,7 +12,7 @@ source ./rest.sh
 popd  > /dev/null
 
 #echo "Creating game"
-new_game_response=$(rest "${server}/game" POST '{"gameName": "AI Game"}')
+new_game_response=$(rest "${server}/game" POST '{"owner": "AI-blue", "gameName": "AI Game"}')
 game_id=$(echo ${new_game_response} | jq -r '.id')
 echo "Created game ${game_id}"
 

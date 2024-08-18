@@ -23,9 +23,9 @@ class Games {
         return Games.self;
     }
 
-    createGame(name, targetNumberOfPlayers, password=null) {
+    createGame(name, owner, targetNumberOfPlayers, password=null) {
         var gameStatus = null;
-        var game = new Game(name, targetNumberOfPlayers, password);
+        var game = new Game(name, owner, targetNumberOfPlayers, password);
         console.log("createGame(): gameId=" + game.id);
         this.games[game.id] = game;
         gameStatus = new GameStatus(game, null);
@@ -102,8 +102,9 @@ class Games {
 class Game {
     
     // validate targetNumberOfPlayers
-    constructor(gameName, targetNumberOfPlayers=4, password="") {
+    constructor(gameName, owner, targetNumberOfPlayers=4, password="") {
         this.log = new GameLog(this);
+        this.owner= owner;
         this.currentRound = 1;
         this.auctionBoard = null;
         this.gameMap = new GameMap();
@@ -1829,6 +1830,7 @@ class GameStatus {
         this.gameId = game.id;
         this.id = game.id;
         this.gameName = game.name;
+        this.owner = game.owner;
         this.name = game.name;
         this.playerNames = "";
         this.currentPlayer = null;
@@ -1844,6 +1846,9 @@ class GameStatus {
         this.playersByPosition = game.players.playersByPosition;
         for (var i=0; i<this.numberOfPlayers; i++) {
             this.playerNames = this.playerNames + " " + game.players.players[i].name;
+            if (game.players.players[i].name == this.owner) {
+                this.ownerColor = game.players.players[i].color;
+            }
         }
         if (firstPlayer != undefined && firstPlayer != null) {
             this.firstPlayer = firstPlayer.color;
