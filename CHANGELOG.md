@@ -1,5 +1,10 @@
 # Rurik Changelog
 
+## 2024-08-24 - v0.5.1.2 - package binary.
+* Added code to package binary.
+* Fix file permissions on assets.
+* Refactored server.js.
+
 ## 2024-08-24 - v0.5.1.1 - fix scheme bug.
 * Fixed scheme bug where scheme deck selection was not displaying.
 * Added Leave Game button.
