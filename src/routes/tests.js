@@ -147,5 +147,23 @@ app.put('/test/game/:id/player/:color/coin', (req, res) => {
     res.send(player);
   });
 
+  app.put('/test/game/:id/state', (req, res) => {
+    console.log("put " + req.path + " " + req.params);
+    var game = games.getGameById(req.params.id);
+    if (game === undefined) {
+      res.status(404).send({"error": "Game not found"});
+      return;
+    }
+    
+    var state = req.body.state;
+    if (state == undefined || state == null || state.length < 1) {
+      res.status(404).send({"error": "state is required"});
+      return;
+    }    
+    game.gameStates.setCurrentState(state);
+    var gameStatus = games.getGameStatus(req.params.id);
+    res.send(gameStatus);
+  });
+
 
 module.exports = app;

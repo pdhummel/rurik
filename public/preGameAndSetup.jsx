@@ -75,6 +75,7 @@
     setInnerHtml("gameId", gameId);
     setInnerHtml("myName", name);
     setInnerHtml("myColor", color);
+    show("gameInProgressDiv")
   }
 
   function deleteGame(gameId) {
@@ -219,16 +220,12 @@
         leftSideDiv.style.display = "table-cell";
         rightSideDiv.style.display = "table-cell"
         refreshGameStatus();
+        show("gameInProgressDiv");
         show("statusDiv");
         hide("gameListDiv");
         hide("createGameDiv");
         hide("joinGameDiv");
         hide("rejoinGameDiv");
-      //} else {
-      //  setInnerHtml("gameId", "");
-      //  listGames();
-      //  hide("joinGameDiv");
-      //}
   }
   
   function rejoinGame(gameId, color) {
@@ -248,6 +245,7 @@
       rightSideDiv.style.display = "table-cell";
       refreshGameStatus();
       setInnerHtml("myName", name);
+      show("gameInProgressDiv");
       show("statusDiv");
       hide("gameListDiv");
       hide("createGameDiv");

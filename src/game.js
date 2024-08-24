@@ -215,6 +215,7 @@ class Game {
             if (cardName == currentPlayer.temporarySecretAgenda[i].name) {
                 currentPlayer.secretAgenda.push(currentPlayer.temporarySecretAgenda[i]);
                 currentPlayer.temporarySecretAgenda = [];
+                this.log.info(color + " chose secret agenda");
                 break;
             }
         }
@@ -433,6 +434,7 @@ class Game {
                 console.log("drawSchemeCards(): Warning null card: schemeCardsToDraw=1");
                 this.gameStates.setCurrentState("actionPhase");
             } else {
+                currentPlayer.temporarySchemeCards = [];
                 currentPlayer.temporarySchemeCards.push(card);
                 this.selectSchemeCardToKeep(color, card);
             }
@@ -462,18 +464,12 @@ class Game {
         var currentPlayer = this.validateCurrentPlayer(color, "selectSchemeCardToKeep");
         console.log("selectSchemeCardToKeep():", color, schemeCard, currentPlayer.temporarySchemeCards.length, currentPlayer.canKeepSchemeCard);
         if (currentPlayer.temporarySchemeCards.length < 1 || ! currentPlayer.canKeepSchemeCard) {
+            console.log("Warning: there were no temporarySchemeCards");
+            this.gameStates.setCurrentState("actionPhase");
             this.throwError("You have no scheme cards to keep.", "selectSchemeCardToKeep");
         }
-        var tempCards = [];
-        for (var i=0; i<currentPlayer.temporarySchemeCards.length; i++) {
-            if (schemeCard.isEqual(currentPlayer.temporarySchemeCards[i])) {
-                currentPlayer.schemeCards.push(currentPlayer.temporarySchemeCards[i]);
-                currentPlayer.canKeepSchemeCard = false;
-            } else {
-                tempCards.push(currentPlayer.temporarySchemeCards[i]);
-            }
-        }                
-        currentPlayer.temporarySchemeCards = tempCards;
+        currentPlayer.schemeCards.push(currentPlayer.temporarySchemeCards[0]);
+        currentPlayer.temporarySchemeCards = [];
         if (currentPlayer.temporarySchemeCards.length < 1) {
             this.log.info(color + " finished selecting a scheme card.");
             this.gameStates.setCurrentState("actionPhase");

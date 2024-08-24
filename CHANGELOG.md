@@ -1,5 +1,11 @@
 # Rurik Changelog
 
+## 2024-08-24 - v0.5.1.1 - fix scheme bug.
+* Fixed scheme bug where scheme deck selection was not displaying.
+* Added Leave Game button.
+* Added hack to set the currentState.
+* Added more integration test code.
+
 ## 2024-08-17 - v0.5.1.0 - game setup enhancements.
 * Table/game setup
   * game creator - 

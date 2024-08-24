@@ -32,26 +32,29 @@
       <!-- rightSideDiv style set in javascript preGameAndSetup.jsx -->
       <div id="rightSideDiv" style="display: table-cell; height:700px; vertical-align: top; background-size: cover; background-repeat: no-repeat; background-image: url('/assets/snow-castle.png');" >
         <%- include('gameStatus.ejs') %>
-        <%- include('gameStatus.ejs') %>
         
         <%- include('preGameAndSetup.ejs') %>
 
-        <%- include('actionPhase.ejs') %>
+        <div id="gameInProgressDiv">
 
-        <%- include('personalCards.ejs') %>
+          <%- include('actionPhase.ejs') %>
 
-        <%- include('gameCards.ejs') %>
-        
-        <%- include('strategyboard.ejs') %>
+          <%- include('actionButtons.ejs') %>
 
-        <%- include('claimboard.ejs') %>
+          <%- include('personalCards.ejs') %>
 
-        <%- include('boatAndSupply.ejs') %>
+          <%- include('gameCards.ejs') %>
+          
+          <%- include('strategyboard.ejs') %>
 
-        <%- include('gameLog.ejs') %>
+          <%- include('claimboard.ejs') %>
 
-        <%- include('endGame.ejs') %>
+          <%- include('boatAndSupply.ejs') %>
 
+          <%- include('gameLog.ejs') %>
+
+          <%- include('endGame.ejs') %>
+        </div>
     </div>
   </div>
 

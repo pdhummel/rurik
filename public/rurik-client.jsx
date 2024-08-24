@@ -119,11 +119,13 @@ function refreshGameStatusResponseHandler(response) {
         show("startGameDiv");
       }
       
+      hide("actionButtonsDiv");
       hide("boatDiv");
       hide("personalCardsDiv");
       hide("supplyDiv");
     } else {
       hide("startGameDiv");
+      show("actionButtonsDiv");
       show("boatDiv");
       show("personalCardsDiv");
       show("supplyDiv");
@@ -206,6 +208,9 @@ function refreshGameStatusResponseHandler(response) {
       show("schemeFirstPlayerDiv");
       show("pickSchemeDeckDiv");
       setInnerHtml("pickFirstPlayer", "1");
+    } else if (currentState == "drawSchemeCards" && currentPlayer == myColor) {
+      hide("schemeFirstPlayerDiv");
+      show("pickSchemeDeckDiv");
     } else {
       hide("schemeFirstPlayerDiv");
       hide("pickSchemeDeckDiv");
@@ -621,4 +626,19 @@ function showSecretAgendasHandler(response) {
   var secretAgendaDiv = document.getElementById("allSecretAgendasDiv");
   secretAgendaDiv.innerHTML = "";
   secretAgendaDiv.appendChild(table);
+}
+
+function leaveGame() {
+  setInnerHtml("gameId", "");
+  setInnerHtml("myColor", "");
+  hide("statusDiv");
+  hide("gameInProgressDiv");
+  // <div id="rightSideDiv" style="display: table-cell; height:700px; vertical-align: top; background-size: cover; background-repeat: no-repeat; background-image: url('/assets/snow-castle.png');" ></div>
+  var rightSideDiv = document.getElementById("rightSideDiv");
+  // <div id="leftSideDiv" style="display: none; width: 5%; position:relative; top: 0; left: 0; z-index: 1 ">
+  var leftSideDiv = document.getElementById("leftSideDiv");
+  leftSideDiv.style.display = "none";
+  show("gameListDiv");
+  show("createGameDiv");
+  listGames();
 }

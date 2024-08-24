@@ -817,6 +817,7 @@ class Ai {
     }
 
     drawSchemeCards(game, player) {
+        console.log("ai drawSchemeCards(): player=" + player.color);
         var r = Math.floor(Math.random() * 2);
         var schemeDeck = r + 1;
         game.drawSchemeCards(player.color, schemeDeck);
@@ -826,8 +827,10 @@ class Ai {
         while (player.temporarySchemeCards.length > 0) {
             var schemeCard = player.temporarySchemeCards[0];
             if (player.temporarySchemeCards.length == 1) {
+                console.log("ai selectSchemeCard() keep: player=" + player.color + " " + schemeCard.id);
                 game.selectSchemeCardToKeep(player.color, schemeCard);
             } else {
+                console.log("ai selectSchemeCard() return: player=" + player.color + " " + schemeCard.id);
                 game.selectSchemeCardToReturn(player.color, player.returnSchemeDeck, schemeCard.id)
             }            
         }

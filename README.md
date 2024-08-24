@@ -47,7 +47,6 @@ Ultimately this project was built so I could play Rurik against some competant A
   * place building from supply to anywhere
   * take scheme card from deck
   * set round
-  * set phase
   * set current player
   * scheme
   * remove advisor

@@ -53,7 +53,7 @@ if [ "${currentState}" != "endGame" ];then
   exit 1
 else
   echo "Game ${game_id} completed"
-  r=$(rest "${server}/test/game/${game_id}" DELETE)
+  #r=$(rest "${server}/test/game/${game_id}" DELETE)
 fi
 
 
