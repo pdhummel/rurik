@@ -586,6 +586,7 @@ function refreshLogHandler(response) {
   var textArea = document.getElementById("gameLogTextArea");
   var lines = response.data;
   for (var i=0; i < lines.length; i++) {
+    //textArea.value = lines[i].timeStamp + " [" + lines[i].gameId + "] " + lines[i].text + "\r\n" + textArea.value;
     textArea.value = lines[i].timeStamp + " " + lines[i].text + "\r\n" + textArea.value;
   }
 }
@@ -631,6 +632,12 @@ function showSecretAgendasHandler(response) {
 function leaveGame() {
   setInnerHtml("gameId", "");
   setInnerHtml("myColor", "");
+  var gameLogTextArea = document.getElementById("gameLogTextArea");
+  gameLogTextArea.value = "";
+  var deedCardsDiv = document.getElementById("myDeedCardsDiv");
+  deedCardsDiv.innerHTML = "";
+  var mySecretAgendaCardDiv = document.getElementById("mySecretAgendaCardDiv");
+  mySecretAgendaCardDiv.innerHTML = "";
   hide("statusDiv");
   hide("gameInProgressDiv");
   // <div id="rightSideDiv" style="display: table-cell; height:700px; vertical-align: top; background-size: cover; background-repeat: no-repeat; background-image: url('/assets/snow-castle.png');" ></div>

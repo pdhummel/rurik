@@ -162,14 +162,16 @@ class ClaimBoard {
         return totalClaimPoints;
     }
 
-    updateClaimsForClaimsPhase(players, gameMap) {
+    updateClaimsForClaimsPhase(game, players, gameMap) {
         for (var p=0; p < players.length; p++) {
             var player = players[p];
+            // Coin compensation logic is done by players.endRoundForPlayers() - see calculateCoins().
             var coinCompensation = this.updateClaims(player, gameMap);
-            if (this.claimsByPlayer[player.color]["warfare"] <= 0) {
-                coinCompensation++;
-            }
-            player.boat.money = player.boat.money + coinCompensation;
+            //if (this.claimsByPlayer[player.color]["warfare"] <= 0) {
+            //    coinCompensation++;
+            //}
+            //player.boat.money = player.boat.money + coinCompensation;
+            //game.log.info(player.color + " received " + coinCompensation + " money from claim tracks.");
         }
         this.resetClaimsByTrack();
         this.updateClaimsByTrack();

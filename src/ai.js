@@ -205,8 +205,12 @@ class Ai {
         */
 
         var takeAction = true;
-        //while (takeAction) {
+        while (takeAction) {
             takeAction = false;
+            if (player.deedCards.length > 0 && player.accomplishedDeedForTurn == false && 
+                game.currentRound >= 3) {
+                this.playDeedCard(game, player);
+            }
             if (player.schemeCards.length > 0 && player.schemeCardsCanPlay > 0) {
                 this.playSchemeCard(game, player);
             }
@@ -234,8 +238,8 @@ class Ai {
                 if (this.build(game, player)) {
                     takeAction = true;
                 }
-            }    
-        //}
+            }
+        }
         // Determine candidate actions.
         // For each candidate action
             // Clone the game
@@ -251,13 +255,169 @@ class Ai {
     playSchemeCard(game, player) {
         console.log("ai playSchemeCard(): player=" + player.color);
         var color = player.color;
-        // For now, just play the first scheme car available which won't be too smart,
+        // For now, just play the first scheme card available which won't be too smart,
         // but better than holding the cards for the whole game.
         if (player.boat.money >= 3) {
             var r = Math.floor(Math.random() * player.schemeCards.length);
             if (player.schemeCards[r].rewards.indexOf("deedCard") < 0) {
                 game.beginActionPhaseAction(color, "schemeAction");
                 game.playSchemeCard(color, player.schemeCards[r].id, null);    
+            }
+        }
+    }
+
+    playDeedCard(game, player) {
+        console.log("ai playDeedCard(): player=" + player.color);
+        for (var i=0; i<player.deedCards.length; i++) {
+            var deedCard = player.deedCards[i];
+            var canFulfill = false;
+            if (deedCard.accomplished) {
+                continue;
+            }
+            if (deedCard.canAi) {
+                console.log("ai playDeedCard(): player=" + player.color + ", deedCard=" + deedCard.name);
+                canFulfill = true;
+                var rebels = player.boat.capturedRebels;
+                var money = player.boat.money;
+                var stone = player.boat.goodsOnDock["stone"];
+                var wood = player.boat.goodsOnDock["wood"];
+                var fish = player.boat.goodsOnDock["fish"];
+                var honey = player.boat.goodsOnDock["honey"];
+                var fur = player.boat.goodsOnDock["fur"];
+                var tradeBoon = player.boat.goodsOnDock["tradeBoon"];
+                var schemeCards = player.schemeCards;
+
+                var costs = deedCard.costs;
+                for (var c=0; c<costs.length; c++) {
+                    if (costs[c] == "coin") {
+                        if (money < 1) {
+                            console.log("ai playDeedCard(): can't pay a coin");
+                            canFulfill = false;
+                            break;    
+                        } else {
+                            console.log("ai playDeedCard(): can pay a coin");
+                            money--;
+                        }
+                    } else if (costs[c] == "wood") {
+                        if (wood < 1) {
+                            console.log("ai playDeedCard(): can't pay wood");
+                            canFulfill = false;
+                            break;
+                        } else {
+                            wood--;
+                        }
+                    } else if (costs[c] == "stone") {
+                        if (stone < 1) {
+                            console.log("ai playDeedCard(): can't pay stone");
+                            canFulfill = false;
+                            break;
+                        } else {
+                            stone--;
+                        }
+                    } else if (costs[c] == "fish") {
+                        if (fish < 1) {
+                            console.log("ai playDeedCard(): can't pay fish");
+                            canFulfill = false;
+                            break;
+                        } else {
+                            fish--;
+                        }
+                    } else if (costs[c] == "honey") {
+                        if (honey < 1) {
+                            console.log("ai playDeedCard(): can't pay honey");
+                            canFulfill = false;
+                            break;
+                        } else {
+                            honey--;
+                        }
+                    } else if (costs[c] == "fur") {
+                        if (fur < 1) {
+                            console.log("ai playDeedCard(): can't pay fur");
+                            canFulfill = false;
+                            break;
+                        } else {
+                            fur--;
+                        }
+                    } else if (costs[c] == "schemeCard") {
+                        if (schemeCards.length < 1) {
+                            console.log("ai playDeedCard(): can't pay a schemeCard");
+                            canFulfill = false;
+                            break;
+                        } else {
+                            var schemeCard = schemeCards.pop();
+                            // TODO: The scheme card should only be put on the discard pile, if canFulfill.
+                            // discardSchemeCard(schemeCard);
+                        }
+                    } else if (costs[c] == "resource") {
+                        var canPay = false;
+                        if (tradeBoon > 0) {
+                            tradeBoon--;
+                            canPay = true;
+                        } else if (stone > 0) {
+                            stone--;
+                            canPay = true;
+                        } else if (wood > 0) {
+                            wood--;
+                            canPay = true;
+                        } else if (fish > 0) {
+                            fish--;
+                            canPay = true;
+                        } else if (honey > 0) {
+                            honey--;
+                            canPay = true;
+                        } else if (fur > 0) {
+                            fur--;
+                            canPay = true;
+                        }
+                        if (! canPay) {
+                            console.log("ai playDeedCard(): can't pay a resource");
+                            canFulfill = false;
+                            break;
+                        }
+                    } else {
+                        console.log("ai playDeedCard(): can't pay " + costs[c]);
+                        canFulfill = false;
+                        break;
+                    }
+                }
+                console.log("ai playDeedCard(): canFulfill=" + canFulfill + ", player=" + player.color + ", deedCard=" + deedCard);
+                if (canFulfill) {
+                    console.log("ai playDeedCard(): check achievements, player=" + player.color + ", deedCard=" + deedCard);
+                    var achievements = deedCard.achievements;
+                    for (var a=0; a < achievements.length; a++) {
+                        if (achievements[a] == "defeatRebel") {
+                            if (rebels < 1) {
+                                canFulfill = false;
+                                break;
+                            } else {
+                                rebels--;
+                            }
+                        } else if (achievements[a] == "firstPlayer") {
+                            if (! player.isNextFirstPlayer) {
+                                canFulfill = false;
+                                break;
+                            }
+                        } else {
+                            canFulfill = false;
+                            break;
+                        }
+                    }
+                }
+                if (canFulfill) {
+                    console.log("ai playDeedCard(): canFulfill, player=" + player.color + ", deedCard=" + deedCard);
+                    player.boat.capturedRebels = rebels;
+                    player.boat.money = money;
+                    player.boat.goodsOnDock["stone"] = stone;
+                    player.boat.goodsOnDock["wood"] = wood;
+                    player.boat.goodsOnDock["fish"] = fish;
+                    player.boat.goodsOnDock["honey"] = honey;
+                    player.boat.goodsOnDock["fur"] = fur;
+                    player.boat.goodsOnDock["tradeBoon"] = tradeBoon;
+                    player.schemeCards = schemeCards;
+                    game.accomplishAndRedeemDeed(player, deedCard);
+                    break;    
+                }
+
             }
         }
     }
@@ -799,15 +959,32 @@ class Ai {
         return decisionValue;
     }
 
+    getPreferredDeedCard(game) {
+        var preferred = 0;
+        for (var i=0; i<3 ; i++) {
+            var deedCard = game.cards.displayedDeedCards[i];
+            if (deedCard.canAi) {
+                preferred = i;
+                break;
+            }
+        }
+        var deedCardName = game.cards.displayedDeedCards[preferred].name;
+        return deedCardName;
+    }
+
     takeDeedCard(game, player) {
         console.log("ai takeDeedCard(): player=" + player.color);
         var color = player.color;
-        var deedCardName = game.cards.displayedDeedCards[0].name;
+        var deedCardName = this.getPreferredDeedCard(game);
         game.takeDeedCard(color, deedCardName)
     }
 
     takeDeedCardForActionPhase(game, player) {
+        console.log("ai takeDeedCardForActionPhase(): player=" + player.color);
         game.gameStates.setCurrentState("actionPhase");
+        var color = player.color;
+        var deedCardName = this.getPreferredDeedCard(game);
+        game.takeDeedCard(color, deedCardName)
     }
 
     schemeFirstPlayer(game, player) {

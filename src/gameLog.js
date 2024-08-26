@@ -24,9 +24,12 @@ class GameLog {
 
     getEntriesAfterTimestamp(ts) {
         var entries = [];
+        var firstMatch = false;
         for (var i=0; i<this.entries.length; i++) {
             var entry = this.entries[i];
-            if (entry.timeStamp > ts) {
+            if (entry.timeStamp == ts && !firstMatch) {
+                firstMatch = true;
+            } else if (entry.timeStamp >= ts) {
                 entries.push(entry);
             }
         }
@@ -50,6 +53,7 @@ class Entry {
     constructor(text, game) {
         this.timeStamp = Date.now();
         this.text = text;
+        this.gameId = game.id;
         if (game != undefined && game != null) {
             this.round = game.currentRound;
             var player = game.players.getCurrentPlayer();

@@ -58,6 +58,25 @@ Ultimately this project was built so I could play Rurik against some competant A
 
 
 ## Build and Deploy
+### Local setup with nodejs
+```
+# assume nodejs + npm is installed
+cd rurik
+npm install
+# optionally, build binary
+npm run build
+# run from source
+nodejs ./src/routes/server.js
+# In a browser: http://localhost:3000
+```
+
+### Local binary
+```
+# download binary from github or locally build binary as above
+./rurik-server-linux
+# In a browser: http://localhost:3000
+```
+
 ### Local setup with docker
 ```
 # assume docker is installed and running
@@ -65,18 +84,10 @@ docker kill rurik
 docker rm rurik
 docker build -f ./docker/Dockerfile -t nodejs-rurik .
 docker run -d --name rurik -p 3000:3000 -d nodejs-rurik
-docker exec -it  rurik bash
+#docker exec -it  rurik bash
 # In a browser: http://localhost:3000
 ```
 
-### Local setup with nodejs
-```
-# assume nodejs + npm is installed
-cd rurik
-npm install
-nodejs ./src/routes/server.js
-# In a browser: http://localhost:3000
-```
 
 ### Server setup with podman on RedHat flavored linux
 ```

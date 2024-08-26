@@ -1,5 +1,13 @@
 # Rurik Changelog
 
+## 2024-08-25 - v0.5.1.4 - Bug fixes
+* Fix case at end of round where AI would not progress the game.
+* Don't allow deed cards to be accomplished more than once.
+
+## 2024-08-25 - v0.5.1.3 - AI improvements
+* AI can complete some deed cards
+* bug: Clear the Game Log with "Leave Game"
+
 ## 2024-08-24 - v0.5.1.2 - package binary.
 * Added code to package binary.
 * Fix file permissions on assets.

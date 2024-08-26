@@ -8,8 +8,15 @@ function refreshPlayer() {
         callApi('/game/' + gameId + '/player/' + color, "get", "", refreshPlayerResponseHandler);
       } 
     }
-
   }
+  function refreshPlayerResponseHandler(response) {
+    console.log("refreshPlayerResponseHandler(): " + JSON.stringify(response.data));
+    var color = response.data.color;
+    this.refreshPlayerAdvisors(response);
+    this.refreshPlayerBoatAndSupply(response);
+    this.refreshPlayerCards(response);
+  }
+
   function selectPlayerBoatChanged() {
     var gameId = getInnerHtmlValue("gameId");
     var color = getSelectedValue("selectPlayerBoat");
@@ -37,13 +44,6 @@ function refreshPlayer() {
     document.getElementById("troopImage").src = "/assets/troop-" + color + ".png";
   }
 
-  function refreshPlayerResponseHandler(response) {
-    console.log("refreshPlayerResponseHandler(): " + JSON.stringify(response.data));
-    var color = response.data.color;
-    this.refreshPlayerAdvisors(response);
-    this.refreshPlayerBoatAndSupply(response);
-    this.refreshPlayerCards(response);
-  }
   
   function refreshPlayerAdvisors(response) {
     console.log("refreshPlayerAdvisors(): " + JSON.stringify(response.data));
@@ -107,7 +107,7 @@ function refreshPlayer() {
     }
     var table = createTable(rows, ["Name", "VPs", "Description", "Reward", "Accomplished?"], "white");
     var accomplishTable = createTable(accomplishRows, ["", "Name", "VPs", "Description", "Reward"], "white");
-    deedCardsDiv.appendChild(table);  
+    deedCardsDiv.appendChild(table);
     playDeedCardChoices.appendChild(accomplishTable);
     show("myDeedCardsDiv");
 

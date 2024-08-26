@@ -16,21 +16,21 @@ class Cards {
         var shuffledDeedCardDeck = [];
 
         // These have simple costs to fulfill
-        this.addDeedCard("Generous Prince", 1, "Pay 4 coins.", ["muster", "muster"], ["coin", "coin", "coin", "coin"], []);
-        this.addDeedCard("Splendid Feast", 1, "Pay fish, honey, 2 coins.", ["scheme2cards"], ["fish", "honey", "coin", "coin"], []);
-        this.addDeedCard("Send Gifts", 1, "Pay fish, fur, 2 coins.", ["move", "move"], ["fish", "fur", "coin", "coin"], []);
-        this.addDeedCard("Wilderness Forts", 1, "Pay stone, fur, wood.", ["build"], ["stone", "fur", "wood"], []);
-        this.addDeedCard("Hire Mercenaries", 1, "Pay fish, stone, 2 coins.", ["attackMinusScheme"], ["fish", "stone", "coin", "coin"], []);
+        this.addDeedCard("Generous Prince", 1, "Pay 4 coins.", ["muster", "muster"], ["coin", "coin", "coin", "coin"], [], true, true);
+        this.addDeedCard("Splendid Feast", 1, "Pay fish, honey, 2 coins.", ["scheme2cards"], ["fish", "honey", "coin", "coin"], [], true, true);
+        this.addDeedCard("Send Gifts", 1, "Pay fish, fur, 2 coins.", ["move", "move"], ["fish", "fur", "coin", "coin"], [], true, true);
+        this.addDeedCard("Wilderness Forts", 1, "Pay stone, fur, wood.", ["build"], ["stone", "fur", "wood"], [], true, true);
+        this.addDeedCard("Hire Mercenaries", 1, "Pay fish, stone, 2 coins.", ["attackMinusScheme"], ["fish", "stone", "coin", "coin"], [], true, true);
 
         // These are cost based, but requires decision for which resource to pay.
         this.addDeedCard("Trade Route", 1, "Pay 3 different resources.", ["coin", "coin"], {"differentResource":["resource", "resource", "resource"]}, []);
-        this.addDeedCard("Reward Laborers", 1, "Pay 2 resources and 2 coins.", ["scheme2Cards"], ["resource", "resource", "coin", "coin"], []);
+        this.addDeedCard("Reward Laborers", 1, "Pay 2 resources and 2 coins.", ["scheme2Cards"], ["resource", "resource", "coin", "coin"], [], true, true);
         this.addDeedCard("Hoard", 1, "Pay 3 of the same resource.", ["scheme2Cards"], {"sameResource":["resource", "resource", "resource"]}, []);
 
         // These require decisions for sacrificing scheme card, buildings, or troops.
-        this.addDeedCard("Great Library", 1, "Pay a scheme card and stone.", ["build"], ["schemeCard", "stone"], []);
-        this.addDeedCard("Master Beekeeper", 2, "Pay a scheme card and 2 honey.", ["build"], ["schemeCard", "honey", "honey"], []);
-        this.addDeedCard("Honorable Prince", 1, "Pay a scheme card and 3 coin.", ["muster", "muster"], ["schemeCard", "coin", "coin", "coin"], []);
+        this.addDeedCard("Great Library", 1, "Pay a scheme card and stone.", ["build"], ["schemeCard", "stone"], [], true, true);
+        this.addDeedCard("Master Beekeeper", 2, "Pay a scheme card and 2 honey.", ["build"], ["schemeCard", "honey", "honey"], [], true, true);
+        this.addDeedCard("Honorable Prince", 1, "Pay a scheme card and 3 coin.", ["muster", "muster"], ["schemeCard", "coin", "coin", "coin"], [], true, true);
         this.addDeedCard("New Beginning", 1, "Sacrifice market, stronghold, and church.", ["tax", "tax"], ["market", "stronghold", "church"], []);
         this.addDeedCard("Retire Veterans", 1, "Remove 2 troops and pay 2 coins.", ["scheme2Cards"], ["troop", "troop", "coin", "coin"], []);
         this.addDeedCard("Victory March", 1, "Remove 2 troops and pay a scheme card.", ["moveAnywhere", "moveAnywhere"], ["schemeCard", "troop", "troop"], []);
@@ -38,22 +38,22 @@ class Cards {
         this.addDeedCard("Border Patrols", 1, "Remove 3 troops from different regions.", ["moveAnywhere", "moveAnywhere"], {"differentRegions":["troop", "troop", "troop"]}, []);
 
         // These include some achievements which must be fulfilled and may also have costs.
-        this.addDeedCard("Enforce Peace", 1, "Pay wood and honey and defeat 2 rebels.", ["attackMinusScheme"], ["wood", "honey"], ["defeatRebel", "defeatRebel"]);
-        this.addDeedCard("Law Giver", 1, "Pay 2 coins and defeat 3 rebels.", ["scheme2Cards"], ["coin", "coin"], ["defeatRebel", "defeatRebel", "defeatRebel"]);
+        this.addDeedCard("Enforce Peace", 1, "Pay wood and honey and defeat 2 rebels.", ["attackMinusScheme"], ["wood", "honey"], ["defeatRebel", "defeatRebel"], true, true);
+        this.addDeedCard("Law Giver", 1, "Pay 2 coins and defeat 3 rebels.", ["scheme2Cards"], ["coin", "coin"], ["defeatRebel", "defeatRebel", "defeatRebel"], true, true);
         this.addDeedCard("Mead Brewery", 1, "Pay honey and build 2 taverns.", ["tax"], ["honey"], ["tavern", "tavern"]);
         this.addDeedCard("Establish Fortress", 1, "Pay 2 wood and build a stronghold and church in a region.", ["scheme2Cards"], ["wood", "wood"], {"sameRegion":["stronghold", "church"]});
         this.addDeedCard("Besiege Citadel", 1, "Pay 2 coins and rule a region with a stronghold.", ["warTrack"], {"sameRegion":["rule", "stronghold"]});
-        this.addDeedCard("Horse Breeder", 1, "Pay wood and build 2 stables.", ["muster"], ["wood"], ["muster", "muster"]);
+        this.addDeedCard("Horse Breeder", 1, "Pay wood and build 2 stables.", ["muster"], ["wood"], ["stable", "stable"]);
         this.addDeedCard("Conquest", 1, "Rule 3 regions.", ["move", "move"], [], ["rule", "rule", "rule"]);
         this.addDeedCard("Amass Forces", 1, "Have 6 troops in a region.", ["move"], [], {"sameRegion":["troop", "troop", "troop", "troop", "troop", "troop"]});
         this.addDeedCard("Tithe Payments", 1, "Have 3 churches in adjacent regions.", ["coin", "coin", "coin"], [], {"adjacentRegions":["church", "church", "church"]});
         this.addDeedCard("Dispatch Messengers", 2, "Have troops in 8 regions.", ["muster", "muster"], [], {"differentRegions":["troop","troop","troop","troop","troop","troop","troop","troop"]});
-        this.addDeedCard("Create Republic", 2, "Rule Novgorod, Chernigov, Volyn.", ["tax"], [], {"rule":["Novgorod", "Chernigov", "Volyn"]});
-        this.addDeedCard("Distant Rule", 2, "Rule Pereyaslavl, Polotsk, Rostov.", ["warTrack"], [], {"rule":["Pereyaslavl", "Polotsk", "Rostov"]});
+        this.addDeedCard("Create Republic", 2, "Rule Novgorod, Chernigov, Volyn.", ["tax"], [], {"rule":["Novgorod", "Chernigov", "Volyn"]}, true, false);
+        this.addDeedCard("Distant Rule", 2, "Rule Pereyaslavl, Polotsk, Rostov.", ["warTrack"], [], {"rule":["Pereyaslavl", "Polotsk", "Rostov"]}, true, false);
         this.addDeedCard("Market Day", 2, "Have 3 markets with different resources.", ["scheme2Cards"], [], {"differentResources":["market", "market", "market"]});
         this.addDeedCard("Defensive Belt", 1, "Have 3 strongholds in adjacent regions.", ["attackMinusScheme"], [], {"adjacentRegions":["stronghold", "stronghold", "stronghold"]});
         this.addDeedCard("Capital City", 2, "Have a market, stronghold, and church in a single region.", ["tax"], [], {"sameRegion":["market", "stronghold", "church"]});
-        this.addDeedCard("Grand Hunter", 2, "Pay 2 fur and have the first player token.", ["move"], ["fur", "fur"], ["firstPlayer"]);
+        this.addDeedCard("Grand Hunter", 2, "Pay 2 fur and have the first player token.", ["move"], ["fur", "fur"], ["firstPlayer"], true, true);
 
 
         // shuffle the deed cards
@@ -74,8 +74,8 @@ class Cards {
         this.displayedDeedCards.push(card);
     }
 
-    addDeedCard(name, victoryPoints, requirementText, rewards=[], costs=[], achievements=[], canSolo=true) {
-        var card = new DeedCard(name, victoryPoints, requirementText, rewards, costs, achievements, canSolo);
+    addDeedCard(name, victoryPoints, requirementText, rewards=[], costs=[], achievements=[], canSolo=true, canAi=false) {
+        var card = new DeedCard(name, victoryPoints, requirementText, rewards, costs, achievements, canSolo, canAi);
         this.allDeedCards[name] = card;
         this.deedCardDeck.push(card);
     }
@@ -351,14 +351,17 @@ class SecretAgendaCard {
 }
 
 class DeedCard {
-    constructor(name, victoryPoints, requirementText, rewards=[], costs=[], achievements=[], canSolo=true) {
+    constructor(name, victoryPoints, requirementText, rewards=[], costs=[], achievements=[], canSolo=true, canAi=false) {
         this.name = name;
         this.victoryPoints = victoryPoints;
         this.requirementText = requirementText;
         this.rewards = rewards;
         this.costs = costs;
+        //this.costs = ["coin"];
         this.achievements = achievements;
+        //this.achievements = [];
         this.canSolo = canSolo;
+        this.canAi = canAi;
         this.accomplished = false;
         this.verifiedByPlayers = {};
         this.verifiedByPlayers['red'] = null;

@@ -35,12 +35,15 @@ app.post('/test/game/:id/create', (req, res) => {
     res.send(game);
 });
 
+// TODO
+/*
 app.put('/test/game/:id/load', (req, res) => {
     var gameObject = require("../../tests/gameData/claimPhase.json");
     gameObject.id = req.params.id;
     var game = games.restoreGame(gameObject);
     res.send(game);
 });
+*/
 
 app.put('/test/game/:id/player/:color/coin', (req, res) => {
     console.log("get " + req.path + " " + req.params);

@@ -55,48 +55,6 @@ class Games {
         return gameStatusList;
     }
 
-    clone(obj) {
-        function CloneFactory () {}
-        CloneFactory.prototype = obj;
-        return new CloneFactory();
-    }
-
-    restoreGame(gameObject) {
-        //var gameProto = clone(Game.prototype);
-        //var game = Object.assign(gameProto, gameObject);
-        var newGame = new Game(gameObject.gameName, gameObject.targetNumberOfPlayers, gameObject.password);
-        var game = Object.assign(newGame, gameObject);
-
-        var newPlayers = new GamePlayers(game.targetNumberOfPlayers);
-        game.players = Object.assign(newPlayers, game.players);
-        game.players.restorePlayers();
-
-        var newCards = new Cards();
-        game.cards = Object.assign(newCards, game.cards);
-
-        var newGameMap = new GameMap();
-        game.gameMap = Object.assign(newGameMap, game.gameMap);
-        game.gameMap.restoreGameMap();
-
-
-        var newGameStates = new GameStates();
-        newGameStates.setCurrentState(game.gameStates.currentState.name);
-        game.gameStates = newGameStates;
-
-        var newClaimBoard = new ClaimBoard();
-        game.claimBoard = Object.assign(newClaimBoard, game.claimBoard);
-
-        var newAvailableLeaders = new AvailableLeaders()
-        game.availableLeaders = Object.assign(newAvailableLeaders, game.availableLeaders);
-
-        this.games[game.id] = game;
-
-        if (game.gameStates.currentState.name == "claimPhase") {
-            game.updateClaimsForClaimsPhase();
-        }
-
-        return game;
-    }
 }
 
 class Game {
@@ -863,6 +821,9 @@ class Game {
                 if (currentPlayer.oneTimeSchemeCard.rewardCoinCost <= currentPlayer.boat.money) {
                     currentPlayer.boat.money = currentPlayer.boat.money - currentPlayer.oneTimeSchemeCard.rewardCoinCost;
                     this.collectSchemeCardReward(currentPlayer, currentPlayer.oneTimeSchemeCard);
+                    if (currentPlayer.oneTimeSchemeCard.rewardCoinCost > 0) {
+                        this.log.info(color + " paid  " + currentPlayer.oneTimeSchemeCard.rewardCoinCost + " money to collect scheme reward");
+                    }
                 }
                 currentPlayer.oneTimeSchemeCard = null;
             }
@@ -883,6 +844,9 @@ class Game {
         if (currentPlayer.hasSchemeCard(schemeCardId) && 
             schemeCard.rewardCoinCost <= currentPlayer.boat.money) {
             currentPlayer.boat.money = currentPlayer.boat.money - schemeCard.rewardCoinCost;
+            if (schemeCard.rewardCoinCost > 0) {
+                this.log.info(color + " paid  " + schemeCard.rewardCoinCost + " money to collect scheme reward");
+            }
             this.log.info(color + " played scheme card " + schemeCardId);
             this.collectSchemeCardReward(currentPlayer, schemeCard, schemeCardActionChoice);
             this.cards.discardedSchemeCards.push(schemeCard);
@@ -974,16 +938,18 @@ class Game {
         this.log.info(color + " took deed card, " + deedCardName);
         if (this.gameStates.currentState.name == "takeDeedCardForActionPhase") {
             this.gameStates.setCurrentState("actionPhase");
+            this.aiEvaluateGame();
         } else {
             currentPlayer.finishedRound = true;
             var nextPlayer = this.players.getNextPlayer(currentPlayer);            
             if (! nextPlayer.finishedRound) {
                 this.players.setCurrentPlayer(nextPlayer);
+                this.aiEvaluateGame();
             } else {
                 this.endRound();
             }
         }
-        this.aiEvaluateGame();
+        
     }
 
     accomplishedDeed(color, deedCardName, claimStatements) {
@@ -991,6 +957,9 @@ class Game {
         this.validateGameStatus("actionPhaseAccomplishDeed", "accomplishedDeed");
         var currentPlayer = this.validateCurrentPlayer(color, "accomplishedDeed");
         this.deedCardToVerify = this.cards.allDeedCards[deedCardName];
+        if (deedCardToVerify.accomplished) {
+            this.throwError("Deed card was already accomplished.", "accomplishedDeed");
+        }
         this.deedCardToVerify.playerColor = color;
         this.deedCardToVerify.claimStatements = claimStatements;
         for (var i=0; i<claimStatements.length; i++) {
@@ -1157,7 +1126,13 @@ class Game {
                 }
             }
         }
+        this.accomplishAndRedeemDeed(player, deedCard);
+    }
+
+    accomplishAndRedeemDeed(player, deedCard) {
+        player.accomplishedDeedForTurn = true;
         deedCard.accomplished = true;
+        console.log("accomplishAndRedeemDeed(): " + player.color + " accomplished deed, " + deedCard.name);
         this.log.info(player.color + " accomplished deed, " + deedCard.name);
         for (var i=0; i<deedCard.rewards.length; i++) {
             // Collect deed card rewards.
@@ -1198,24 +1173,27 @@ class Game {
         }
     }
 
+
     endRound() {
-        console.log("endRound()");
+        console.log("endRound(): gameId=" + this.id);
         this.log.info("end round " + this.currentRound);
         this.currentRound++;
         if (this.currentRound > 4) {
+            this.evaluateSecretAgendas();
             this.endGame();
         } else {
             this.players.setCurrentPlayer(this.players.firstPlayer);
             var advisors = this.getAdvisorsForRound(this.players.getNumberOfPlayers(), this.currentRound-1);
             this.players.setAdvisors(advisors);
-            this.players.endRoundForPlayers(this.claimBoard);
+            this.players.endRoundForPlayers(this, this.claimBoard);
             this.gameMap.resetResources();
             this.gameStates.setCurrentState("strategyPhase");
+            this.aiEvaluateGame();
         }
     }
 
     endGame() {
-        console.log("endGame() ");
+        console.log("endGame(): gameId=" + this.id);
         this.gameStates.setCurrentState("endGame");
         this.log.info("game over");
     }
@@ -1413,21 +1391,19 @@ class Game {
     updateClaimsForClaimsPhase() {
         console.log("updateClaimsForClaimsPhase()");
         this.validateGameStatus("claimPhase", "updateClaimsForClaimsPhase");
-        this.claimBoard.updateClaimsForClaimsPhase(this.players.players, this.gameMap);
+        this.claimBoard.updateClaimsForClaimsPhase(this, this.players.players, this.gameMap);
         if (this.currentRound != 4) {
             this.players.setCurrentPlayer(this.players.firstPlayer);
-            this.gameStates.setCurrentState("takeDeedCardForClaimPhase")    
+            this.gameStates.setCurrentState("takeDeedCardForClaimPhase");
+            this.aiEvaluateGame();
         } else {
-            this.log.info("end round " + this.currentRound);
-            this.evaluateSecretAgendas();
-            this.endGame();
+            this.endRound();
         }
-        this.aiEvaluateGame();
         console.log("updateClaimsForClaimsPhase(): " + this.gameStates.currentState);
     }
 
     evaluateSecretAgendas() {
-        console.log("evaluateSecretAgendas():");
+        console.log("evaluateSecretAgendas(): gameId=" + this.id);
         var evaluationFunctions = {};
         evaluationFunctions["Prosperous"] = "evaluateSecretAgendaProsperous";
         evaluationFunctions["Esteemed"] = "evaluateSecretAgendaEsteemed";
@@ -1448,6 +1424,7 @@ class Game {
             var secretAgenda = player.secretAgenda[0];
             console.log("evaluateSecretAgendas(): secretAgenda=" + secretAgenda.name + " for " + color);
             if (this[evaluationFunctions[secretAgenda.name]](color)) {
+                this.log.info(color + " accomplished secret agenda " + secretAgenda.name);
                 secretAgenda.accomplished = true;
             }
         }
@@ -1455,7 +1432,7 @@ class Game {
     }
 
     evaluateSecretAgendaProsperous(playerColor) {
-        console.log("evaluateSecretAgendaProsperous()");
+        console.log("evaluateSecretAgendaProsperous() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1477,7 +1454,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaEsteemed(playerColor) {
-        console.log("evaluateSecretAgendaEsteemed()");
+        console.log("evaluateSecretAgendaEsteemed() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1505,7 +1482,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaCapable(playerColor) {
-        console.log("evaluateSecretAgendaCapable()");
+        console.log("evaluateSecretAgendaCapable() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1533,7 +1510,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaConquering(playerColor) {
-        console.log("evaluateSecretAgendaConquering()");
+        console.log("evaluateSecretAgendaConquering() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1555,7 +1532,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaProtective(playerColor) {
-        console.log("evaluateSecretAgendaProtective()");
+        console.log("evaluateSecretAgendaProtective() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1588,7 +1565,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaSuccessful(playerColor) {
-        console.log("evaluateSecretAgendaSuccessful()");
+        console.log("evaluateSecretAgendaSuccessful() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1610,7 +1587,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaRegal(playerColor) {
-        console.log("evaluateSecretAgendaRegal()");
+        console.log("evaluateSecretAgendaRegal() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1635,7 +1612,7 @@ class Game {
 
     // TODO: Bug: Finish in first place on the build track.
     evaluateSecretAgendaCommitted(playerColor) {
-        console.log("evaluateSecretAgendaCommitted()");
+        console.log("evaluateSecretAgendaCommitted() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1657,7 +1634,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaDignified(playerColor) {
-        console.log("evaluateSecretAgendaDignified()");
+        console.log("evaluateSecretAgendaDignified() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1685,7 +1662,7 @@ class Game {
     }
 
     evaluateSecretAgendaCourageous(playerColor) {
-        console.log("evaluateSecretAgendaCourageous()");
+        console.log("evaluateSecretAgendaCourageous() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
@@ -1707,7 +1684,7 @@ class Game {
         return hasAccomplished;
     }
     evaluateSecretAgendaWealthy(playerColor) {
-        console.log("evaluateSecretAgendaWealthy()");
+        console.log("evaluateSecretAgendaWealthy() for " + playerColor);
         var hasAccomplished = false;
         var most = 0;
         var mostPlayers = [];
