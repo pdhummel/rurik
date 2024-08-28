@@ -113,6 +113,9 @@ class ClaimBoard {
             var tradePoints = this.claimsByPlayer[color]["trade"];
             this.claimsByTrack["trade"][tradePoints].push(color);
             var warfarePoints = this.claimsByPlayer[color]["warfare"];
+            if (warfarePoints > 10) {
+                warfarePoints = 10;
+            }
             this.claimsByTrack["warfare"][warfarePoints].push(color);
         }
     }
@@ -167,11 +170,6 @@ class ClaimBoard {
             var player = players[p];
             // Coin compensation logic is done by players.endRoundForPlayers() - see calculateCoins().
             var coinCompensation = this.updateClaims(player, gameMap);
-            //if (this.claimsByPlayer[player.color]["warfare"] <= 0) {
-            //    coinCompensation++;
-            //}
-            //player.boat.money = player.boat.money + coinCompensation;
-            //game.log.info(player.color + " received " + coinCompensation + " money from claim tracks.");
         }
         this.resetClaimsByTrack();
         this.updateClaimsByTrack();

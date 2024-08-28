@@ -23,9 +23,9 @@ class Cards {
         this.addDeedCard("Hire Mercenaries", 1, "Pay fish, stone, 2 coins.", ["attackMinusScheme"], ["fish", "stone", "coin", "coin"], [], true, true);
 
         // These are cost based, but requires decision for which resource to pay.
-        this.addDeedCard("Trade Route", 1, "Pay 3 different resources.", ["coin", "coin"], {"differentResource":["resource", "resource", "resource"]}, []);
+        this.addDeedCard("Trade Route", 1, "Pay 3 different resources.", ["coin", "coin"], {"differentResource":["resource", "resource", "resource"]}, [], true, true);
         this.addDeedCard("Reward Laborers", 1, "Pay 2 resources and 2 coins.", ["scheme2Cards"], ["resource", "resource", "coin", "coin"], [], true, true);
-        this.addDeedCard("Hoard", 1, "Pay 3 of the same resource.", ["scheme2Cards"], {"sameResource":["resource", "resource", "resource"]}, []);
+        this.addDeedCard("Hoard", 1, "Pay 3 of the same resource.", ["scheme2Cards"], {"sameResource":["resource", "resource", "resource"]}, [], true, true);
 
         // These require decisions for sacrificing scheme card, buildings, or troops.
         this.addDeedCard("Great Library", 1, "Pay a scheme card and stone.", ["build"], ["schemeCard", "stone"], [], true, true);
@@ -40,16 +40,16 @@ class Cards {
         // These include some achievements which must be fulfilled and may also have costs.
         this.addDeedCard("Enforce Peace", 1, "Pay wood and honey and defeat 2 rebels.", ["attackMinusScheme"], ["wood", "honey"], ["defeatRebel", "defeatRebel"], true, true);
         this.addDeedCard("Law Giver", 1, "Pay 2 coins and defeat 3 rebels.", ["scheme2Cards"], ["coin", "coin"], ["defeatRebel", "defeatRebel", "defeatRebel"], true, true);
-        this.addDeedCard("Mead Brewery", 1, "Pay honey and build 2 taverns.", ["tax"], ["honey"], ["tavern", "tavern"]);
+        this.addDeedCard("Mead Brewery", 1, "Pay honey and build 2 taverns.", ["tax"], ["honey"], ["tavern", "tavern"], true, true);
         this.addDeedCard("Establish Fortress", 1, "Pay 2 wood and build a stronghold and church in a region.", ["scheme2Cards"], ["wood", "wood"], {"sameRegion":["stronghold", "church"]});
         this.addDeedCard("Besiege Citadel", 1, "Pay 2 coins and rule a region with a stronghold.", ["warTrack"], {"sameRegion":["rule", "stronghold"]});
-        this.addDeedCard("Horse Breeder", 1, "Pay wood and build 2 stables.", ["muster"], ["wood"], ["stable", "stable"]);
+        this.addDeedCard("Horse Breeder", 1, "Pay wood and build 2 stables.", ["muster"], ["wood"], ["stable", "stable"]), true, true;
         this.addDeedCard("Conquest", 1, "Rule 3 regions.", ["move", "move"], [], ["rule", "rule", "rule"]);
         this.addDeedCard("Amass Forces", 1, "Have 6 troops in a region.", ["move"], [], {"sameRegion":["troop", "troop", "troop", "troop", "troop", "troop"]});
         this.addDeedCard("Tithe Payments", 1, "Have 3 churches in adjacent regions.", ["coin", "coin", "coin"], [], {"adjacentRegions":["church", "church", "church"]});
         this.addDeedCard("Dispatch Messengers", 2, "Have troops in 8 regions.", ["muster", "muster"], [], {"differentRegions":["troop","troop","troop","troop","troop","troop","troop","troop"]});
-        this.addDeedCard("Create Republic", 2, "Rule Novgorod, Chernigov, Volyn.", ["tax"], [], {"rule":["Novgorod", "Chernigov", "Volyn"]}, true, false);
-        this.addDeedCard("Distant Rule", 2, "Rule Pereyaslavl, Polotsk, Rostov.", ["warTrack"], [], {"rule":["Pereyaslavl", "Polotsk", "Rostov"]}, true, false);
+        this.addDeedCard("Create Republic", 2, "Rule Novgorod, Chernigov, Volyn.", ["tax"], [], {"rule":["Novgorod", "Chernigov", "Volyn"]}, true, true);
+        this.addDeedCard("Distant Rule", 2, "Rule Pereyaslavl, Polotsk, Rostov.", ["warTrack"], [], {"rule":["Pereyaslavl", "Polotsk", "Rostov"]}, true, true);
         this.addDeedCard("Market Day", 2, "Have 3 markets with different resources.", ["scheme2Cards"], [], {"differentResources":["market", "market", "market"]});
         this.addDeedCard("Defensive Belt", 1, "Have 3 strongholds in adjacent regions.", ["attackMinusScheme"], [], {"adjacentRegions":["stronghold", "stronghold", "stronghold"]});
         this.addDeedCard("Capital City", 2, "Have a market, stronghold, and church in a single region.", ["tax"], [], {"sameRegion":["market", "stronghold", "church"]});

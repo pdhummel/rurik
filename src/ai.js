@@ -67,6 +67,7 @@ class Ai {
                 this[method](game, currentPlayer);
             } catch(error) {
                 console.log("ai evaluateGame(): " + error.message);
+                console.log(error.stack);
                 //process.exit(1);
             }
     
@@ -105,6 +106,7 @@ class Ai {
             var r = Math.floor(Math.random() * this.aiCards.length);
             var aiCard = this.aiCards[r];
             player.aiCard = aiCard;
+            // TODO: figure out a better way of picking strategy
             var strategies = ["attack-move", "build", "tax"];
             r = Math.floor(Math.random() * strategies.length);
             player.aiStrategy = strategies[r];
@@ -121,7 +123,7 @@ class Ai {
         var success = false;
         // Using the AiStrategyCard, try to place the advisor per the curent turn. 
         // If that is not possible, move to the next turn recommendation on the AiStrategyCard.
-        // The AiStrategyCards has some illegal moves which must be skipped.
+        // The AiStrategyCards have some illegal moves which must be skipped.
 
         while (! success && index < auctions.length && player.advisors.length > 0) {
             //console.log("placeAdvisor(): " + player.color + " " + auction.action + " " + advisorNumber);
@@ -198,12 +200,6 @@ class Ai {
         var endGameStats = clonedGame.calculateEndGameStats();
         var decisionValue = this.calculateDecisionValue(clonedGame, clonedPlayer);
         
-        /*
-        actionToStateMap["transferGoodsAction"] = "actionPhaseTransfer";
-        actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
-        actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
-        */
-
         var takeAction = true;
         while (takeAction) {
             takeAction = false;
@@ -268,15 +264,40 @@ class Ai {
 
     playDeedCard(game, player) {
         console.log("ai playDeedCard(): player=" + player.color);
+        var color = player.color;
         for (var i=0; i<player.deedCards.length; i++) {
             var deedCard = player.deedCards[i];
             var canFulfill = false;
+            if (player.accomplishedDeedForTurn) {
+                break;
+            }
             if (deedCard.accomplished) {
                 continue;
             }
             if (deedCard.canAi) {
                 console.log("ai playDeedCard(): player=" + player.color + ", deedCard=" + deedCard.name);
+
                 canFulfill = true;
+                if (deedCard.name == "Create Republic") {
+                    // Novgorod, Chernigov, Volyn
+                    var novgorod = game.gameMap.getLocation("Novgorod");
+                    var chernigov = game.gameMap.getLocation("Chernigov");
+                    var volyn = game.gameMap.getLocation("Volyn");
+                    if (novgorod.doesRule(color) && chernigov.doesRule(color) && volyn.doesRule(color)) {
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Distant Rule") {
+                    //"Pereyaslavl", "Polotsk", "Rostov"
+                    var pereyaslavl = game.gameMap.getLocation("Pereyaslavl");
+                    var polotsk = game.gameMap.getLocation("Polotsk");
+                    var rostov = game.gameMap.getLocation("Rostov");
+                    if (pereyaslavl.doesRule(color) && polotsk.doesRule(color) && rostov.doesRule(color)) {
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                }
+
                 var rebels = player.boat.capturedRebels;
                 var money = player.boat.money;
                 var stone = player.boat.goodsOnDock["stone"];
@@ -285,15 +306,85 @@ class Ai {
                 var honey = player.boat.goodsOnDock["honey"];
                 var fur = player.boat.goodsOnDock["fur"];
                 var tradeBoon = player.boat.goodsOnDock["tradeBoon"];
-                var schemeCards = player.schemeCards;
+                var schemeCards = [];
+                for (var s=0; s < player.schemeCards.length; s++) {
+                    schemeCards.push(player.schemeCards[s]);
+                }
+
+                if (deedCard.name == "Hoard") {
+                    if (stone >= 3) {
+                        player.boat.goodsOnDock["stone"] = stone -3;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    } else if (wood >= 3) {
+                        player.boat.goodsOnDock["wood"] = wood -3;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    } else if (fish >= 3) {
+                        player.boat.goodsOnDock["fish"] = fish -3;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    } else if (honey >= 3) {
+                        player.boat.goodsOnDock["honey"] = honey -3;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    } else if (fur >= 3) {
+                        player.boat.goodsOnDock["fur"] = fur -3;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Trade Route") {
+                    var count = 0;
+                    if (stone > 0) {
+                        stone--;
+                        count++;
+                    }
+                    if (wood > 0) {
+                        wood--;
+                        count++;
+                    }
+                    if (fish > 0) {
+                        fish--;
+                        count++;
+                    }
+                    if (count <3 && honey > 0) {
+                        honey--;
+                        count++;
+                    }
+                    if (count <3 && fur > 0) {
+                        fur--;
+                        count++;
+                    }
+                    if (count >= 3) {
+                        player.boat.goodsOnDock["stone"] = stone;
+                        player.boat.goodsOnDock["wood"] = wood;
+                        player.boat.goodsOnDock["fish"] = fish;
+                        player.boat.goodsOnDock["honey"] = honey;
+                        player.boat.goodsOnDock["fur"] = fur;    
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Mead Brewery") {
+                    if (honey > 0 && player.buildings["tavern"] == 0) {
+                        player.boat.goodsOnDock["honey"] = honey - 1;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Horse Breeder") {
+                    if (wood > 0 && player.buildings["stable"] == 0) {
+                        player.boat.goodsOnDock["wood"] = wood - 1;
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                }
+                
+
 
                 var costs = deedCard.costs;
                 for (var c=0; c<costs.length; c++) {
+                    if (!canFulfill) {
+                        continue;
+                    }
                     if (costs[c] == "coin") {
                         if (money < 1) {
                             console.log("ai playDeedCard(): can't pay a coin");
                             canFulfill = false;
-                            break;    
                         } else {
                             console.log("ai playDeedCard(): can pay a coin");
                             money--;
@@ -302,7 +393,6 @@ class Ai {
                         if (wood < 1) {
                             console.log("ai playDeedCard(): can't pay wood");
                             canFulfill = false;
-                            break;
                         } else {
                             wood--;
                         }
@@ -310,7 +400,6 @@ class Ai {
                         if (stone < 1) {
                             console.log("ai playDeedCard(): can't pay stone");
                             canFulfill = false;
-                            break;
                         } else {
                             stone--;
                         }
@@ -318,7 +407,6 @@ class Ai {
                         if (fish < 1) {
                             console.log("ai playDeedCard(): can't pay fish");
                             canFulfill = false;
-                            break;
                         } else {
                             fish--;
                         }
@@ -326,7 +414,6 @@ class Ai {
                         if (honey < 1) {
                             console.log("ai playDeedCard(): can't pay honey");
                             canFulfill = false;
-                            break;
                         } else {
                             honey--;
                         }
@@ -334,7 +421,6 @@ class Ai {
                         if (fur < 1) {
                             console.log("ai playDeedCard(): can't pay fur");
                             canFulfill = false;
-                            break;
                         } else {
                             fur--;
                         }
@@ -342,7 +428,6 @@ class Ai {
                         if (schemeCards.length < 1) {
                             console.log("ai playDeedCard(): can't pay a schemeCard");
                             canFulfill = false;
-                            break;
                         } else {
                             var schemeCard = schemeCards.pop();
                             // TODO: The scheme card should only be put on the discard pile, if canFulfill.
@@ -372,12 +457,10 @@ class Ai {
                         if (! canPay) {
                             console.log("ai playDeedCard(): can't pay a resource");
                             canFulfill = false;
-                            break;
                         }
                     } else {
                         console.log("ai playDeedCard(): can't pay " + costs[c]);
                         canFulfill = false;
-                        break;
                     }
                 }
                 console.log("ai playDeedCard(): canFulfill=" + canFulfill + ", player=" + player.color + ", deedCard=" + deedCard);
@@ -385,21 +468,21 @@ class Ai {
                     console.log("ai playDeedCard(): check achievements, player=" + player.color + ", deedCard=" + deedCard);
                     var achievements = deedCard.achievements;
                     for (var a=0; a < achievements.length; a++) {
+                        if (!canFulfill) {
+                            continue;
+                        }
                         if (achievements[a] == "defeatRebel") {
                             if (rebels < 1) {
                                 canFulfill = false;
-                                break;
                             } else {
                                 rebels--;
                             }
                         } else if (achievements[a] == "firstPlayer") {
                             if (! player.isNextFirstPlayer) {
                                 canFulfill = false;
-                                break;
                             }
                         } else {
                             canFulfill = false;
-                            break;
                         }
                     }
                 }
@@ -415,7 +498,6 @@ class Ai {
                     player.boat.goodsOnDock["tradeBoon"] = tradeBoon;
                     player.schemeCards = schemeCards;
                     game.accomplishAndRedeemDeed(player, deedCard);
-                    break;    
                 }
 
             }
@@ -805,6 +887,7 @@ class Ai {
             // build where there are none of their buildings
             // build where there are enemy or neutral troops
             // build where there are no enemy or neutral troops
+            // TODO: build to improve adjaceny
             var rules = [];
             var occupies = [];
             var enemies = [];

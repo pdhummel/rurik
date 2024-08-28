@@ -36,7 +36,7 @@ r=$(rest "${server}/game/${game_id}/firstPlayer/blue" PUT)
 count=0
 currentState=nothing
 while [ "${currentState}" != "endGame" ] && [ ${count} -lt 10 ];do
-  sleep 10
+  sleep 5
   r=$(rest "${server}/gameStatus/${game_id}" GET)
   currentState=$(echo ${r} | jq -r '.currentState' | tr -d '\n')
   count=$((count + 1))
@@ -53,6 +53,12 @@ if [ "${currentState}" != "endGame" ];then
   exit 1
 else
   echo "Game ${game_id} completed"
+  r=$(rest "${server}/game/${game_id}/endGame" GET)
+  r=$(echo $r | jq ". + {\"gameId\": \"${game_id}\" }")
+  echo $r | jq -r '((.gameId) + "," + (.total.blue | tostring) + "," + 
+    (.total.red | tostring)  + "," + (.total.yellow | tostring)  + "," + 
+    (.total.white | tostring))' >> totals.csv
+
   #r=$(rest "${server}/test/game/${game_id}" DELETE)
 fi
 

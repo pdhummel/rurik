@@ -59,6 +59,9 @@ class Entry {
             var player = game.players.getCurrentPlayer();
             this.player = player.color;
             player.lastActionTimeStamp = this.timeStamp;
+            console.log("[" + game.id + "] " + text);
+        } else {
+            console.log(text);
         }
     }
 }
