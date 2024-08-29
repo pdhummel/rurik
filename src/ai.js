@@ -372,9 +372,88 @@ class Ai {
                         game.accomplishAndRedeemDeed(player, deedCard);
                     }
                     continue;
+                } else if (deedCard.name == "Establish Fortress") {
+                    if (wood > 1) {
+                        var found = false;
+                        for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
+                            var location = game.gameMap.locationsForGame[l];
+                            if (location.doesPlayerHaveThisBuilding(color, "stronghold") && 
+                                location.doesPlayerHaveThisBuilding(color, "church")) {
+                                found = true;
+                            }
+                        }
+                        if (found) {
+                            player.boat.goodsOnDock["wood"] = wood - 2;
+                            game.accomplishAndRedeemDeed(player, deedCard);
+                        }
+                    }
+                    continue;
+                } else if (deedCard.name == "Besiege Citadel") {
+                    if (money > 1) {
+                        var found = false;
+                        for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
+                            var location = game.gameMap.locationsForGame[l];
+                            if (location.doesPlayerHaveThisBuilding(color, "stronghold")) {
+                                found = true;
+                            }
+                        }
+                        if (found) {
+                            player.boat.money = money - 2;
+                            game.accomplishAndRedeemDeed(player, deedCard);
+                        }
+                    }
+                    continue;
+                } else if (deedCard.name == "Conquest") {
+                    var rules = 0;
+                    for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
+                        var location = game.gameMap.locationsForGame[l];
+                        if (location.doesRule(color)) {
+                            rules++;
+                        }
+                    }
+                    if (rules >= 3) {
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Amass Forces") {
+                    var found = false;
+                    for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
+                        var location = game.gameMap.locationsForGame[l];
+                        if (location.troopsByColor[color] >= 6) {
+                            found = true;
+                        }
+                    }
+                    if (found) {
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Dispatch Messengers") {
+                    var count = 0;
+                    for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
+                        var location = game.gameMap.locationsForGame[l];
+                        if (location.troopsByColor[color] >= 1) {
+                            count++;
+                        }
+                    }
+                    if (count >= 8) {
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
+                } else if (deedCard.name == "Capital City") {
+                    var found = false;
+                    for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
+                        var location = game.gameMap.locationsForGame[l];
+                        if (location.doesPlayerHaveThisBuilding(color, "stronghold") && 
+                            location.doesPlayerHaveThisBuilding(color, "church") &&
+                            location.doesPlayerHaveThisBuilding(color, "market")) {
+                            found = true;
+                        }
+                    }
+                    if (found) {
+                        game.accomplishAndRedeemDeed(player, deedCard);
+                    }
+                    continue;
                 }
-                
-
 
                 var costs = deedCard.costs;
                 for (var c=0; c<costs.length; c++) {

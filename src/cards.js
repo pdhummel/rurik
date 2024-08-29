@@ -41,18 +41,18 @@ class Cards {
         this.addDeedCard("Enforce Peace", 1, "Pay wood and honey and defeat 2 rebels.", ["attackMinusScheme"], ["wood", "honey"], ["defeatRebel", "defeatRebel"], true, true);
         this.addDeedCard("Law Giver", 1, "Pay 2 coins and defeat 3 rebels.", ["scheme2Cards"], ["coin", "coin"], ["defeatRebel", "defeatRebel", "defeatRebel"], true, true);
         this.addDeedCard("Mead Brewery", 1, "Pay honey and build 2 taverns.", ["tax"], ["honey"], ["tavern", "tavern"], true, true);
-        this.addDeedCard("Establish Fortress", 1, "Pay 2 wood and build a stronghold and church in a region.", ["scheme2Cards"], ["wood", "wood"], {"sameRegion":["stronghold", "church"]});
-        this.addDeedCard("Besiege Citadel", 1, "Pay 2 coins and rule a region with a stronghold.", ["warTrack"], {"sameRegion":["rule", "stronghold"]});
+        this.addDeedCard("Establish Fortress", 1, "Pay 2 wood and build a stronghold and church in a region.", ["scheme2Cards"], ["wood", "wood"], {"sameRegion":["stronghold", "church"]}, true, true);
+        this.addDeedCard("Besiege Citadel", 1, "Pay 2 coins and rule a region with a stronghold.", ["warTrack"], {"sameRegion":["rule", "stronghold"]}, true, true);
         this.addDeedCard("Horse Breeder", 1, "Pay wood and build 2 stables.", ["muster"], ["wood"], ["stable", "stable"]), true, true;
-        this.addDeedCard("Conquest", 1, "Rule 3 regions.", ["move", "move"], [], ["rule", "rule", "rule"]);
-        this.addDeedCard("Amass Forces", 1, "Have 6 troops in a region.", ["move"], [], {"sameRegion":["troop", "troop", "troop", "troop", "troop", "troop"]});
+        this.addDeedCard("Conquest", 1, "Rule 3 regions.", ["move", "move"], [], ["rule", "rule", "rule"], true, true);
+        this.addDeedCard("Amass Forces", 1, "Have 6 troops in a region.", ["move"], [], {"sameRegion":["troop", "troop", "troop", "troop", "troop", "troop"]}), true, true;
         this.addDeedCard("Tithe Payments", 1, "Have 3 churches in adjacent regions.", ["coin", "coin", "coin"], [], {"adjacentRegions":["church", "church", "church"]});
-        this.addDeedCard("Dispatch Messengers", 2, "Have troops in 8 regions.", ["muster", "muster"], [], {"differentRegions":["troop","troop","troop","troop","troop","troop","troop","troop"]});
+        this.addDeedCard("Dispatch Messengers", 2, "Have troops in 8 regions.", ["muster", "muster"], [], {"differentRegions":["troop","troop","troop","troop","troop","troop","troop","troop"]}, true, true);
         this.addDeedCard("Create Republic", 2, "Rule Novgorod, Chernigov, Volyn.", ["tax"], [], {"rule":["Novgorod", "Chernigov", "Volyn"]}, true, true);
         this.addDeedCard("Distant Rule", 2, "Rule Pereyaslavl, Polotsk, Rostov.", ["warTrack"], [], {"rule":["Pereyaslavl", "Polotsk", "Rostov"]}, true, true);
         this.addDeedCard("Market Day", 2, "Have 3 markets with different resources.", ["scheme2Cards"], [], {"differentResources":["market", "market", "market"]});
         this.addDeedCard("Defensive Belt", 1, "Have 3 strongholds in adjacent regions.", ["attackMinusScheme"], [], {"adjacentRegions":["stronghold", "stronghold", "stronghold"]});
-        this.addDeedCard("Capital City", 2, "Have a market, stronghold, and church in a single region.", ["tax"], [], {"sameRegion":["market", "stronghold", "church"]});
+        this.addDeedCard("Capital City", 2, "Have a market, stronghold, and church in a single region.", ["tax"], [], {"sameRegion":["market", "stronghold", "church"]}, true, true);
         this.addDeedCard("Grand Hunter", 2, "Pay 2 fur and have the first player token.", ["move"], ["fur", "fur"], ["firstPlayer"], true, true);
 
 

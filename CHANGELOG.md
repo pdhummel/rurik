@@ -1,5 +1,8 @@
 # Rurik Changelog
 
+## 2024-08-28 - v0.5.1.6 - AI improvements
+* AI can complete some more deed cards - 24 of 32
+
 ## 2024-08-27 - v0.5.1.5 - AI improvements
 * AI can complete some more deed cards - 18 of 32
 * bug: warfare track goes beyond 10.

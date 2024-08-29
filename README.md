@@ -21,10 +21,10 @@ Ultimately this project was built so I could play Rurik against some competant A
   * add support for scheme card option for building a tavern
 
 * AI
-  * ai complete deed cards - 18 out of 32 supported
-  * ai conversion token
   * ai bid money
   * ai build adjacency
+  * ai complete deed cards - 24 out of 32 supported
+  * ai conversion token
   * try and compare candidate moves and pick the best
 
 * Game management

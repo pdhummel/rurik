@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+index=$1
+
 server=http://localhost:3000
 #server=http://localhost:8080
 #server=https://real-parts-run.loca.lt/
@@ -14,7 +16,7 @@ popd  > /dev/null
 #echo "Creating game"
 new_game_response=$(rest "${server}/game" POST '{"owner": "AI-blue", "gameName": "AI Game"}')
 game_id=$(echo ${new_game_response} | jq -r '.id')
-echo "Created game ${game_id}"
+echo "Created game ${index} ${game_id}"
 
 #echo "First player joining"
 r=$(rest "${server}/game/${game_id}/player" POST '{ "color": "blue", "name": "p1", "position": "N", "isAi": true }')
@@ -59,7 +61,7 @@ else
     (.total.red | tostring)  + "," + (.total.yellow | tostring)  + "," + 
     (.total.white | tostring))' >> totals.csv
 
-  #r=$(rest "${server}/test/game/${game_id}" DELETE)
+  r=$(rest "${server}/test/game/${game_id}" DELETE)
 fi
 
 
