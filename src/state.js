@@ -38,17 +38,6 @@ class GameStates {
     getCurrentState() {
         return this.currentState;
     }
-
-    restoreGameStates() {
-        var keys = Object.keys(this.gameStates);
-        for (var i=0; i < keys.length; i++) {
-            var key = keys[i];
-            var gameState = this.gameStates[key];
-            var newGameState = new GameState(gameState.name, gameState.allowedActions);
-            gameState = Object.assign(newGameState, gameState);
-            this.gameStates[key] = gameState;
-        }
-    }
     
 }
 

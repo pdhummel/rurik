@@ -113,8 +113,16 @@ class Location {
         return false;
     }
 
-    doesRule(color) {
-        if (this.whoRules() == color) {
+    doesRule(color, isSviatopolk=false, isYaroslav=false) {
+        var ruler = null;
+        if (isSviatopolk) {
+            ruler = this.whoRules(color, null);
+        } else if (isYaroslav) {
+            ruler = this.whoRules(null, color);
+        } else {
+            ruler = this.whoRules();
+        }
+        if (ruler == color) {
             return true;
         }
         return false;
@@ -162,15 +170,39 @@ class Location {
         return hasEnemies;
     }
 
-    whoRules() {
-        var yellow = this.countStrongholds("yellow") + this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
-        var red = this.countStrongholds("red") + this.troopsByColor["red"] + this.leaderByColor["red"];
-        var white = this.countStrongholds("white") + this.troopsByColor["white"] + this.leaderByColor["white"];
-        var blue = this.countStrongholds("blue") + this.troopsByColor["blue"] + this.leaderByColor["blue"];
+    whoRules(sviatopolk=null, yaroslav=null) {
+        var yellow = this.troopsByColor["yellow"] + this.leaderByColor["yellow"];
+        var red = this.troopsByColor["red"] + this.leaderByColor["red"];
+        var white = this.troopsByColor["white"] + this.leaderByColor["white"];
+        var blue = this.troopsByColor["blue"] + this.leaderByColor["blue"];
+        if (yaroslav == null || yaroslav == "yellow") {
+            yellow = yellow  + this.countStrongholds("yellow");
+        }
+        if (yaroslav == null || yaroslav == "red") {
+            red = red  + this.countStrongholds("red");
+        }
+        if (yaroslav == null || yaroslav == "white") {
+            white = white  + this.countStrongholds("white");
+        }
+        if (yaroslav == null || yaroslav == "blue") {
+            blue = blue  + this.countStrongholds("blue");
+        }
         var rebels = this.rebels.length;
+        if (sviatopolk == "yellow") {
+            yellow = yellow + rebels;
+        } else if (sviatopolk == "red") {
+            red = red + rebels;
+        } else if (sviatopolk == "white") {
+            white = white + rebels;
+        } else if (sviatopolk == "blue") {
+            blue = blue + rebels;
+        }
         var highValue = rebels;
         var ruler = null;
         if (red > highValue) {
+            ruler = "red"
+            highValue = red;
+        } else if (red == highValue && yaroslav == "red") {
             ruler = "red"
             highValue = red;
         } else if (red == highValue) {
@@ -179,16 +211,25 @@ class Location {
         if (blue > highValue) {
             ruler = "blue"
             highValue = blue;
+        } else if (blue == highValue && yaroslav == "blue") {
+            ruler = "blue"
+            highValue = blue;
         } else if (blue == highValue) {
             ruler = null;
         }
         if (white > highValue) {
             ruler = "white"
             highValue = white;
+        } else if (white == highValue && yaroslav == "white") {
+            ruler = "white"
+            highValue = white;
         } else if (white == highValue) {
             ruler = null;
         }
         if (yellow > highValue) {
+            ruler = "yellow"
+            highValue = yellow;
+        } else if (yellow == highValue && yaroslav == "yellow") {
             ruler = "yellow"
             highValue = yellow;
         } else if (yellow == highValue) {
@@ -233,17 +274,17 @@ class Location {
         return false;
     }
 
-    restoreLocation() {
-        var tempBuildings = [];
-        for (var b=0; b<this.buildings.length; b++) {
-            var building = this.buildings[b];
-            var newBuilding = new Building(building.color, building.name);
-            //var buildingProto = this.clone(Building.proto);
-            building = Object.assign(newBuilding, building);
-            tempBuildings.push(building);
+    isEnemyYaroslavInLocation(color, players) {
+        var hasEnemyYaroslav = false;
+        for (var i=0; i < players.length; i++) {
+            var leaderName = players[i].leader.name;
+            var otherColor = players[i].color;
+            if (leaderName == "Yaroslav" && otherColor != color && this.leaderByColor[otherColor] > 0) {
+                return true;
+            }
         }
-        this.buildings = tempBuildings;
-    }    
+        return hasEnemyYaroslav;
+    }
 }
 
 class GameMap {
@@ -270,36 +311,6 @@ class GameMap {
         this.addLocation(15, "Azov", "brown", "fish", ["Kiev", "Pereyaslavl", "Galich", "Murom", "Peresech"]);
     }
 
-
-    restoreGameMap() {
-        var newRebels = new Rebels();
-        this.rebels = Object.assign(newRebels, this.rebels);
-
-        for (var i=0; i < Object.keys(this.locationByName).length; i++) {
-            var key = Object.keys(this.locationByName)[i];
-            var location = this.locationByName[key];
-            var newLocation = new Location(location.id, location.name, location.color, location.defaultResource, location.neighbors);
-            var location = Object.assign(newLocation, location);
-            this.locationByName[key] = location;
-        }
-
-        var tempLocations = [];
-        for (var i=0; i < this.locations.length; i++) {
-            var location = this.locations[i];
-            var locationName = location.name;
-            location = this.locationByName[locationName];
-            tempLocations.push(location);
-        }
-        this.locations = tempLocations;
-        tempLocations = [];
-        for (var i=0; i < this.locationsForGame.length; i++) {
-            var location = this.locationsForGame[i];
-            var locationName = location.name;
-            location = this.locationByName[locationName];
-            tempLocations.push(location);
-        }
-        this.locationsForGame = tempLocations;
-    }
 
     addLocation(id, name, color, resource, neighbors) {
         var location = new Location(id, name, color, resource, neighbors);
@@ -342,7 +353,7 @@ class GameMap {
         return locationNames;
     }
 
-    getLocationsForPlayer(color) {
+    getLocationsForPlayer(color, isSviatopolk=false, isYaroslav=false) {
         var locationMap = {};
         locationMap["rules"] = [];
         locationMap["occupies"] = [];
@@ -358,7 +369,7 @@ class GameMap {
         for (var i=0; i < this.locations.length; i++) {
             var location = this.locations[i];
             locationMap[location.name] = {};
-            locationMap[location.name]["rules"] = location.doesRule(color);
+            locationMap[location.name]["rules"] = location.doesRule(color, isSviatopolk, isYaroslav);    
             if (locationMap[location.name]["rules"]) {
                 locationMap["rules"].push(location.name);
             }

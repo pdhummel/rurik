@@ -84,11 +84,12 @@
       <option>white</option>
       <option>yellow</option>
     </select>
-    <input type="button" value="Pick First Player" onclick="javascript:pickFirstPlayer();"/>
+    <input type="button" value="Pick First Player" onChange="javascript:pickFirstPlayer();"/>
     <input type="button" value="Pick Random First Player" onclick="javascript:pickRandomFirstPlayer();"/><br/>
   </div>
   <div id="leaderSelectionDiv" style="display:none;">
-    <select id="selectLeader"></select>
+    <select id="selectLeader" onclick="javascript:leaderChanged();"></select>
+    <div id="leaderDescription"></div>
     <input type="button" value="Select Leader" onclick="javascript:chooseLeader();"/><br/>
     <br/>
   </div>

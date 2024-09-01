@@ -38,10 +38,6 @@ app.post('/test/game/:id/create', (req, res) => {
 // TODO
 /*
 app.put('/test/game/:id/load', (req, res) => {
-    var gameObject = require("../../tests/gameData/claimPhase.json");
-    gameObject.id = req.params.id;
-    var game = games.restoreGame(gameObject);
-    res.send(game);
 });
 */
 

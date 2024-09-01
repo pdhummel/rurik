@@ -1,5 +1,9 @@
 # Rurik Changelog
 
+## 2024-09-01 - v0.5.2.0 - leader special abilities
+* add leader special abilities - 4 of 11
+* remove unused code
+
 ## 2024-08-28 - v0.5.1.6 - AI improvements
 * AI can complete some more deed cards - 24 of 32
 

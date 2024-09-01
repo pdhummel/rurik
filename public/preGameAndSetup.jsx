@@ -160,8 +160,22 @@
       element.value = key;
       selectLeader.append(element);
     }
+    leaderChanged();
     show("leaderSelectionDiv");
   }
+  function leaderChanged() {
+    var gameId = getInnerHtmlValue("gameId");
+    var leaderDescription = document.getElementById("leaderDescription");
+    setInnerHtml("leaderDescription", "");
+    var leaderName = getSelectedValue("selectLeader");
+    callApi("/game/" + gameId + "/leaders/" + leaderName, "get", "", leaderChangedHandler);
+  }
+  function leaderChangedHandler(response) {
+    console.log("leaderChangedHandler(): " + JSON.stringify(response.data));
+    var description = response.data.description;
+    setInnerHtml("leaderDescription", description);
+  }
+
 
   function getSecretAgendaHandler(response) {
     console.log("getSecretAgendaHandler(): " + JSON.stringify(response.data));

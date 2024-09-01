@@ -297,7 +297,15 @@ class Game {
             // If a player has no troops on the map, they may muster their leader + 1 other troop
             // to any one region.
             var occupiesSomewhere = false;
-            var locationsForPlayer = this.gameMap.getLocationsForPlayer(color);
+            var isSviatopolk = false;
+            if (currentPlayer.leader.name == "Sviatopolk") {
+                isSviatopolk = true;
+            }
+            var isYaroslav = false;
+            if (currentPlayer.leader.name == "Yaroslav") {
+                isYaroslav = true;
+            }
+            var locationsForPlayer = this.gameMap.getLocationsForPlayer(color, isSviatopolk, isYaroslav);
             if (locationsForPlayer["occupies"].length > 0) {
                 occupiesSomewhere = true;
             }
@@ -476,7 +484,15 @@ class Game {
         var currentPlayer = this.validateCurrentPlayer(color, "muster");
         var location = this.gameMap.getLocation(locationName);
         var occupiesSomewhere = false;
-        var locationsForPlayer = this.gameMap.getLocationsForPlayer(color);
+        var isSviatopolk = true;
+        if (currentPlayer.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (currentPlayer.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
+        var locationsForPlayer = this.gameMap.getLocationsForPlayer(color, isSviatopolk, isYaroslav);
         if (locationsForPlayer["occupies"].length > 0) {
             occupiesSomewhere = true;
         }
@@ -544,22 +560,34 @@ class Game {
         console.log("tax(): " + color + ": " + locationName);
         this.validateGameStatus("actionPhaseTax", "tax");
         var currentPlayer = this.validateCurrentPlayer(color, "tax");
-
         var location = this.gameMap.getLocation(locationName);
         if (! location.doesOccupy(color)) {
             throw new Error("You cannot tax a location that you don't occupy.", "tax()");
         }
+        if (location.resourceCount < 1) {
+            throw new Error("Location has no resources.", "tax");
+        }
 
         var taxActionsRequired = 2;
-        if (location.doesRule(color)) {
+        var isSviatopolk = false;
+        if (currentPlayer.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (currentPlayer.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
+        var rules = location.doesRule(color, isSviatopolk, isYaroslav);
+        if (rules) {
             taxActionsRequired = 1;
         }
 
+        if (currentPlayer.leader.name == "Mstislav" && location.leaderByColor[color] > 0) {
+            this.log.info(color + ", Mstislav, only requires 1 tax action to tax in " + locationName);
+            taxActionsRequired = 1;
+        }
         if (currentPlayer.taxActions < taxActionsRequired) {
             throw new Error("You do not have enough tax actions.", "tax");
-        }
-        if (location.resourceCount < 1) {
-            throw new Error("Location has no resources.", "tax");
         }
 
         console.log("tax(): after validations");
@@ -572,18 +600,26 @@ class Game {
             currentPlayer.boat.addGoodToDock(resource);
         }
         this.log.info(color + " taxed " + locationName + " for " + resource);
+        var enemyYaroslavInLocation = false;
+        if (location.isEnemyYaroslavInLocation(color, this.players.players)) {
+            enemyYaroslavInLocation = true;
+        }
         // check for market
         if (location.doesPlayerHaveMarket(color)) {
-            if (marketCoinNotResource) {
-                currentPlayer.boat.money++;
-                this.log.info(color + " gained a coin from their market at " + locationName);
-            } else {
-                if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
-                    currentPlayer.boat.addGoodToBoat(resource);
+            if (! enemyYaroslavInLocation) {
+                if (marketCoinNotResource) {
+                    currentPlayer.boat.money++;
+                    this.log.info(color + " gained a coin from their market at " + locationName);
                 } else {
-                    currentPlayer.boat.addGoodToDock(resource);
+                    if (toBoat && currentPlayer.boat.doesBoatHaveRoom(resource)) {
+                        currentPlayer.boat.addGoodToBoat(resource);
+                    } else {
+                        currentPlayer.boat.addGoodToDock(resource);
+                    }
+                    this.log.info(color + " gained " + resource + " from their market at " + locationName);
                 }
-                this.log.info(color + " gained " + resource + " from their market at " + locationName);
+            } else {
+                this.log.info("Enemy Yaroslav blocked " + color + " from using their market");
             }
         }
         this.gameStates.setCurrentState("actionPhase");
@@ -607,9 +643,23 @@ class Game {
         }
 
         var buildActionsRequired = 2;
-        if (location.doesRule(color)) {
+        var isSviatopolk = false;
+        if (currentPlayer.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (currentPlayer.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
+        var rules = location.doesRule(color, isSviatopolk, isYaroslav);
+        if (rules) {
             buildActionsRequired = 1;
         }
+        if (currentPlayer.leader.name == "Mstislav" && location.leaderByColor[color] > 0) {
+            this.log.info(color + ", Mstislav, only requires 1 build action to tax in " + locationName);
+            buildActionsRequired = 1;
+        }
+
         if (currentPlayer.buildActions < buildActionsRequired) {
             throw new Error("You do not have enough build actions.", "build()");
         }
@@ -623,38 +673,54 @@ class Game {
         this.log.info(color + " built a " + buildingName + " at " + locationName);
 
         this.gameStates.setCurrentState("actionPhase");
+        var enemyYaroslavInLocation = false;
+        if (location.isEnemyYaroslavInLocation(color, this.players.players)) {
+            enemyYaroslavInLocation = true;
+        }
         if (buildingName == "stable") {
-            currentPlayer.moveActionsFromLocation[locationName] = 2;
-            this.log.info(color + " gained movement " + " at " + locationName + " for building a stable");
+            if (!enemyYaroslavInLocation) {
+                currentPlayer.moveActionsFromLocation[locationName] = 2;
+                this.log.info(color + " gained movement " + " at " + locationName + " for building a stable");    
+            } else {
+                this.log.info("Enemy Yaroslav blocked " + color + " from using their stable");
+            }
         } else if (buildingName == "church") {
-            var converted = false;
-            // Per rules, you can convert an enemy even if you don't have any troops in supply.
-            // Also you can't convert leaders.
-            if (targetToConvert == "rebel" && location.rebels.length > 0) {
-                location.rebels.pop();
-                if (currentPlayer.supplyTroops > 0) {
-                    location.troopsByColor[color]++;
-                    currentPlayer.supplyTroops--;
+            if (!enemyYaroslavInLocation) {
+                var converted = false;
+                // Per rules, you can convert an enemy even if you don't have any troops in supply.
+                // Also you can't convert leaders.
+                if (targetToConvert == "rebel" && location.rebels.length > 0) {
+                    location.rebels.pop();
+                    if (currentPlayer.supplyTroops > 0) {
+                        location.troopsByColor[color]++;
+                        currentPlayer.supplyTroops--;
+                    }
+                    converted = true;
+                } else if (location.troopsByColor[targetToConvert] > 0) {
+                    location.troopsByColor[targetToConvert]--;
+                    if (currentPlayer.supplyTroops > 0) {
+                        location.troopsByColor[color]++;
+                        currentPlayer.supplyTroops--;
+                    }
+                    converted = true;
                 }
-                converted = true;
-            } else if (location.troopsByColor[targetToConvert] > 0) {
-                location.troopsByColor[targetToConvert]--;
-                if (currentPlayer.supplyTroops > 0) {
-                    location.troopsByColor[color]++;
-                    currentPlayer.supplyTroops--;
+                if (converted  == false && targetToConvert != undefined && targetToConvert != null && targetToConvert.length > 0) {
+                    this.throwError("Could not convert enemy " + targetToConvert, "build");
                 }
-                converted = true;
+                this.log.info(color + " converted " + targetToConvert + " by building a church");
+            } else {
+                this.log.info("Enemy Yaroslav blocked " + color + " from using their church");
             }
-            if (converted  == false && targetToConvert != undefined && targetToConvert != null && targetToConvert.length > 0) {
-                this.throwError("Could not convert enemy " + targetToConvert, "build");
-            }
-            this.log.info(color + " converted " + targetToConvert + " by building a church");
         } else if (buildingName == "tavern") {
-            currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
-            // Per rules, if you have not played a scheme card yet this turn, you may play the top card
-            // from the scheme discard pile and then remove it from the game.
-            //this.gameStates.setCurrentState("oneTimeScheme");
-            this.log.info(color + " gained " + location.buildings.length + " money by building a tavern");
+            if (!enemyYaroslavInLocation) {      
+                currentPlayer.boat.money = currentPlayer.boat.money + location.buildings.length;
+                // Per rules, if you have not played a scheme card yet this turn, you may play the top card
+                // from the scheme discard pile and then remove it from the game.
+                //this.gameStates.setCurrentState("oneTimeScheme");
+                this.log.info(color + " gained " + location.buildings.length + " money by building a tavern");
+            } else {
+                this.log.info("Enemy Yaroslav blocked " + color + " from using their tavern");
+            }
         }
 
     }
@@ -663,6 +729,10 @@ class Game {
         console.log("attack(): " + color + ": " + locationName + " " + target);
         this.validateGameStatus("actionPhaseAttack", "attack");
         var currentPlayer = this.validateCurrentPlayer(color, "attack");
+        var isSviatopolk = false;
+        if (currentPlayer.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
         var troopsLost = 0;
         var location = this.gameMap.getLocation(locationName);
         if ((location.troopsByColor[color] < 1 && location.leaderByColor[color] < 1)) {
@@ -685,6 +755,11 @@ class Game {
                 currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;
                 console.log("attack(): " + color + " defeated rebel");
                 this.log.info(color + " defeated a rebel at " + locationName);
+                if (isSviatopolk && currentPlayer.supplyTroops > 0) {
+                    location.troopsByColor[color]++;
+                    currentPlayer.supplyTroops--;
+                    this.log.info(color + ", Sviatopolk, converted a rebel at " + locationName);
+                }
             } else {
                 throw new Error("There are no rebels  to attack in " + locationName + ".", "attack()");
             }
@@ -696,7 +771,16 @@ class Game {
             var targetPlayer = this.players.getPlayerByColor(targetColor);
 
             var schemeCardsToDraw = 1;
-            if (location.doesRule(targetColor)) {
+            var isSviatopolk = false;
+            if (targetPlayer.leader.name == "Sviatopolk") {
+                isSviatopolk = true;
+            }
+            var isYaroslav = false;
+            if (targetPlayer.leader.name == "Yaroslav") {
+                isYaroslav = true;
+            }
+            var targetColorRules = location.doesRule(targetColor, isSviatopolk, isYaroslav);
+            if (targetColorRules) {
                 schemeCardsToDraw++;
             }
 
@@ -711,9 +795,19 @@ class Game {
                 console.log("attack(): " + color + " killed leader for " + targetPlayer.color);
                 this.log.info(color + " killed the leader for " + targetPlayer.color + " at " + locationName);
             }
-
             if (location.countStrongholds(targetColor) > 0) {
                 schemeCardsToDraw++;
+            }
+            if (currentPlayer.leader.name == "Boris" && location.leaderByColor[color] > 0) {
+                if (schemeCardsToDraw > 0) {
+                    schemeCardsToDraw--;
+                    this.log.info(currentPlayer.color + ", Boris, draws 1 less scheme card for casualties.");
+                }
+                if (targetPlayer.boat.money > 0) {
+                    currentPlayer.boat.money++;
+                    targetPlayer.boat.money--;
+                    this.log.info(currentPlayer.color + ", Boris, stole 1 coin from " + targetPlayer.color);
+                }
             }
             //var schemeDeck = this.cards.getSchemeDeckByNumber(schemeDeckNumber);
             for (var i=0; i<schemeCardsToDraw; i++) {
@@ -1542,7 +1636,16 @@ class Game {
             var count = 0;
             for (var j=0; j<this.gameMap.locationsForGame.length; j++) {
                 var location = this.gameMap.locationsForGame[j];
-                if (location.doesRule(color)) {
+                var isSviatopolk = false;
+                if (player.leader.name == "Sviatopolk") {
+                    isSviatopolk = true;
+                }
+                var isYaroslav = false;
+                if (player.leader.name == "Yaroslav") {
+                    isYaroslav = true;
+                }
+                var rules = location.doesRule(color, isSviatopolk, isYaroslav);
+                if (rules) {
                     for (var k=0; k<location.buildings.length; k++) {
                         if (location.buildings[k].color == color) {
                             count++;

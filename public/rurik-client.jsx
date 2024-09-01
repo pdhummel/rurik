@@ -106,8 +106,10 @@ function refreshGameStatusResponseHandler(response) {
     if (clientLeader != undefined && clientLeader != null && 
         clientLeader.name != undefined && clientLeader.name != null && clientLeader.name.length > 0) {
       setInnerHtml("leader", clientLeader.name);
+      setInnerHtml("myLeaderDescription", clientLeader.description);
     } else {
       setInnerHtml("leader", ". . . ?");
+      setInnerHtml("myLeaderDescription", "");
     }
 
     setInnerHtml("gameStatusName", gameName);

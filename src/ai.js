@@ -76,9 +76,14 @@ class Ai {
 
     selectLeader(game, player) {
         console.log("selectLeader()");
-        var leaderNames = Object.keys(game.availableLeaders.availableLeaders);
-        var r = Math.floor(Math.random() * leaderNames.length);
-        var leaderName = leaderNames[r];
+        var leaderName = null;
+        while (!(leaderName == "Boris" || leaderName == "Sviatopolk" || 
+                 leaderName == "Yaroslav" || leaderName == "Mstislav")) {
+            var leaderNames = Object.keys(game.availableLeaders.availableLeaders);
+            var r = Math.floor(Math.random() * leaderNames.length);
+            var leaderName = leaderNames[r];
+        }
+        player.name = leaderName;
         game.chooseLeader(player.color, leaderName);
     }
 
@@ -265,6 +270,14 @@ class Ai {
     playDeedCard(game, player) {
         console.log("ai playDeedCard(): player=" + player.color);
         var color = player.color;
+        var isSviatopolk = false;
+        if (player.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (player.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
         for (var i=0; i<player.deedCards.length; i++) {
             var deedCard = player.deedCards[i];
             var canFulfill = false;
@@ -283,7 +296,8 @@ class Ai {
                     var novgorod = game.gameMap.getLocation("Novgorod");
                     var chernigov = game.gameMap.getLocation("Chernigov");
                     var volyn = game.gameMap.getLocation("Volyn");
-                    if (novgorod.doesRule(color) && chernigov.doesRule(color) && volyn.doesRule(color)) {
+                    if (novgorod.doesRule(color, isSviatopolk, isYaroslav) && chernigov.doesRule(color, isSviatopolk, isYaroslav) && 
+                        volyn.doesRule(color, isSviatopolk, isYaroslav)) {
                         game.accomplishAndRedeemDeed(player, deedCard);
                     }
                     continue;
@@ -292,7 +306,8 @@ class Ai {
                     var pereyaslavl = game.gameMap.getLocation("Pereyaslavl");
                     var polotsk = game.gameMap.getLocation("Polotsk");
                     var rostov = game.gameMap.getLocation("Rostov");
-                    if (pereyaslavl.doesRule(color) && polotsk.doesRule(color) && rostov.doesRule(color)) {
+                    if (pereyaslavl.doesRule(color, isSviatopolk, isYaroslav) && polotsk.doesRule(color, isSviatopolk, isYaroslav) && 
+                        rostov.doesRule(color, isSviatopolk, isYaroslav)) {
                         game.accomplishAndRedeemDeed(player, deedCard);
                     }
                     continue;
@@ -407,7 +422,7 @@ class Ai {
                     var rules = 0;
                     for (var l=0; l<game.gameMap.locationsForGame.length; l++) {
                         var location = game.gameMap.locationsForGame[l];
-                        if (location.doesRule(color)) {
+                        if (location.doesRule(color, isSviatopolk, isYaroslav)) {
                             rules++;
                         }
                     }
@@ -621,6 +636,14 @@ class Ai {
         var tookAction = false;
         var color = player.color;
         var canTax = true;
+        var isSviatopolk = false;
+        if (player.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (player.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
         while (player.taxActions > 0 && canTax) {
             // Priorities:
             // locations with goods remaining
@@ -658,7 +681,7 @@ class Ai {
                 if (location.doesPlayerHaveMarket(color)) {
                     locationsWithMarket.push(location);
                 }
-                if (location.doesRule(color)) {
+                if (location.doesRule(color, isSviatopolk, isYaroslav)) {
                     locationsRuled.push(location);
                 }
                 if (location.doesOccupy(color)) {
@@ -821,6 +844,14 @@ class Ai {
         var tookAction = false;
         var color = player.color;
         var canMove = true;
+        var isSviatopolk = false;
+        if (player.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (player.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
         while (player.moveActions > 0 && canMove) {
             var canMove = false;
             // Priorities:
@@ -855,7 +886,7 @@ class Ai {
                     for (var n=0; n<validNeighbors.length; n++) {
                         var neighbor = game.gameMap.locationByName[validNeighbors[n]];
                         if (player.aiStrategy == "attack-move") {
-                            if (neighbor.doesOccupy(color) && ! neighbor.doesRule(color)) {
+                            if (neighbor.doesOccupy(color) && ! neighbor.doesRule(color, isSviatopolk, isYaroslav)) {
                                 toLocationName = validNeighbors[n];
                                 canMove = true;
                                 break;
@@ -887,6 +918,14 @@ class Ai {
 
     checkLocationForBuildingsToPlay(location, player) {
         console.log("checkLocationForBuildingsToPlay(): " + JSON.stringify(location) + " " + player.color);
+        var isSviatopolk = false;
+        if (player.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (player.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
         var locationBuildings = [];
         for (var i=0; i<location.buildings.length; i++) {
             locationBuildings.push(location.buildings[i].name);
@@ -909,7 +948,7 @@ class Ai {
             console.log("checkLocationForBuildingsToPlay(): candidateBuildings=" + JSON.stringify(candidateBuildings));
             for (var i=0; i < candidateBuildings.length; i++) {
                 var candidate = candidateBuildings[i];
-                if (candidate == "stable" && location.doesRule(player.color)) {
+                if (candidate == "stable" && location.doesRule(player.color, isSviatopolk, isYaroslav)) {
                     if (location.calculateExcessTroopsForRule(player.color) >= 3) {
                         buildingsAllowed.push(candidate);
                         break;                        
@@ -955,6 +994,14 @@ class Ai {
         var color = player.color;
         var aiCard = player.aiCard;
         var gameMap = game.gameMap;
+        var isSviatopolk = false;
+        if (player.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (player.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
         var buildingOrder = aiCard.strategies[player.aiStrategy].buildingOrder;
         var canBuild = true;
 
@@ -975,7 +1022,7 @@ class Ai {
             var targetToConvert = null;
             for (var i=0; i < locationsForGame.length; i++) {
                 var location = locationsForGame[i];
-                if (location.doesRule(color)) {
+                if (location.doesRule(color, isSviatopolk, isYaroslav)) {
                     rules.push(location.name);
                 }
                 if (location.doesOccupy(color)) {
@@ -1013,7 +1060,7 @@ class Ai {
                         buildingAndLocation = this.pickLocationAndBuilding(gameMap, openWithNoPlayerBuildings, player, buildingOrder);
                         if (buildingAndLocation["location"] != null && buildingAndLocation["building"] != null) {
                             var location = gameMap.locationByName[buildingAndLocation["location"]];
-                            if (location.doesRule(color) || player.buildActions >= 2) {
+                            if (location.doesRule(color, isSviatopolk, isYaroslav) || player.buildActions >= 2) {
                                 canBuild = true;
                             }
                         }
@@ -1023,7 +1070,7 @@ class Ai {
                     buildingAndLocation = this.pickLocationAndBuilding(gameMap, occupiesWithOpenings, player, buildingOrder);
                     if (buildingAndLocation["location"] != null && buildingAndLocation["building"] != null) {
                         var location = gameMap.locationByName[buildingAndLocation["location"]];
-                        if (location.doesRule(color) || player.buildActions >= 2) {
+                        if (location.doesRule(color, isSviatopolk, isYaroslav) || player.buildActions >= 2) {
                             canBuild = true;
                         }
                     }
@@ -1055,13 +1102,21 @@ class Ai {
         var occupies = [];
         var rules = [];
         var occupiesButDoesNotRule = [];
+        var isSviatopolk = false;
+        if (player.leader.name == "Sviatopolk") {
+            isSviatopolk = true;
+        }
+        var isYaroslav = false;
+        if (player.leader.name == "Yaroslav") {
+            isYaroslav = true;
+        }
         for (var i=0; i<locations.length; i++) {
             //var location = game.gameMap.locationByName[locations[i]];
             var location = locations[i];
             var locationName = location.name;
             if (location.doesOccupy(color)) {
                 occupies.push(locationName);
-                if (location.doesRule(color)) {
+                if (location.doesRule(color, isSviatopolk, isYaroslav)) {
                     rules.push(locationName);
                 } else {
                     occupiesButDoesNotRule.push(locationName);

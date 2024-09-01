@@ -170,6 +170,17 @@ app.get('/game', (req, res) => {
     }
     res.send(game.availableLeaders.availableLeaders);
   });
+
+  app.get('/game/:id/leaders/:leader', (req, res) => {
+    console.log("get " + req.path + " " + req.params);
+    var game = games.getGameById(req.params.id);
+    if (game === undefined) {
+      res.status(404).send({ "error": "Game not found"});
+      return;
+    }
+    var leaderName = req.params.leader;
+    res.send(game.availableLeaders.allLeaders[leaderName]);
+  });
   
   app.post('/game/:id/player/:color/leaders', (req, res) => {
     console.log("post " + req.path + " " + req.params);

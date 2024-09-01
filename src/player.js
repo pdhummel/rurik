@@ -77,6 +77,10 @@ class GamePlayers {
             player.finishedRound = false;
             player.aiCard = null;
             player.aiStrategy = null;
+            player.usedGlebAttack = false;
+            player.usedTheofanaTax = false;
+            player.usedTheofanaTax = false;
+            player.usedPredslavaMove = false;
         }
     }
 
@@ -260,6 +264,10 @@ class Player {
 
         this.aiCard = null;
         this.aiStrategy = null;
+        this.usedGlebAttack = false;
+        this.usedTheofanaTax = false;
+        this.usedMariaMuster = false;
+        this.usedPredslavaMove = false;
     }
 
     resetMoveActionsFromLocation(locations) {
@@ -317,11 +325,6 @@ class Player {
             }
         }
         return false;
-    }
-
-    restorePlayer() {
-        var newBoat = new BoatMat();
-        this.boat = Object.assign(newBoat, this.boat);
     }
 }
 

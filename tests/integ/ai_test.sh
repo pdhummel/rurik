@@ -61,7 +61,7 @@ else
     (.total.red | tostring)  + "," + (.total.yellow | tostring)  + "," + 
     (.total.white | tostring))' >> totals.csv
 
-  r=$(rest "${server}/test/game/${game_id}" DELETE)
+  #r=$(rest "${server}/test/game/${game_id}" DELETE)
 fi
 
 

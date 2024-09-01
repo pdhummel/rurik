@@ -216,7 +216,16 @@ class ClaimBoard {
         var rulesNovgorod = false;
         for (var i=0; i<gameMap.locationsForGame.length; i++) {
             var location = gameMap.locationsForGame[i];
-            if (location.doesRule(color)) {
+            var isSviatopolk = false;
+            if (player.leader.name == "Sviatopolk") {
+                isSviatopolk = true;
+            }
+            var isYaroslav = false;
+            if (player.leader.name == "Yaroslav") {
+                isYaroslav = true;
+            }
+            var rules = location.doesRule(color, isSviatopolk, isYaroslav);
+            if (rules) {
                 if (location.name == "Kiev") {
                     rulesKiev = true;
                 }
@@ -289,7 +298,7 @@ class ClaimBoard {
     }
 
     DFSUtil(gameMap, color, cluster, locationName, visited) {
-        console.log("DFSUtil(): " + locationName);
+        //console.log("DFSUtil(): " + locationName);
         // Mark the current node as visited and print it
         visited[locationName] = true;
         var location = gameMap.getLocation(locationName);
