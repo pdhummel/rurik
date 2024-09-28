@@ -106,7 +106,7 @@ app.put('/test/game/:id/player/:color/coin', (req, res) => {
       return;
     }
     var action = req.body.action;
-    if (this.gameStates.currentState.name.startsWith("actionPhase") && this.players.getCurrentPlayer().color == color) {
+    if (game.gameStates.currentState.name.startsWith("actionPhase") && game.players.getCurrentPlayer().color == color) {
         if (action == "muster") {
             player.troopsToDeploy = currentPlayer.troopsToDeploy + 1;
         } else if (action == "build") {

@@ -217,15 +217,15 @@ class ClaimBoard {
         for (var i=0; i<gameMap.locationsForGame.length; i++) {
             var location = gameMap.locationsForGame[i];
             var isSviatopolk = false;
-            if (player.leader.name == "Sviatopolk") {
+            if (player.leader.name == "Sviatopolk" && location.leaderByColor[color] > 0) {
                 isSviatopolk = true;
             }
             var isYaroslav = false;
-            if (player.leader.name == "Yaroslav") {
+            if (player.leader.name == "Yaroslav" && location.leaderByColor[color] > 0) {
                 isYaroslav = true;
             }
-            var rules = location.doesRule(color, isSviatopolk, isYaroslav);
-            if (rules) {
+            var rulesLocation = location.doesRule(color, isSviatopolk, isYaroslav);
+            if (rulesLocation) {
                 if (location.name == "Kiev") {
                     rulesKiev = true;
                 }

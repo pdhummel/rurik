@@ -115,9 +115,9 @@ class Location {
 
     doesRule(color, isSviatopolk=false, isYaroslav=false) {
         var ruler = null;
-        if (isSviatopolk) {
+        if (isSviatopolk && this.isLeaderInLocation(color)) {
             ruler = this.whoRules(color, null);
-        } else if (isYaroslav) {
+        } else if (isYaroslav && this.isLeaderInLocation(color)) {
             ruler = this.whoRules(null, color);
         } else {
             ruler = this.whoRules();
@@ -235,7 +235,9 @@ class Location {
         } else if (yellow == highValue) {
             ruler = null;
         }
-        //console.log(this.name + " is ruled by " + ruler);
+        //if (ruler == null) {
+            //console.log(this.name + " is ruled by no one");
+        //}
         return ruler;
     }
 

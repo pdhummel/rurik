@@ -137,6 +137,43 @@ function getNextAdvisor() {
   function showActionPhaseHandler(response) {
     console.log("showActionPhaseHandler(): " + JSON.stringify(response.data));
     var playerData = response.data;
+
+    if (playerData.leader.name == "Maria" && 1==0) {
+      show("mariaMusterOption");
+    } else {
+      hide("mariaMusterOption");
+    }
+    if (playerData.leader.name == "Agatha" && 1==0) {
+      show("agathaMoveOption");
+    } else {
+      hide("agathaMoveOption");
+    }
+    if (playerData.leader.name == "Gleb" && 1==0) {
+      show("glebAttackOption");
+    } else {
+      hide("glebAttackOption");
+    }
+    if (playerData.leader.name == "Sudislav" && 1==0) {
+      show("sudislavOption");
+    } else {
+      hide("sudislavOption");
+    }
+    if (playerData.leader.name == "Theofona" && 1==0) {
+      show("theofonaTaxOption");
+    } else {
+      hide("theofonaTaxOption");
+    }
+    if (playerData.leader.name == "Sviatoslav" && 1==0) {
+      show("sviatoslavBuildOption");
+    } else {
+      hide("sviatoslavBuildOption");
+    }
+    if (playerData.leader.name == "Predslava" && 1==0) {
+      show("predslavaOption");
+    } else {
+      hide("predslavaOption");
+    }
+
     if (playerData.convertedGoodsForTurn == false && 
       (playerData.boat.canPlayAttackConversionTile || playerData.boat.canPlayBuildConversionTile || playerData.boat.canPlayMusterConversionTile)) {
         show("convertGoodsOption");

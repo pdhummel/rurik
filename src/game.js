@@ -14,6 +14,7 @@ const GameLog = require('./gameLog.js');
 class Games {
     constructor() {
         this.games = {};
+        this.gameSummaries = {};
     }
 
     static getInstance() {
@@ -49,7 +50,7 @@ class Games {
         var gameStatusList = [];
         for (var i=0; i<Object.keys(this.games).length; i++) {
             var game = this.games[Object.keys(this.games)[i]];
-            var gameStatus = new GameStatus(game, null);
+            var gameStatus = new GameStatus(game, null, this);
             gameStatusList.push(gameStatus);
         }
         return gameStatusList;
@@ -326,14 +327,14 @@ class Game {
                 this.log.info(color + " forfeited their action for money.");
             } else {
                 if (auctionSpace.extraCoin > currentPlayer.boat.money) {
-                    currentPlayer.boat.money++;
-                    this.log.info(color + " was forced to forfeit their action for money.");
-                    //throw new Error("Not enough money to take action.", "takeMainAction()");
-                    // TODO: send message to player.
+                    forfeitAction = true;
                 } else {
                     currentPlayer.boat.money = currentPlayer.boat.money - auctionSpace.extraCoin;
                 }
-                if (actionColumnName == "build") {
+                if (forfeitAction == true) {
+                    currentPlayer.boat.money++;
+                    this.log.info(color + " was forced to forfeit their action for money.");
+                } else if (actionColumnName == "build") {
                     currentPlayer.buildActions = currentPlayer.buildActions + auctionSpace.quantity;
                     console.log("takeMainAction(): build actions=" + currentPlayer.buildActions);
                     this.log.info(color + " got " + auctionSpace.quantity + " build actions.");
@@ -687,6 +688,7 @@ class Game {
         } else if (buildingName == "church") {
             if (!enemyYaroslavInLocation) {
                 var converted = false;
+                var gotTroop = false;
                 // Per rules, you can convert an enemy even if you don't have any troops in supply.
                 // Also you can't convert leaders.
                 if (targetToConvert == "rebel" && location.rebels.length > 0) {
@@ -694,13 +696,17 @@ class Game {
                     if (currentPlayer.supplyTroops > 0) {
                         location.troopsByColor[color]++;
                         currentPlayer.supplyTroops--;
+                        gotTroop = true;
                     }
                     converted = true;
                 } else if (location.troopsByColor[targetToConvert] > 0) {
                     location.troopsByColor[targetToConvert]--;
+                    var targetPlayer = this.players.getPlayerByColor(targetToConvert);
+                    targetPlayer.supplyTroops++;
                     if (currentPlayer.supplyTroops > 0) {
                         location.troopsByColor[color]++;
                         currentPlayer.supplyTroops--;
+                        gotTroop = true;
                     }
                     converted = true;
                 }
@@ -708,6 +714,9 @@ class Game {
                     this.throwError("Could not convert enemy " + targetToConvert, "build");
                 }
                 this.log.info(color + " converted " + targetToConvert + " by building a church");
+                if (! gotTroop) {
+                    this.log.info(color + " did not get a troop from conversion because of limited supply.")
+                }
             } else {
                 this.log.info("Enemy Yaroslav blocked " + color + " from using their church");
             }
@@ -1051,7 +1060,7 @@ class Game {
         this.validateGameStatus("actionPhaseAccomplishDeed", "accomplishedDeed");
         var currentPlayer = this.validateCurrentPlayer(color, "accomplishedDeed");
         this.deedCardToVerify = this.cards.allDeedCards[deedCardName];
-        if (deedCardToVerify.accomplished) {
+        if (this.deedCardToVerify.accomplished) {
             this.throwError("Deed card was already accomplished.", "accomplishedDeed");
         }
         this.deedCardToVerify.playerColor = color;
@@ -1478,6 +1487,9 @@ class Game {
                 console.log("endTurn(): currentPlayer was " + currentPlayer.color + ", nextPlayer=" + nextPlayer.color);
             }
             this.gameStates.setCurrentState("claimPhase");
+            if (this.players.nextFirstPlayer != undefined && this.players.nextFirstPlayer != null) {
+                this.players.setFirstPlayer(this.players.nextFirstPlayer);
+            }
             this.updateClaimsForClaimsPhase();
         }
     }
@@ -1822,7 +1834,6 @@ class Game {
         actionToStateMap["schemeAction"] = "actionPhasePlaySchemeCard";
         actionToStateMap["convertGoodsAction"] = "actionPhasePlayConversionTile";
         actionToStateMap["accomplishDeedAction"] = "actionPhaseAccomplishDeed";
-        //actionToStateMap["convertGoodsAction"] = "actionPhaseVerifyDeed";
         if (this.gameStates.currentState.name.startsWith("actionPhase")) {
             var currentPlayer = this.players.getCurrentPlayer();
             if (currentPlayer.color == color) {
@@ -1905,7 +1916,7 @@ class Game {
 
 
 class GameStatus {
-    constructor(game, clientColor=null) {
+    constructor(game, clientColor=null, games=null) {
         this.gameId = game.id;
         this.id = game.id;
         this.gameName = game.name;
@@ -1914,12 +1925,31 @@ class GameStatus {
         this.playerNames = "";
         this.currentPlayer = null;
         this.clientPlayer = null;
+        this.endGameSummary = "";
         this.numberOfPlayers = game.players.players.length;
         this.targetNumberOfPlayers = game.targetNumberOfPlayers;
         var currentGameState = game.gameStates.getCurrentState();
         this.currentState = null;
         if (currentGameState != undefined && currentGameState != null) {
             this.currentState = currentGameState.name;
+            if (games != undefined && games != null && this.currentState == "endGame") {
+                var gameSummary = games.gameSummaries[game.id];
+                if (gameSummary == undefined || gameSummary == null) {
+                    var endGameStats = game.calculateEndGameStats();
+                    for (var i=0; i<Object.keys(endGameStats["total"]).length; i++) {
+                        var key = Object.keys(endGameStats["total"])[i];
+                        var total = endGameStats["total"][key];
+                        if (this.endGameSummary == "") {
+                            this.endGameSummary = "" + total;
+                        } else {
+                            this.endGameSummary = this.endGameSummary + "-" + total;
+                        }
+                    }
+                    games.gameSummaries[game.id] = this.endGameSummary;
+                } else {
+                    this.endGameSummary = gameSummary;
+                }
+            }
         }
         var firstPlayer = game.players.getFirstPlayer();
         this.playersByPosition = game.players.playersByPosition;

@@ -231,8 +231,8 @@ function refreshGameStatusResponseHandler(response) {
       showClaimBoard();
     } else {
       document.getElementById("nopop_claimboard").checked = false;
-      hide("claimBoardTable");
-      hide("warfareDiv");
+      //hide("claimBoardTable");
+      //hide("warfareDiv");
     }
 
     if (currentState == "endGame") {

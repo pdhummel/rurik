@@ -4,10 +4,11 @@ const Games = require('../game.js');
 var games = Games.Games.getInstance();
 
 
-app.get('/game', (req, res) => {
-    console.log("get " + req.path);
-    var gameList = games.listGames();
-    res.send(gameList);
+  // list games
+  app.get('/game', (req, res) => {
+      console.log("get " + req.path);
+      var gameList = games.listGames();
+      res.send(gameList);
   });
   
   // create game
@@ -135,7 +136,7 @@ app.get('/game', (req, res) => {
     res.send(gameStatus);
   });
   
-  
+  // Set first player
   app.put('/game/:id/firstplayer/:color', (req, res) => {
     console.log("put " + req.path + " " + req.params);
     var game = games.getGameById(req.params.id);

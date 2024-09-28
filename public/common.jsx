@@ -133,6 +133,10 @@ function callApi(path, httpMethod, jsonData="", responseHandler) {
     var value = e.value;
     return value;
   }
+  function setValue(elementId, value) {
+    var e = document.getElementById(elementId);
+    e.value = value;
+  }
   function clearOptions(selectElement) {
     if (selectElement != undefined && selectElement.options != undefined && selectElement.options != null) {
       var i, L = selectElement.options.length - 1;

@@ -1,5 +1,16 @@
 # Rurik Changelog
 
+## 2024-09-28 - v0.5.2.1 - bug fixes mostly caused by leader changes
+* Fix accomplish deedCardToVerify is not defined.
+* Should not show leader action choices for other players.
+* Claim board doesn't score+show correct rule points.
+* Scheme first player did not pick new first player.
+* Troop converted by church did not return troop to supply.
+* Put-action hack did not work.
+* AI forfeited attack action but still attacked.
+* Set coin bid back to 0 after placing advisor.
+* Reduce flicker and flashing on Claim board.
+
 ## 2024-09-01 - v0.5.2.0 - leader special abilities
 * add leader special abilities - 4 of 11
 * remove unused code

@@ -268,6 +268,8 @@ class Player {
         this.usedTheofanaTax = false;
         this.usedMariaMuster = false;
         this.usedPredslavaMove = false;
+        //this.glebAttackInProgress = false;
+
     }
 
     resetMoveActionsFromLocation(locations) {

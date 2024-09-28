@@ -13,10 +13,10 @@ Ultimately this project was built so I could play Rurik against some competant A
 ### TODOs
 
 * Miscellaneous
+  * add leader special abilities - 4 of 11
   * show leader name and description in other player Boat and Supply view.
   * fix deed card bonuses - scheme2cards, attackMinusScheme, moveAnywhere
   * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
-  * add leader special abilities
   * add version info
   * show upcoming advisors on map board
   * add support for scheme card option for building a tavern

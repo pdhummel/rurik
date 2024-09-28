@@ -7,6 +7,7 @@ function placeAdvisor() {
     var coins = 0;
     if (bidCoins > 0) {
       coins = bidCoins;
+      setValue("bidCoins", 0);
     }
     var data = '{ "color":"'+ color +'", "bidCoins":"' + coins + '", "advisor":"'+ advisor + '" }';
     callApi("/game/" + gameId + "/advisorBid/" + selectedAction, "put", data, placeAdvisorResponseHandler);

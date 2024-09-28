@@ -23,6 +23,7 @@
       row.push(gameName);
       row.push(games[key].owner);
       row.push(games[key].currentState);
+      row.push(games[key].endGameSummary);
       var playerSummary = "";
       if (games[key].numberOfPlayers > 0) {
         var playersByPosition = games[key].playersByPosition;
@@ -31,7 +32,6 @@
           var player = playersByPosition[position];
           playerSummary = playerSummary + '<input type="button" style="background-color: 	#696969; color:' + player.color + '" value="' + player.name + ' (' + position + ')" onclick=\'javascript:rejoinGame("' + games[key].gameId + '", "' + player.color + '");\' />';
         }
-        
       }
       row.push(playerSummary);
       var deleteButton =  '<input type="button" style="background-color: 	#696969; color:black" value="Delete" onclick=\'javascript:deleteGame("' + games[key].gameId + '");\' />'
@@ -45,7 +45,7 @@
       rows.push(row);
     }
   
-    populateTable(rows, ["Game Id", "Game Name", "Owner", "Status", "Players"]);
+    populateTable(rows, ["Game Id", "Game Name", "Owner", "Status", "Summary", "Players"]);
     var myName = getInnerHtmlValue("playerName");
     if (Object.keys(games).length > 0 && myName.length > 0) {
       //show("joinGameDiv");
