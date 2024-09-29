@@ -4,7 +4,7 @@
       <span id="closeBoatAndSupplyModal" class="close">&times;</span>
 
       <table>
-        <tr><td>
+        <tr><td colspan="4">
           Player: <select id="selectPlayerBoat" onchange="javascript:selectPlayerBoatChanged();">
             <option></option>
             <option>blue</option>
@@ -12,6 +12,7 @@
             <option>yellow</option>
             <option>white</option>
           </select>
+
         </td></tr>
         <tr><td>
           <div id="boatDiv" style="display: none;">
@@ -81,6 +82,7 @@
         <td style="width: 20px"></td>
         <td>
           <div id="supplyDiv" style="display: none">
+            <span id="boatLeaderText" style="background-color: lightgrey"></span>
             <div style="display:flex; height: 50px;">
               <span class="container">
                 <img src="/assets/coin.png" alt="coin" width="40px" height="45px" />

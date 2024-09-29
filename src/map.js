@@ -395,6 +395,15 @@ class GameMap {
         return locationMap;
     }
 
+    countTroopsInLocations(color) {
+        var troops = 0;
+        for (var i=0; i < this.locationsForGame.length; i++) {
+            var location = this.locationsForGame[i];
+            troops = troops + location.troopsByColor[color];
+        }
+        return troops;
+    }
+
     resetResources() {
         for (var i=0; i<this.locationsForGame.length; i++) {
             var location = this.locationsForGame[i];

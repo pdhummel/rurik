@@ -763,7 +763,7 @@ class Game {
                 }
                 currentPlayer.boat.capturedRebels = currentPlayer.boat.capturedRebels + 1;
                 console.log("attack(): " + color + " defeated rebel");
-                this.log.info(color + " defeated a rebel at " + locationName);
+                this.log.info(color + " defeated a rebel at " + locationName + " and got " + reward);
                 if (isSviatopolk && currentPlayer.supplyTroops > 0) {
                     location.troopsByColor[color]++;
                     currentPlayer.supplyTroops--;
@@ -831,10 +831,17 @@ class Game {
                             removeLeader = true;
                         }
                         deaths = location.troopsByColor[color];
-                    }    
+                    }
                 }
-                location.troopsByColor[color] = location.troopsByColor[color] - deaths;
-                currentPlayer.supplyTroops = currentPlayer.supplyTroops + deaths;
+                if (deaths > 0) {
+                    location.troopsByColor[color] = location.troopsByColor[color] - deaths;
+                    currentPlayer.supplyTroops = currentPlayer.supplyTroops + deaths;
+                    var casualty = "a troop casualty";
+                    if (deaths > 1) {
+                        casualty = deaths + " troop casualties"
+                    }
+                    this.log.info(color + " had " + casualty + " at " + locationName);
+                }
                 if (removeLeader) {
                     location.leaderByColor[color] = 0;
                     currentPlayer.supplyLeader = 1;
@@ -842,8 +849,6 @@ class Game {
                     this.log.info(color + " lost their leader as a casualty at " + locationName);
                 }
                 if (deaths > 0) {
-                    troopsLost = deaths;
-                    this.log.info(color + " had a casualty at " + locationName);
                     break;
                 }
             }
@@ -1454,6 +1459,11 @@ class Game {
         if (currentPlayer.advisorCountForTurn <= currentPlayer.advisors.length) {
             this.throwError("Cannot end turn before playing your advisor.", "endTurn");
         }
+        var totalTroops = this.gameMap.countTroopsInLocations(currentPlayer.color) + currentPlayer.supplyTroops;
+        if (totalTroops < 12) {
+            console.log("endTurn(): Warning: totalTroops=" + totalTroops + ", troopsToDeploy=" + currentPlayer.troopsToDeploy);
+            currentPlayer.supplyTroops = currentPlayer.supplyTroops + (12 - totalTroops);
+        }
         currentPlayer.troopsToDeploy = 0;
         currentPlayer.advisorCountForTurn = currentPlayer.advisors.length;
         currentPlayer.taxActions = 0;
@@ -1489,6 +1499,7 @@ class Game {
             this.gameStates.setCurrentState("claimPhase");
             if (this.players.nextFirstPlayer != undefined && this.players.nextFirstPlayer != null) {
                 this.players.setFirstPlayer(this.players.nextFirstPlayer);
+                this.log.info(this.players.nextFirstPlayer.color + " is now the first player.");
             }
             this.updateClaimsForClaimsPhase();
         }

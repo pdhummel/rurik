@@ -14,7 +14,6 @@ Ultimately this project was built so I could play Rurik against some competant A
 
 * Miscellaneous
   * add leader special abilities - 4 of 11
-  * show leader name and description in other player Boat and Supply view.
   * fix deed card bonuses - scheme2cards, attackMinusScheme, moveAnywhere
   * retrieveAdvisor - for a player, handle 2 advisors with the same number in the same column
   * add version info
@@ -56,7 +55,9 @@ Ultimately this project was built so I could play Rurik against some competant A
   * switch AI player to human
 
 ### Known Bugs not in TODOs
-
+* Claim board not displaying region-rule points for all players.
+* Could not play conversion token using 2 tradeboon resources.
+* Get rid of scroll bar on modal windows. Appears when dragging.
 
 ## Build and Deploy
 ### Local setup with nodejs

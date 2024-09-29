@@ -108,7 +108,7 @@ app.put('/test/game/:id/player/:color/coin', (req, res) => {
     var action = req.body.action;
     if (game.gameStates.currentState.name.startsWith("actionPhase") && game.players.getCurrentPlayer().color == color) {
         if (action == "muster") {
-            player.troopsToDeploy = currentPlayer.troopsToDeploy + 1;
+            player.troopsToDeploy = player.troopsToDeploy + 1;
         } else if (action == "build") {
             player.buildActions++;
         } else if (action == "tax") {
@@ -140,7 +140,9 @@ app.put('/test/game/:id/player/:color/coin', (req, res) => {
     if (amount == undefined || amount == null || amount == "") {
         amount = 1;
     }
-    if (player.boat.goodsOnDock[resource] + amount >= 0) {
+    if (resource == "coin") {
+      player.boat.money = player.boat.money + amount;
+    } else if (player.boat.goodsOnDock[resource] + amount >= 0) {
       player.boat.goodsOnDock[resource] = player.boat.goodsOnDock[resource] + amount;
     }
     res.send(player);

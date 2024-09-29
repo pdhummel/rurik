@@ -1,5 +1,8 @@
 # Rurik Changelog
 
+## 2024-09-28 - v0.5.2.2 - minor enhancements
+* Show leader name and description in other player Boat and Supply view.
+
 ## 2024-09-28 - v0.5.2.1 - bug fixes mostly caused by leader changes
 * Fix accomplish deedCardToVerify is not defined.
 * Should not show leader action choices for other players.

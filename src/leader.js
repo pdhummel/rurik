@@ -4,7 +4,7 @@ class AvailableLeaders {
         this.availableLeaders = {};
         this.addLeader("Boris", "When you attack an opponent in Boris's region, reveal one less scheme card and steal one coin from that opponent.");
         this.addLeader("Sviatopolk", "Rebels in Sviatopolk's region count as your troops for purposes of rule. If you defeat a rebel in that region, replace it with one of your troops.");
-        this.addLeader("Yaroslav", "", "In Yaroslav's region, you win ties for rule and your opponents lose the abilities of their structures.");
+        this.addLeader("Yaroslav", "In Yaroslav's region, you win ties for rule and your opponents lose the abilities of their structures.");
         this.addLeader("Mstislav", "In Mstislav's region, it only costs you one tax point to tax or one build point to build, regardless of who rules that region.");
         this.addLeader("Gleb", "", "Once per round, when you attack in Gleb's region with no casualty, gain two movement points to use with any of your troops located in his region (including Gleb).");
         this.addLeader("Theofana", "", "Once per round, when you tax in Theofana's region, you may move her to an adjacent region or gain one coin from the supply. If you use this ability, you cannot tax again this turn.");

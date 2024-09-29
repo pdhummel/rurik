@@ -127,6 +127,7 @@ function refreshPlayer() {
   function refreshPlayerBoatAndSupply(response) {
     console.log("refreshPlayerBoatAndSupply(): " + JSON.stringify(response.data));
     var color = response.data.color;
+    setInnerHtml("boatLeaderText", "<i>" + response.data.leader.description + "</i>");
     var goodsOnDock = response.data["boat"]["goodsOnDock"];
     setInnerHtml("dockStone", goodsOnDock["stone"]);
     setInnerHtml("dockWood", goodsOnDock["wood"]);
