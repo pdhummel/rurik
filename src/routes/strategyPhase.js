@@ -32,6 +32,7 @@ app.get('/game/:id/auction', (req, res) => {
       game.playAdvisor(color, action, advisor, coins);
     } catch(error) {
       console.log(error.message);
+      console.log(error.stack);
       res.status(400).send({ "error": error.message});
       return;
     }   

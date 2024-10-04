@@ -192,6 +192,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     try {
       console.log("/game/:id/advisorRetrieve/:action: " + color + " " + advisor + " " + action + " " + " " + row + " " + 
           forfeitActionYN + " " + forfeitAction);
+      game.beginPlayerAction();
       game.takeMainAction(color, advisor, action, row, forfeitAction)
     } catch(error) {
       console.log(error.message);
@@ -201,6 +202,7 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     res.send(game.auctionBoard);
   });
   
+  // end turn
   app.delete('/game/:id/player/:color/turn', (req, res) => {
     console.log("delete " + req.path + " " + JSON.stringify(req.params));
     var game = games.getGameById(req.params.id);
@@ -217,8 +219,27 @@ app.get('/game/:id/player/:color/nextAdvisor', (req, res) => {
     }    
     res.send(gameStatus);
   });
+
   
+  // undo
+  app.delete('/game/:id/player/:color/undoTurn', (req, res) => {
+    console.log("delete " + req.path + " " + JSON.stringify(req.params));
+    var game = games.getGameById(req.params.id);
+    if (game === undefined) {
+      res.status(404).send({"error": "Game not found"});
+      return;
+    }
+    var color = req.params.color;
+    game.undoPlayerAction();
+    var gameStatus = games.getGameStatus(req.params.id, color);
+    if (gameStatus === undefined || gameStatus == null) {
+      res.status(404).send({"error": "Game not found"});
+      return;
+    }    
+    res.send(gameStatus);
+  });
   
+
   // http://localhost:3000/game/1713819462226/player/blue/turn
   app.put('/game/:id/player/:color/turn', (req, res) => {
     console.log("put " + req.path + " " + JSON.stringify(req.params) + " " + JSON.stringify(req.body));

@@ -53,8 +53,8 @@ class Entry {
     constructor(text, game) {
         this.timeStamp = Date.now();
         this.text = text;
-        this.gameId = game.id;
         if (game != undefined && game != null) {
+            this.gameId = game.id;
             this.round = game.currentRound;
             var player = game.players.getCurrentPlayer();
             this.player = player.color;

@@ -260,6 +260,10 @@ function getNextAdvisor() {
         actionPhaseActionValue == "accomplishDeedAction") {
       beginAction(gameId, color, actionPhaseActionValue);
     }
+    if (actionPhaseActionValue == "undoTurnAction") {
+      undoTurn(gameId, color);
+    }
+
     if (actionPhaseActionValue == "endTurnAction") {
       endTurn(gameId, color);
     }
@@ -271,7 +275,12 @@ function getNextAdvisor() {
     console.log("endTurnResponseHandler(): " + JSON.stringify(response.data));
     refreshGameStatus();
   }
-  
+
+  function undoTurn(gameId, color) {
+    callApi('/game/' + gameId + '/player/' + color + '/undoTurn', "delete", "", endTurnResponseHandler);
+  }
+
+
   function beginAction(gameId, color, action) {
     console.log("beginAction(): " + gameId + " " + color + " " + action);
     var data = '{ "action": "' + action + '" }';

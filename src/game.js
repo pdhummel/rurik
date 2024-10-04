@@ -15,6 +15,7 @@ class Games {
     constructor() {
         this.games = {};
         this.gameSummaries = {};
+        this.undoGames = {};
     }
 
     static getInstance() {
@@ -258,9 +259,33 @@ class Game {
         this.aiEvaluateGame();
     }
 
+    beginPlayerAction() {
+        var games = Games.getInstance();
+        var undoGame = games.undoGames[this.id];
+        if (undoGame != undefined && undoGame != null) {
+            if (undoGame.players.getCurrentPlayer().color == this.players.getCurrentPlayer().color) {
+                return;
+            }
+        }
+        games.undoGames[this.id] = lodash.cloneDeep(this);
+    }
+
+    undoPlayerAction() {
+        console.log("undoPlayerAction(): enter");
+        var games = Games.getInstance();
+        var undoGame = games.undoGames[this.id];
+        if (undoGame != undefined && undoGame != null) {
+            games.games[this.id] = undoGame;
+            games.undoGames[this.id] = null;
+            console.log("undoPlayerAction(): complete");
+        } else {
+            console.log("undoPlayerAction(): skipped");
+        }
+    }
+
     // retrieve advisor, rows=1-4
     takeMainAction(color, advisor, actionColumnName, row, forfeitAction=false) {
-        console.log("takeMainAction(): ", color, "advisor=" + advisor, actionColumnName, "row(1-4)=" + row, forfeitAction);
+        console.log("takeMainAction(): ", color, "advisor=" + advisor, actionColumnName, "row(1-4)=" + row, forfeitAction);        
         this.validateGameStatus("retrieveAdvisor", "takeMainAction");
         var currentPlayer = this.validateCurrentPlayer(color, "takeMainAction");
         if (currentPlayer.tookMainActionForTurn == true) {
@@ -392,7 +417,8 @@ class Game {
         if (currentPlayer.schemeCardsToDraw < 1) {
             this.throwError("You don't have any scheme cards to draw.", "drawSchemeCards");
         }
-
+        var games = Games.getInstance();
+        games.undoGames[this.id] = null;
         currentPlayer.canKeepSchemeCard = true;
         this.log.info(color + " is drawing " + currentPlayer.schemeCardsToDraw + " scheme cards from scheme deck " + schemeDeck);
         if (currentPlayer.schemeCardsToDraw == 1) {
@@ -747,7 +773,8 @@ class Game {
         if ((location.troopsByColor[color] < 1 && location.leaderByColor[color] < 1)) {
             throw new Error("You do not have troops in " + locationName + ".", "attack()");
         }
-
+        var games = Games.getInstance();
+        games.undoGames[this.id] = null;
         if (target == "rebel") {
             if (location.rebels.length > 0) {
                 var reward = location.rebels.shift();
