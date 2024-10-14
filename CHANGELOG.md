@@ -1,5 +1,9 @@
 # Rurik Changelog
 
+## 2024-10-13 - v0.5.3.1 - bug fixes
+* Bug fixes for accomplishing deeds (mStatement, currentPlayer)
+
+
 ## 2024-10-03 - v0.5.3.0 - undo action
 * Undo actions for a turn.
 * Fix bug with game log.

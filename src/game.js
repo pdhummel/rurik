@@ -1215,7 +1215,7 @@ class Game {
                         this.throwError("You do not have " + claimStatement.claimPayResourceChoice + " on your dock.", "reedeemDeed");
                     }
                     player.boat.goodsOnDock[claimStatement.claimPayResourceChoice]--;
-                    this.log.info(player.color + " paid " + mStatement.claimPayResourceChoice + " for deed, " + deedCard.name);
+                    this.log.info(player.color + " paid " + claimStatement.claimPayResourceChoice + " for deed, " + deedCard.name);
                 } else if (claimStatement.claimPayChoice == "scheme card") {
                     if (player.schemeCards.length < 1) {
                         this.throwError("You do not have a scheme card");
@@ -1224,6 +1224,7 @@ class Game {
                     this.cards.discardedSchemeCards.push(schemeCard);
                     // remove the scheme card
                     var playerSchemeCards = [];
+                    var currentPlayer = player;
                     for (var i=0; i < currentPlayer.schemeCards.length; i++) {
                         var playerSchemeCard = currentPlayer.schemeCards[i];
                         if (playerSchemeCard.id != schemeCard.id) {
